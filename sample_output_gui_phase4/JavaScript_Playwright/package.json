@@ -1,0 +1,11 @@
+{
+  "name": "playwright-js-automation",
+  "version": "1.0.0",
+  "description": "Corporate JavaScript Playwright Automation Suite",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0"
+  }
+}

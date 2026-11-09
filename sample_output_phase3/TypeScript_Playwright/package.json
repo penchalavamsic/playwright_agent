@@ -1,0 +1,13 @@
+{
+  "name": "playwright-ts-automation",
+  "version": "1.0.0",
+  "description": "Corporate TypeScript Playwright Automation Suite",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}

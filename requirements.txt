@@ -1,0 +1,14 @@
+# ---------------------------------------------------------------------------
+# Offline Playwright Framework Generator - Phase 1 dependencies
+# NOTE: No LLM / cloud SDKs are permitted in this project.
+# Browsers: the agent uses the machine's installed Chrome/Edge via
+# `channel="chrome"` / `channel="msedge"`; `playwright install` is NOT required
+# unless you want the bundled-Chromium fallback.
+# ---------------------------------------------------------------------------
+playwright>=1.49.0      # >=1.49 required for Locator.aria_snapshot()
+langgraph>=0.2.0        # deterministic state-graph orchestration (no LLM nodes)
+jinja2>=3.1.0           # multi-language framework code templates
+customtkinter>=5.2.0    # Windows desktop UI
+pydantic>=2.6.0         # typed data models
+pyinstaller>=6.0.0      # standalone Windows .exe packaging
+
