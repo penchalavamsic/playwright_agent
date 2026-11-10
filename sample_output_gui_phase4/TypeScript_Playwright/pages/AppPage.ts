@@ -4,7 +4,7 @@ export class AppPage {
   readonly page: Page;
   readonly baseUrl: string;
 
-  constructor(page: Page, baseUrl: string = 'http://127.0.0.1:50992/') {
+  constructor(page: Page, baseUrl: string = 'http://127.0.0.1:55998/') {
     this.page = page;
     this.baseUrl = baseUrl;
   }

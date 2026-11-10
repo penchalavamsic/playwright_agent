@@ -7,7 +7,7 @@ export default defineConfig({
     timeout: 5000,
   },
   use: {
-    baseURL: 'http://127.0.0.1:54697/',
+    baseURL: 'http://127.0.0.1:50751/',
     headless: true,
     ignoreHTTPSErrors: true,
     channel: 'chrome',

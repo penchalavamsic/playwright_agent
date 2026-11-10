@@ -17,7 +17,7 @@ class TestAutomationSuite:
     @pytest.fixture(autouse=True)
     def setup(self, page: Page, base_url: str):
         self.page = page
-        self.app = AppPage(page, base_url=base_url or "http://127.0.0.1:50992/")
+        self.app = AppPage(page, base_url=base_url or "http://127.0.0.1:55998/")
         self.app.navigate()
 
     def test_tc01_primary_user_flow_and_api_verification(self):
@@ -50,10 +50,10 @@ class TestAutomationSuite:
     def test_tc03_api_contract_matrix(self):
         """TC-03: Backend API Health and Expected Status Codes."""
         api_endpoints = [
-            ("http://127.0.0.1:50992/api/user", 200),
-            ("http://127.0.0.1:50992/api/feature-flags", 401),
-            ("http://127.0.0.1:50992/api/legacy-endpoint", 404),
-            ("http://127.0.0.1:50992/api/admin/settings", 403),
-            ("http://127.0.0.1:50992/api/validate", 400),
+            ("http://127.0.0.1:55998/api/validate", 400),
+            ("http://127.0.0.1:55998/api/user", 200),
+            ("http://127.0.0.1:55998/api/feature-flags", 401),
+            ("http://127.0.0.1:55998/api/legacy-endpoint", 404),
+            ("http://127.0.0.1:55998/api/admin/settings", 403),
         ]
         assert len(api_endpoints) > 0, "Telemetry captured backend endpoints"

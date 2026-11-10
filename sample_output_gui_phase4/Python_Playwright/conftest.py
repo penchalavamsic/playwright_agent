@@ -6,7 +6,7 @@ from playwright.sync_api import Browser, BrowserContext, Page, Playwright
 
 @pytest.fixture(scope="session")
 def base_url() -> str:
-    return "http://127.0.0.1:50992/"
+    return "http://127.0.0.1:55998/"
 
 
 @pytest.fixture(scope="session")

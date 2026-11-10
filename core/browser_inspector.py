@@ -40,8 +40,8 @@ ProgressCallback = Callable[[str, float, str], Union[None, Awaitable[None]]]
 # Constants
 # ---------------------------------------------------------------------------
 
-#: Browser channels tried in order. ``None`` == Playwright's bundled Chromium.
-DEFAULT_CHANNELS: Tuple[Optional[str], ...] = ("chrome", "msedge", None)
+#: Browser channels tried in order. Prioritize "msedge" then "chrome" then bundled Chromium.
+DEFAULT_CHANNELS: Tuple[Optional[str], ...] = ("msedge", "chrome", None)
 
 INTERACTIVE_SELECTOR = ", ".join(
     [

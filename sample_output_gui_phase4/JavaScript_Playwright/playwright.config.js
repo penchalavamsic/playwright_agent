@@ -7,7 +7,7 @@ module.exports = defineConfig({
     timeout: 5000,
   },
   use: {
-    baseURL: 'http://127.0.0.1:50992/',
+    baseURL: 'http://127.0.0.1:55998/',
     headless: true,
     ignoreHTTPSErrors: true,
     channel: 'chrome',

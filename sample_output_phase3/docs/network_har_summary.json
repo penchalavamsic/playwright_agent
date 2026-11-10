@@ -1,44 +1,6 @@
 [
   {
-    "url": "http://127.0.0.1:54697/api/user",
-    "method": "GET",
-    "resource_type": "fetch",
-    "status_code": 200,
-    "request_payload_keys": [],
-    "response_keys": [
-      "id",
-      "name",
-      "roles",
-      "email"
-    ],
-    "triggered_by_action": "page_load"
-  },
-  {
-    "url": "http://127.0.0.1:54697/api/feature-flags",
-    "method": "GET",
-    "resource_type": "fetch",
-    "status_code": 401,
-    "request_payload_keys": [],
-    "response_keys": [
-      "error",
-      "code"
-    ],
-    "triggered_by_action": "page_load"
-  },
-  {
-    "url": "http://127.0.0.1:54697/api/admin/settings",
-    "method": "GET",
-    "resource_type": "fetch",
-    "status_code": 403,
-    "request_payload_keys": [],
-    "response_keys": [
-      "error",
-      "requiredRole"
-    ],
-    "triggered_by_action": "page_load"
-  },
-  {
-    "url": "http://127.0.0.1:54697/api/validate",
+    "url": "http://127.0.0.1:50751/api/validate",
     "method": "POST",
     "resource_type": "fetch",
     "status_code": 400,
@@ -53,7 +15,33 @@
     "triggered_by_action": "page_load"
   },
   {
-    "url": "http://127.0.0.1:54697/api/legacy-endpoint",
+    "url": "http://127.0.0.1:50751/api/user",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [
+      "id",
+      "name",
+      "roles",
+      "email"
+    ],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "http://127.0.0.1:50751/api/feature-flags",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 401,
+    "request_payload_keys": [],
+    "response_keys": [
+      "error",
+      "code"
+    ],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "http://127.0.0.1:50751/api/legacy-endpoint",
     "method": "GET",
     "resource_type": "fetch",
     "status_code": 404,
@@ -65,7 +53,19 @@
     "triggered_by_action": "page_load"
   },
   {
-    "url": "http://127.0.0.1:54697/api/config",
+    "url": "http://127.0.0.1:50751/api/admin/settings",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 403,
+    "request_payload_keys": [],
+    "response_keys": [
+      "error",
+      "requiredRole"
+    ],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "http://127.0.0.1:50751/api/config",
     "method": "GET",
     "resource_type": "xhr",
     "status_code": 200,
@@ -77,7 +77,7 @@
     "triggered_by_action": "page_load"
   },
   {
-    "url": "http://127.0.0.1:54697/api/preferences",
+    "url": "http://127.0.0.1:50751/api/preferences",
     "method": "PUT",
     "resource_type": "fetch",
     "status_code": 204,
@@ -89,7 +89,7 @@
     "triggered_by_action": "page_load"
   },
   {
-    "url": "http://127.0.0.1:54697/api/search?q=test",
+    "url": "http://127.0.0.1:50751/api/search?q=test",
     "method": "GET",
     "resource_type": "fetch",
     "status_code": 200,
@@ -102,7 +102,7 @@
     "triggered_by_action": "probe:search -> typed 'test' into searchbox 'Search'"
   },
   {
-    "url": "http://127.0.0.1:54697/api/search?q=test&submit=1",
+    "url": "http://127.0.0.1:50751/api/search?q=test&submit=1",
     "method": "GET",
     "resource_type": "fetch",
     "status_code": 200,
@@ -115,7 +115,7 @@
     "triggered_by_action": "probe:search -> typed 'test' into searchbox 'Search'"
   },
   {
-    "url": "http://127.0.0.1:54697/api/dashboard",
+    "url": "http://127.0.0.1:50751/api/dashboard",
     "method": "GET",
     "resource_type": "fetch",
     "status_code": 200,
@@ -128,7 +128,7 @@
     "triggered_by_action": "probe:click tab 'Dashboard'"
   },
   {
-    "url": "http://127.0.0.1:54697/api/events",
+    "url": "http://127.0.0.1:50751/api/events",
     "method": "POST",
     "resource_type": "fetch",
     "status_code": 201,

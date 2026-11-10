@@ -1,5 +1,5 @@
 ---
-test_id: "TP-IEEE829-1794293603"
+test_id: "TP-IEEE829-1794298091"
 title: "To verify the functionality of "Acme" → "Primary Navigation" → "Search" → "Input 'search' and Submit""
 module: "Acme"
 page: "Acme QA Portal"
@@ -17,7 +17,7 @@ environment_variables:
   - "LIMAS_BASE_URL"
   - "TEST_ACCESS_PROFILE"
 test_data:
-  target_url: "http://127.0.0.1:54697/"
+  target_url: "http://127.0.0.1:50751/"
   flow_prompt: "Create automation script for the dashboard, search API, click button and verify whether it succeeded with 200 or 201 status code"
 related_script: "tests/test_automation_suite.py"
 ---
@@ -28,7 +28,7 @@ Verify the end-to-end functionality and backend API status code contracts for Ac
 
 # Preconditions
 
-- `${LIMAS_BASE_URL}` is reachable (configured for target: `http://127.0.0.1:54697/`).
+- `${LIMAS_BASE_URL}` is reachable (configured for target: `http://127.0.0.1:50751/`).
 - Credentials for `${TEST_ACCESS_PROFILE}` are configured.
 - The required role and test data are available.
 - The starting page is accessible without security blockades.
@@ -36,14 +36,14 @@ Verify the end-to-end functionality and backend API status code contracts for Ac
 # Test Data
 
 Use environment variables, runtime fixtures, or configuration keys:
-- `${LIMAS_BASE_URL}`: `http://127.0.0.1:54697/`
+- `${LIMAS_BASE_URL}`: `http://127.0.0.1:50751/`
 - Access Profile: `ADMIN`
 - Target Locators: Prioritized Playwright locators (`data-testid` &rarr; `id` &rarr; `role+name`).
 
 # Steps and Expected Results
 
-1. Action: NAVIGATE on Browser Context with value 'http://127.0.0.1:54697/' using locator `page.goto('http://127.0.0.1:54697/')`.
-   Expected Result: Navigate to application URL: http://127.0.0.1:54697/. Successfully interact without DOM ambiguity. Expected status: [200].
+1. Action: NAVIGATE on Browser Context with value 'http://127.0.0.1:50751/' using locator `page.goto('http://127.0.0.1:50751/')`.
+   Expected Result: Navigate to application URL: http://127.0.0.1:50751/. Successfully interact without DOM ambiguity. Expected status: [200].
 
 2. Action: VERIFY_UI on Dashboard using locator `page.get_by_role("tab", name="Dashboard", exact=True)`.
    Expected Result: Verify visibility and readiness of UI component 'Dashboard'. Successfully interact without DOM ambiguity.
@@ -60,8 +60,8 @@ Use environment variables, runtime fixtures, or configuration keys:
 6. Action: VERIFY_API on Network Event Listener.
    Expected Result: Verify backend API response status ([200, 201]) for endpoint '/api/user'. Successfully interact without DOM ambiguity. Expected status: [200, 201].
 
-7. Action: NAVIGATE on Page with value 'http://127.0.0.1:54697/' using locator `page.goto('http://127.0.0.1:54697/')`.
-   Expected Result: Open target URL: http://127.0.0.1:54697/. Successfully interact without DOM ambiguity. Expected status: [200].
+7. Action: NAVIGATE on Page with value 'http://127.0.0.1:50751/' using locator `page.goto('http://127.0.0.1:50751/')`.
+   Expected Result: Open target URL: http://127.0.0.1:50751/. Successfully interact without DOM ambiguity. Expected status: [200].
 
 8. Action: VERIFY_UI on Document Title with value 'Acme QA Portal' using locator `expect(page).to_have_title(...)`.
    Expected Result: Verify Page Title equals or contains 'Acme QA Portal'. Successfully interact without DOM ambiguity.
@@ -80,7 +80,7 @@ Use environment variables, runtime fixtures, or configuration keys:
 
 # Network Verification
 
-- Request URL: `http://127.0.0.1:54697/api/user`
+- Request URL: `http://127.0.0.1:50751/api/user`
 - HTTP Method: `GET`
 - Expected Status: `[200, 201]`
 - Payload Presence: Yes (JSON keys: id, name, roles, email)
@@ -90,11 +90,11 @@ Use environment variables, runtime fixtures, or configuration keys:
 
 | Method | Endpoint Path | Observed Status | Target Assertion Status | Response Payload Keys | Triggered By Action |
 | :--- | :--- | :--- | :--- | :--- | :--- |
+| `POST` | `/api/validate` | `400` | `400` | `error, fields` | page_load |
 | `GET` | `/api/user` | `200` | `200, 201` | `id, name, roles, email` | page_load |
 | `GET` | `/api/feature-flags` | `401` | `401` | `error, code` | page_load |
-| `GET` | `/api/admin/settings` | `403` | `403` | `error, requiredRole` | page_load |
-| `POST` | `/api/validate` | `400` | `400` | `error, fields` | page_load |
 | `GET` | `/api/legacy-endpoint` | `404` | `404` | `error, path` | page_load |
+| `GET` | `/api/admin/settings` | `403` | `403` | `error, requiredRole` | page_load |
 | `GET` | `/api/config` | `200` | `200, 201` | `key, value` | page_load |
 | `PUT` | `/api/preferences` | `204` | `204` | `[]` | page_load |
 | `GET` | `/api/search` | `200` | `200, 201` | `query, results, total` | probe:search -> typed 'test' into searchbox 'Search' |
