@@ -1,0 +1,1062 @@
+[
+  {
+    "url": "https://googleads.g.doubleclick.net/pagead/id",
+    "method": "GET",
+    "resource_type": "xhr",
+    "status_code": 302,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://googleads.g.doubleclick.net/pagead/id?slf_rd=1",
+    "method": "GET",
+    "resource_type": "xhr",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://www.youtube.com/youtubei/v1/guide?prettyPrint=false",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [
+      "responseContext",
+      "items",
+      "trackingParams"
+    ],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://www.youtube.com/youtubei/v1/feedback?prettyPrint=false",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [
+      "responseContext",
+      "feedbackResponses"
+    ],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://youtube.com/",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 301,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://www.youtube.com/",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 0,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://rr4---sn-q4flrnel.googlevideo.com/videoplayback?expire=5948628505&ei=rntGmwOirLGxxP53s4M0Kx4&ip=42.33.52.16&id=o-AFIhS9v5AmytatTtGwnc5yTiIMKo1L0rCFE84ImauDRzX&itag=18&source=youtube&requiressl=yes&mh=X6&mm=059%2C88346%2C82045&mn=QrNZE%2C3xHnO%2CBxG30&ms=QrNZE%2C3xHnO%2CBxG30&mv=S&mvi=5&pl=96&ctier=L&initcwndbps=8598955&siu=5&spc=kauVNPXADUxgikNAVH-i1Hfj8g8_a2LNB9U9atX2CnIb&vprv=5&svpuc=5&mime=video%2Fmp4&ns=Sxi4UelL1eDyDik1L0A3XHfb&cnr=96&ratebypass=yes&dur=21779848&lmt=0273364812730273&mt=5948628505&fvip=3&c=WEB&txp=8598955&n=lX4fCi6al6WXAw68&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cctier%2Csiu%2Cspc%2Cvprv%2Csvpuc%2Cmime%2Cns%2Ccnr%2Cratebypass%2Cdur%2Clmt&sig=6A53TFLJOBPzOLFDDYjWQqNTvEuE1sxrGmawK6P8mKXozMtenloegN1Grt_nI5pa-QDLyUub2k3USFVfwe_ArP-fCUOm6vkDFrRb1bvDvy6K&lsparams=mh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpl%2Cinitcwndbps&lsig=6A53TFLJOBPzOLFDDYjWQqNTvEuE1sxrGmawK6P8mKXozMtenloegN1Grt_nI5pa-QDLyUub2k3USFVfwe_ArP-fCUOm6vkDFrRb1bvDvy6K",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 403,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://rr4---sn-q4flrnel.googlevideo.com/videoplayback?expire=5948628505&ei=rntGmwOirLGxxP53s4M0Kx4&ip=42.33.52.16&id=o-AFIhS9v5AmytatTtGwnc5yTiIMKo1L0rCFE84ImauDRzX&itag=18&source=youtube&requiressl=yes&mh=X6&mm=059%2C88346%2C82045&mn=QrNZE%2C3xHnO%2CBxG30&ms=QrNZE%2C3xHnO%2CBxG30&mv=S&mvi=5&pl=96&initcwndbps=8598955&siu=5&spc=kauVNPXADUxgikNAVH-i1Hfj8g8_a2LNB9U9atX2CnIb&vprv=5&svpuc=5&mime=video%2Fmp4&ns=Sxi4UelL1eDyDik1L0A3XHfb&cnr=96&ratebypass=yes&dur=21779848&lmt=0273364812730273&mt=5948628505&fvip=3&c=WEB&txp=8598955&n=lX4fCi6al6WXAw68&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Csiu%2Cspc%2Cvprv%2Csvpuc%2Cmime%2Cns%2Ccnr%2Cratebypass%2Cdur%2Clmt&sig=6A53TFLJOBPzOLFDDYjWQqNTvEuE1sxrGmawK6P8mKXozMtenloegN1Grt_nI5pa-QDLyUub2k3USFVfwe_ArP-fCUOm6vkDFrRb1bvDvy6K&lsparams=mh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpl%2Cinitcwndbps&lsig=6A53TFLJOBPzOLFDDYjWQqNTvEuE1sxrGmawK6P8mKXozMtenloegN1Grt_nI5pa-QDLyUub2k3USFVfwe_ArP-fCUOm6vkDFrRb1bvDvy6K",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 403,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/search/v16/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://rr4---sn-q4flrnel.googlevideo.com/videoplayback?expire=5948628505&ei=rntGmwOirLGxxP53s4M0Kx4&ip=42.33.52.16&id=o-AFIhS9v5AmytatTtGwnc5yTiIMKo1L0rCFE84ImauDRzX&itag=18&source=youtube&requiressl=yes&mh=X6&mm=059%2C88346%2C82045&mn=QrNZE%2C3xHnO%2CBxG30&ms=QrNZE%2C3xHnO%2CBxG30&mv=S&mvi=5&pl=96&ctier=L&initcwndbps=8598955&siu=5&spc=kauVNPXADUxgikNAVH-i1Hfj8g8_a2LNB9U9atX2CnIb&vprv=5&svpuc=5&mime=video%2Fmp4&ns=Sxi4UelL1eDyDik1L0A3XHfb&cnr=96&ratebypass=yes&dur=21779848&lmt=0273364812730273&mt=5948628505&fvip=3&c=WEB&txp=8598955&n=lX4fCi6al6WXAw68&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cctier%2Csiu%2Cspc%2Cvprv%2Csvpuc%2Cmime%2Cns%2Ccnr%2Cratebypass%2Cdur%2Clmt&sig=6A53TFLJOBPzOLFDDYjWQqNTvEuE1sxrGmawK6P8mKXozMtenloegN1Grt_nI5pa-QDLyUub2k3USFVfwe_ArP-fCUOm6vkDFrRb1bvDvy6K&lsparams=mh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpl%2Cinitcwndbps&lsig=6A53TFLJOBPzOLFDDYjWQqNTvEuE1sxrGmawK6P8mKXozMtenloegN1Grt_nI5pa-QDLyUub2k3USFVfwe_ArP-fCUOm6vkDFrRb1bvDvy6K",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 0,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://rr4---sn-q4flrnel.googlevideo.com/videoplayback?expire=5948628505&ei=rntGmwOirLGxxP53s4M0Kx4&ip=42.33.52.16&id=o-AFIhS9v5AmytatTtGwnc5yTiIMKo1L0rCFE84ImauDRzX&itag=18&source=youtube&requiressl=yes&mh=X6&mm=059%2C88346%2C82045&mn=QrNZE%2C3xHnO%2CBxG30&ms=QrNZE%2C3xHnO%2CBxG30&mv=S&mvi=5&pl=96&initcwndbps=8598955&siu=5&spc=kauVNPXADUxgikNAVH-i1Hfj8g8_a2LNB9U9atX2CnIb&vprv=5&svpuc=5&mime=video%2Fmp4&ns=Sxi4UelL1eDyDik1L0A3XHfb&cnr=96&ratebypass=yes&dur=21779848&lmt=0273364812730273&mt=5948628505&fvip=3&c=WEB&txp=8598955&n=lX4fCi6al6WXAw68&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Csiu%2Cspc%2Cvprv%2Csvpuc%2Cmime%2Cns%2Ccnr%2Cratebypass%2Cdur%2Clmt&sig=6A53TFLJOBPzOLFDDYjWQqNTvEuE1sxrGmawK6P8mKXozMtenloegN1Grt_nI5pa-QDLyUub2k3USFVfwe_ArP-fCUOm6vkDFrRb1bvDvy6K&lsparams=mh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpl%2Cinitcwndbps&lsig=6A53TFLJOBPzOLFDDYjWQqNTvEuE1sxrGmawK6P8mKXozMtenloegN1Grt_nI5pa-QDLyUub2k3USFVfwe_ArP-fCUOm6vkDFrRb1bvDvy6K",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 0,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/menu/v1/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/chevron_down/v10/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/overflow_vertical/v14/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/person_circle/v10/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/mic/v15/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_fill_experimental/home/v11/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/shorts/v3/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/subscriptions/v12/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/audio/v15/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/history/v2/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/live/v3/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/chevron_up/v10/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://www.youtube.com/api/jnn/v1/GenerateIT",
+    "method": "POST",
+    "resource_type": "xhr",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/clapperboard/v3/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/flag/v11/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/x/v11/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/location_pin/v3/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://www.gstatic.com/youtube/img/icons/web/youtube_fill/youtube_round/v2/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://www.gstatic.com/youtube/img/icons/web/youtube_outline/refresh/v1/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://www.gstatic.com/youtube/img/icons/web/youtube_fill/yt-logo-updated/v3/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://www.gstatic.com/youtube/img/icons/web/youtube_fill/youtube_music/v2/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://www.gstatic.com/youtube/img/icons/web/youtube_fill/youtube_kids_round/v2/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://www.gstatic.com/youtube/img/icons/web/youtube_fill/youtube_labs_red_logo/v3/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/add_circle/v7/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_fill_experimental/add_circle/v7/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/alert_bubble/v3/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://www.gstatic.com/youtube/img/icons/web/youtube_fill/creator_studio_red_logo/v2/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://www.gstatic.com/youtube/img/icons/web/youtube_fill/offline_no_content/v1/192px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://www.gstatic.com/youtube/img/icons/web/youtube_fill/unplugged_logo/v2/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://www.gstatic.com/youtube/img/icons/web/youtube_outline/waveform/v1/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_fill_experimental/bell/v12/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/bag/v7/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_fill_experimental/bag/v7/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_fill_experimental/audio/v15/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_fill_experimental/share/v13/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/share/v13/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_fill_experimental/text_bubble/v4/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/arrow_up/v3/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_fill_experimental/pause/v9/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/play/v4/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_fill_experimental/play/v4/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_fill_experimental/youtube_shorts/v11/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/video/v3/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/arrow_down/v3/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_fill_experimental/trash_can/v11/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/youtube_shorts/v11/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_fill_experimental/video/v3/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/trophy/v3/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/video_camera_add/v2/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/thumb_up/v24/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_fill_experimental/trophy/v3/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/trending/v2/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_fill_experimental/trending/v2/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/trash_can/v11/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_fill_experimental/thumb_up/v24/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_fill_experimental/search/v16/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_fill_experimental/podcast/v6/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/podcast/v6/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/play_square_stack/v1/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_fill_experimental/play_square_stack/v1/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/news/v3/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_fill_experimental/lightbulb/v4/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/lightbulb/v4/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_fill_experimental/mic/v15/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/home/v11/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/gear/v10/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/help_circle/v2/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/gaming/v3/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/fashion/v4/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_fill_experimental/gaming/v3/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_fill_experimental/flag/v11/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/download/v11/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_fill_experimental/fashion/v4/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_fill_experimental/clapperboard/v3/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/copy/v3/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/clock/v10/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_fill_experimental/clock/v10/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/bell/v12/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/text_bubble/v4/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/playlist/v5/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/overflow_horizontal/v6/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/thumb_down/v25/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_fill_experimental/subscriptions/v12/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_fill_experimental/gear/v10/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_fill_experimental/news/v3/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_fill_experimental/volume_mute/v3/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_fill_experimental/thumb_down/v25/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/volume_mute/v3/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/volume_max/v3/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_fill_experimental/volume_max/v3/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://www.youtube.com/youtubei/v1/log_event?alt=json",
+    "method": "POST",
+    "resource_type": "xhr",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [
+      "responseContext"
+    ],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://www.youtube.com/complete/search?ds=yt&hl=en&gl=in&client=youtube&gs_ri=youtube&sugexp=ytotfrq_ta1_e29%2Cytpo.bo.so.fgf%3D1%2Cytpo.bo.so.fsf%3D29.65%2Cytpo.bo.so.fmb%3D5.0%2Cytposo.bo.so.fgf%3D1%2Cytposo.bo.so.fsf%3D35.0%2Cytposo.bo.so.fmb%3D5.0&h=180&w=320&ytvs=1&gs_id=0&q=&cp=0",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "probe:search -> typed 'Veera' into combobox 'Search'"
+  },
+  {
+    "url": "https://www.youtube.com/complete/search?ds=yt&hl=en&gl=in&client=youtube&gs_ri=youtube&sugexp=ytotfrq_ta1_e29%2Cytpo.bo.so.fgf%3D1%2Cytpo.bo.so.fsf%3D29.65%2Cytpo.bo.so.fmb%3D5.0%2Cytposo.bo.so.fgf%3D1%2Cytposo.bo.so.fsf%3D35.0%2Cytposo.bo.so.fmb%3D5.0&h=180&w=320&ytvs=1&gs_id=1&q=Veera&cp=5",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "probe:search -> typed 'Veera' into combobox 'Search'"
+  },
+  {
+    "url": "https://fonts.gstatic.com/s/i/youtube_outline_experimental/info_circle/v12/24px.svg",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "probe:search -> typed 'Veera' into combobox 'Search'"
+  },
+  {
+    "url": "https://www.youtube.com/complete/search?ds=yt&hl=en&gl=in&client=youtube&gs_ri=youtube&sugexp=ytotfrq_ta1_e29%2Cytpo.bo.so.fgf%3D1%2Cytpo.bo.so.fsf%3D29.65%2Cytpo.bo.so.fmb%3D5.0%2Cytposo.bo.so.fgf%3D1%2Cytposo.bo.so.fsf%3D35.0%2Cytposo.bo.so.fmb%3D5.0&h=180&w=320&ytvs=1&gs_id=2&q=Veera&cp=5&pq=Veera",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "probe:search -> typed 'Veera' into combobox 'Search'"
+  },
+  {
+    "url": "https://www.youtube.com/youtubei/v1/search?prettyPrint=false",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [
+      "responseContext",
+      "estimatedResults",
+      "contents",
+      "trackingParams",
+      "header",
+      "topbar",
+      "targetId",
+      "frameworkUpdates"
+    ],
+    "triggered_by_action": "probe:search -> typed 'Veera' into combobox 'Search'"
+  },
+  {
+    "url": "https://www.youtube.com/youtubei/v1/log_event?alt=json",
+    "method": "POST",
+    "resource_type": "xhr",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "restore_navigation"
+  },
+  {
+    "url": "https://googleads.g.doubleclick.net/pagead/id",
+    "method": "GET",
+    "resource_type": "xhr",
+    "status_code": 302,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "restore_navigation"
+  },
+  {
+    "url": "https://googleads.g.doubleclick.net/pagead/id?slf_rd=1",
+    "method": "GET",
+    "resource_type": "xhr",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "restore_navigation"
+  },
+  {
+    "url": "https://rr2---sn-q4fzen7r.googlevideo.com/videoplayback?expire=7969075741&ei=Y-va0KXPG47Jh6Y2t_F58I7&ip=3.67.83.10&id=o-AFGd0fu9eZplOQKQLpnsCgjSZbIimkP6zj3Y7hf2X96sj&itag=18&source=youtube&requiressl=yes&mh=X6&mm=731%2C19911%2C75001&mn=o3TjP%2CQ12c8%2CF2NSx&ms=o3TjP%2CQ12c8%2CF2NSx&mv=o&mvi=2&pl=20&initcwndbps=7691865&siu=2&spc=XXyE-I2ZDKv-5RJOnsSCGV1BzgO4Kl-watS9E1e7Uqu8&vprv=2&svpuc=2&mime=video%2Fmp4&ns=BzDZ6AvADy1zCGGCplm8nDQD&cnr=20&ratebypass=yes&dur=58526190&lmt=1638883999811991&mt=7969075741&fvip=3&c=WEB&txp=7691865&n=WORreIiLJtU6_38f&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Csiu%2Cspc%2Cvprv%2Csvpuc%2Cmime%2Cns%2Ccnr%2Cratebypass%2Cdur%2Clmt&sig=ggnE-0ubEKa1LqlsXtheuco6LLE-Yf7WQDCUtYlRTLxIwglrgFD445CPtEfWQ_Jc1lVZb5qK-4zzNUMfj2V0klGg6LzQaPnz5JtL4xbDLCH8&lsparams=mh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpl%2Cinitcwndbps&lsig=ggnE-0ubEKa1LqlsXtheuco6LLE-Yf7WQDCUtYlRTLxIwglrgFD445CPtEfWQ_Jc1lVZb5qK-4zzNUMfj2V0klGg6LzQaPnz5JtL4xbDLCH8",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 0,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "restore_navigation"
+  },
+  {
+    "url": "https://rr2---sn-q4fzen7r.googlevideo.com/videoplayback?expire=7969075741&ei=Y-va0KXPG47Jh6Y2t_F58I7&ip=3.67.83.10&id=o-AFGd0fu9eZplOQKQLpnsCgjSZbIimkP6zj3Y7hf2X96sj&itag=18&source=youtube&requiressl=yes&mh=X6&mm=731%2C19911%2C75001&mn=o3TjP%2CQ12c8%2CF2NSx&ms=o3TjP%2CQ12c8%2CF2NSx&mv=o&mvi=2&pl=20&ctier=L&initcwndbps=7691865&siu=2&spc=XXyE-I2ZDKv-5RJOnsSCGV1BzgO4Kl-watS9E1e7Uqu8&vprv=2&svpuc=2&mime=video%2Fmp4&ns=BzDZ6AvADy1zCGGCplm8nDQD&cnr=20&ratebypass=yes&dur=58526190&lmt=1638883999811991&mt=7969075741&fvip=3&c=WEB&txp=7691865&n=WORreIiLJtU6_38f&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cctier%2Csiu%2Cspc%2Cvprv%2Csvpuc%2Cmime%2Cns%2Ccnr%2Cratebypass%2Cdur%2Clmt&sig=ggnE-0ubEKa1LqlsXtheuco6LLE-Yf7WQDCUtYlRTLxIwglrgFD445CPtEfWQ_Jc1lVZb5qK-4zzNUMfj2V0klGg6LzQaPnz5JtL4xbDLCH8&lsparams=mh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpl%2Cinitcwndbps&lsig=ggnE-0ubEKa1LqlsXtheuco6LLE-Yf7WQDCUtYlRTLxIwglrgFD445CPtEfWQ_Jc1lVZb5qK-4zzNUMfj2V0klGg6LzQaPnz5JtL4xbDLCH8",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 0,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "restore_navigation"
+  },
+  {
+    "url": "https://www.youtube.com/youtubei/v1/guide?prettyPrint=false",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [
+      "responseContext",
+      "items",
+      "trackingParams"
+    ],
+    "triggered_by_action": "restore_navigation"
+  },
+  {
+    "url": "https://www.youtube.com/youtubei/v1/feedback?prettyPrint=false",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [
+      "responseContext",
+      "feedbackResponses"
+    ],
+    "triggered_by_action": "restore_navigation"
+  },
+  {
+    "url": "https://www.youtube.com/api/jnn/v1/GenerateIT",
+    "method": "POST",
+    "resource_type": "xhr",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "restore_navigation"
+  }
+]

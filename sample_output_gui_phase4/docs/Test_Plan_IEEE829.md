@@ -1,46 +1,151 @@
-# IEEE 829 CORPORATE TEST PLAN & AUTOMATION SPECIFICATION
+---
+test_id: "TP-IEEE829-1794294642"
+title: "To verify the functionality of "Acme" → "Primary Navigation" → "Search" → "Input 'search' and Submit""
+module: "Acme"
+page: "Acme QA Portal"
+section: "Primary Navigation"
+control: "Search"
+action: "Input 'search' and Submit"
+access_profile: "ADMIN"
+priority: "High"
+classification: "Read-only"
+test_type: "Automated End-to-End & API Contract"
+automation_candidate: true
+plan_status: "approved"
+script_status: "generated"
+environment_variables:
+  - "LIMAS_BASE_URL"
+  - "TEST_ACCESS_PROFILE"
+test_data:
+  target_url: "http://127.0.0.1:50992/"
+  flow_prompt: "Create automation script for the dashboard, search API, click button and verify whether it succeeded with 200 or 201 status code"
+related_script: "tests/test_automation_suite.py"
+---
 
-**Document Reference**: `TP-IEEE829-AUTOGEN-1794246544`  
-**Standard**: IEEE 829-2008 Standard for Software and System Test Documentation  
-**Generated On**: `2026-11-09 17:49:04 UTC`  
-**Host Target**: `127.0.0.1:59064`  
-**Target URL**: `http://127.0.0.1:59064/`  
-**Page Title**: `Acme QA Portal`  
-**Automation Engine**: 100% Offline Zero-API Playwright Desktop Agent  
+# Purpose
+
+Verify the end-to-end functionality and backend API status code contracts for Acme (Acme QA Portal) when executing the user flow: "Create automation script for the dashboard, search API, click button and verify whether it succeeded with 200 or 201 status code".
+
+# Preconditions
+
+- `${LIMAS_BASE_URL}` is reachable (configured for target: `http://127.0.0.1:50992/`).
+- Credentials for `${TEST_ACCESS_PROFILE}` are configured.
+- The required role and test data are available.
+- The starting page is accessible without security blockades.
+
+# Test Data
+
+Use environment variables, runtime fixtures, or configuration keys:
+- `${LIMAS_BASE_URL}`: `http://127.0.0.1:50992/`
+- Access Profile: `ADMIN`
+- Target Locators: Prioritized Playwright locators (`data-testid` &rarr; `id` &rarr; `role+name`).
+
+# Steps and Expected Results
+
+1. Action: NAVIGATE on Browser Context with value 'http://127.0.0.1:50992/' using locator `page.goto('http://127.0.0.1:50992/')`.
+   Expected Result: Navigate to application URL: http://127.0.0.1:50992/. Successfully interact without DOM ambiguity. Expected status: [200].
+
+2. Action: VERIFY_UI on Dashboard using locator `page.get_by_role("tab", name="Dashboard", exact=True)`.
+   Expected Result: Verify visibility and readiness of UI component 'Dashboard'. Successfully interact without DOM ambiguity.
+
+3. Action: SEARCH on Search with value 'search' using locator `page.locator("#global-search")`.
+   Expected Result: Search value 'search' into control 'Search'. Successfully interact without DOM ambiguity. Expected status: [200].
+
+4. Action: VERIFY_API on Network Event Listener.
+   Expected Result: Verify backend API response status ([200, 201]) for endpoint '/api/user'. Successfully interact without DOM ambiguity. Expected status: [200, 201].
+
+5. Action: CLICK on Go using locator `page.get_by_test_id("search-submit")`.
+   Expected Result: Click interactive component 'Go'. Successfully interact without DOM ambiguity.
+
+6. Action: VERIFY_API on Network Event Listener.
+   Expected Result: Verify backend API response status ([200, 201]) for endpoint '/api/user'. Successfully interact without DOM ambiguity. Expected status: [200, 201].
+
+7. Action: NAVIGATE on Page with value 'http://127.0.0.1:50992/' using locator `page.goto('http://127.0.0.1:50992/')`.
+   Expected Result: Open target URL: http://127.0.0.1:50992/. Successfully interact without DOM ambiguity. Expected status: [200].
+
+8. Action: VERIFY_UI on Document Title with value 'Acme QA Portal' using locator `expect(page).to_have_title(...)`.
+   Expected Result: Verify Page Title equals or contains 'Acme QA Portal'. Successfully interact without DOM ambiguity.
+
+9. Action: VERIFY_UI on Home using locator `page.get_by_role("link", name="Home", exact=True)`.
+   Expected Result: Verify visibility of core control 'Home' (a). Successfully interact without DOM ambiguity.
+
+10. Action: VERIFY_UI on Docs using locator `page.get_by_role("link", name="Docs", exact=True)`.
+   Expected Result: Verify visibility of core control 'Docs' (a). Successfully interact without DOM ambiguity.
+
+11. Action: VERIFY_UI on External using locator `page.get_by_role("link", name="External", exact=True)`.
+   Expected Result: Verify visibility of core control 'External' (a). Successfully interact without DOM ambiguity.
+
+12. Action: VERIFY_UI on Search using locator `page.locator("#global-search")`.
+   Expected Result: Verify visibility of core control 'Search' (input). Successfully interact without DOM ambiguity.
+
+# Network Verification
+
+- Request URL: `http://127.0.0.1:50992/api/user`
+- HTTP Method: `GET`
+- Expected Status: `[200, 201]`
+- Payload Presence: Yes (JSON keys: id, name, roles, email)
+- Visible UI Result: Core interactive elements update state and remain responsive.
+
+### Captured Network API & Status Code Verification Matrix
+
+| Method | Endpoint Path | Observed Status | Target Assertion Status | Response Payload Keys | Triggered By Action |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| `GET` | `/api/user` | `200` | `200, 201` | `id, name, roles, email` | page_load |
+| `GET` | `/api/feature-flags` | `401` | `401` | `error, code` | page_load |
+| `GET` | `/api/legacy-endpoint` | `404` | `404` | `error, path` | page_load |
+| `GET` | `/api/admin/settings` | `403` | `403` | `error, requiredRole` | page_load |
+| `POST` | `/api/validate` | `400` | `400` | `error, fields` | page_load |
+| `PUT` | `/api/preferences` | `204` | `204` | `[]` | page_load |
+| `GET` | `/api/config` | `200` | `200, 201` | `key, value` | page_load |
+| `GET` | `/api/search` | `200` | `200, 201` | `query, results, total` | probe:search -> typed 'test' into searchbox 'Search' |
+| `GET` | `/api/search` | `200` | `200, 201` | `query, results, total` | probe:search -> typed 'test' into searchbox 'Search' |
+| `GET` | `/api/dashboard` | `200` | `200, 201` | `widgets, updatedAt, owner` | probe:click tab 'Dashboard' |
+| `POST` | `/api/events` | `201` | `200, 201` | `eventId, status` | probe:click tab 'Dashboard' |
+
+# Expected Final Result
+
+One clear and independently verifiable result: The automation flow completes deterministically with 100% UI locator fidelity and all backend API calls return expected status codes (200, 201).
+
+# Classification
+
+- Read-only or Data-changing: Read-only (Non-destructive safe probes only)
+- Category: Positive, API, Functional E2E
+
+# Restrictions
+
+- Do not include credentials, tokens, cookies, authorization codes, or sensitive payloads.
+- Do not repeat data-changing submissions.
+- Do not manually navigate to simulate a successful result.
+- Do not use static environment-specific data.
+
+# Generation Status
+
+- Test script generation: Complete (Python, Java, TypeScript, JavaScript)
+- CI/CD execution: Ready
+- Healing: Ready
+
+# Dynamic Plan Rules
+
+1. Use only behavior verified through Playwright MCP.
+2. Verify one atomic behavior per plan.
+3. Do not hardcode application URLs.
+4. Do not hardcode usernames or passwords.
+5. Do not hardcode user names, emails, request IDs, license IDs, hardware IDs, dates, User Groups, Profiles, Roles, feature names, versions, or local paths.
+6. Use environment variables, access-profiles.json, runtime fixtures, or test-data configuration.
+7. Select exactly one access profile:
+   - SUPER_USER
+   - ADMIN
+   - SUPER_USER_ADMIN_USER
+8. Keep every plan shareable between environments and team members.
+9. CI/CD owns test execution.
+10. The Healer may propose test-only changes later but must not change expected LIMAS behavior.
+11. Plans must use this Jira-style title format:
+
+To verify the functionality of "<Module>" → "<Section>" → "<Control>" → "<Action>"
 
 ---
 
-## 1. Test Plan Identifier & Executive Summary
-
-### 1.1 Scope of Automation
-This deterministic Test Plan defines the automated validation requirements for **Acme QA Portal**.
-All interactive controls, live DOM hierarchy, and backend XHR/Fetch communication have been cataloged
-via non-destructive browser telemetry.
-
-- **Total Interactive UI Controls Cataloged**: `17`
-- **Total Backend Endpoints Monitored**: `11`
-- **Target Automation Languages**: `Python`, `Java (JUnit 5)`, `TypeScript`, `JavaScript`
-- **Execution Mode**: Local Corporate Channel (`chrome` / `msedge`), 100% Offline, Zero Cloud Dependencies.
-
-### 1.2 User Flow Objectives
-The corporate user declared the following functional flow requirement:
-> *"Create automation script for the dashboard, search API, click button and verify whether it succeeded with 200 or 201 status code"*
-
----
-
-## 2. Test Items & Features to be Tested
-
-The following functional objectives were decomposed into deterministic test items:
-- **Step 1 [NAVIGATE]**: Target: `http://127.0.0.1:59064/` | Value: `http://127.0.0.1:59064/` | Target Status Codes: `[200]`
-- **Step 2 [VERIFY_UI]**: Target: `Create automation script for the dashboard` | Value: `N/A` | Target Status Codes: `N/A`
-- **Step 3 [SEARCH]**: Target: `search` | Value: `search` | Target Status Codes: `N/A`
-- **Step 4 [VERIFY_API]**: Target: `api` | Value: `N/A` | Target Status Codes: `[200, 201]`
-- **Step 5 [CLICK]**: Target: `button` | Value: `N/A` | Target Status Codes: `N/A`
-- **Step 6 [VERIFY_API]**: Target: `api` | Value: `N/A` | Target Status Codes: `[200, 201]`
-
----
-
-## 3. UI Component & Multi-Language Locator Inventory
+## Appendix: UI Component & Multi-Language Locator Inventory
 
 Prioritized corporate locator hierarchy: `data-testid` &rarr; `id` &rarr; `role + name` &rarr; `placeholder` &rarr; `label` &rarr; `text` &rarr; `css`.
 
@@ -63,84 +168,3 @@ Prioritized corporate locator hierarchy: `data-testid` &rarr; `id` &rarr; `role 
 | e15 | a (link) | Learn more | `page.locator("a[href=\"#b\"]")` | `page.locator("a[href=\"#b\"]")` | `page.locator('a[href="#b"]')` |
 | e16 | div (button) | Help | `page.get_by_test_id("help-widget")` | `page.getByTestId("help-widget")` | `page.getByTestId('help-widget')` |
 | e17 | button (button) | Delete Account | `page.get_by_test_id("delete-account")` | `page.getByTestId("delete-account")` | `page.getByTestId('delete-account')` |
-
----
-
-## 4. Captured Network API & Status Code Verification Matrix
-
-Real-time telemetry captured during navigation and safe flow probing:
-
-| Method | Endpoint Path | Observed Status | Target Assertion Status | Response Payload Keys | Triggered By Action |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| `GET` | `/api/user` | `200` | `200, 201` | `id, name, roles, email` | page_load |
-| `GET` | `/api/feature-flags` | `401` | `401` | `error, code` | page_load |
-| `POST` | `/api/validate` | `400` | `400` | `error, fields` | page_load |
-| `GET` | `/api/legacy-endpoint` | `404` | `404` | `error, path` | page_load |
-| `GET` | `/api/admin/settings` | `403` | `403` | `error, requiredRole` | page_load |
-| `GET` | `/api/config` | `200` | `200, 201` | `key, value` | page_load |
-| `PUT` | `/api/preferences` | `204` | `204` | `[]` | page_load |
-| `GET` | `/api/search` | `200` | `200, 201` | `query, results, total` | probe:search -> typed 'test' into searchbox 'Search' |
-| `GET` | `/api/search` | `200` | `200, 201` | `query, results, total` | probe:search -> typed 'test' into searchbox 'Search' |
-| `GET` | `/api/dashboard` | `200` | `200, 201` | `widgets, updatedAt, owner` | probe:click tab 'Dashboard' |
-| `POST` | `/api/events` | `201` | `200, 201` | `eventId, status` | probe:click tab 'Dashboard' |
-
----
-
-## 5. Detailed Test Scenarios & Execution Steps
-
-### Scenario: [TC-01] Primary User Flow & API Status Verification
-
-- **Classification**: `Positive E2E`
-
-| Step | Action | Description | Playwright Locator (Python) | Expected Status |
-| :--- | :--- | :--- | :--- | :--- |
-| 1 | **NAVIGATE** | Navigate to application URL: http://127.0.0.1:59064/ | `page.goto('http://127.0.0.1:59064/')` | `200` |
-| 2 | **VERIFY_UI** | Verify visibility and readiness of UI component 'Dashboard' | `page.get_by_role("tab", name="Dashboard", exact=True)` | `N/A` |
-| 3 | **SEARCH** | Search value 'search' into control 'Search' | `page.locator("#global-search")` | `200` |
-| 4 | **VERIFY_API** | Verify backend API response status ([200, 201]) for endpoint '/api/user' | N/A | `200, 201` |
-| 5 | **CLICK** | Click interactive component 'Go' | `page.get_by_test_id("search-submit")` | `N/A` |
-| 6 | **VERIFY_API** | Verify backend API response status ([200, 201]) for endpoint '/api/user' | N/A | `200, 201` |
-
-### Scenario: [TC-02] Page Load & Core UI Component Sanity
-
-- **Classification**: `UI Element Check`
-
-| Step | Action | Description | Playwright Locator (Python) | Expected Status |
-| :--- | :--- | :--- | :--- | :--- |
-| 1 | **NAVIGATE** | Open target URL: http://127.0.0.1:59064/ | `page.goto('http://127.0.0.1:59064/')` | `200` |
-| 2 | **VERIFY_UI** | Verify Page Title equals or contains 'Acme QA Portal' | `expect(page).to_have_title(...)` | `N/A` |
-| 3 | **VERIFY_UI** | Verify visibility of core control 'Home' (a) | `page.get_by_role("link", name="Home", exact=True)` | `N/A` |
-| 4 | **VERIFY_UI** | Verify visibility of core control 'Docs' (a) | `page.get_by_role("link", name="Docs", exact=True)` | `N/A` |
-| 5 | **VERIFY_UI** | Verify visibility of core control 'External' (a) | `page.get_by_role("link", name="External", exact=True)` | `N/A` |
-| 6 | **VERIFY_UI** | Verify visibility of core control 'Search' (input) | `page.locator("#global-search")` | `N/A` |
-| 7 | **VERIFY_UI** | Verify visibility of core control 'Go' (button) | `page.get_by_test_id("search-submit")` | `N/A` |
-
-### Scenario: [TC-03] API Health & Contract Matrix Verification
-
-- **Classification**: `API Verification`
-
-| Step | Action | Description | Playwright Locator (Python) | Expected Status |
-| :--- | :--- | :--- | :--- | :--- |
-| 1 | **VERIFY_API** | Validate contract for GET /api/user (Expected Status: [200], Keys: ['id', 'name', 'roles', 'email']) | N/A | `200` |
-| 2 | **VERIFY_API** | Validate contract for GET /api/config (Expected Status: [200], Keys: ['key', 'value']) | N/A | `200` |
-| 3 | **VERIFY_API** | Validate contract for GET /api/search (Expected Status: [200], Keys: ['query', 'results', 'total']) | N/A | `200` |
-| 4 | **VERIFY_API** | Validate contract for GET /api/search (Expected Status: [200], Keys: ['query', 'results', 'total']) | N/A | `200` |
-| 5 | **VERIFY_API** | Validate contract for GET /api/dashboard (Expected Status: [200], Keys: ['widgets', 'updatedAt', 'owner']) | N/A | `200` |
-
-
----
-
-## 6. Pass/Fail Criteria & Risk Mitigation
-
-### 6.1 Pass Criteria
-1. **Zero UI Divergence**: Every prioritized locator uniquely identifies exactly 1 DOM node without ambiguity.
-2. **Deterministic HTTP Contract**: Captured API endpoints must return one of the declared target status codes (`200` or `201`).
-3. **Multi-Language Parity**: All 4 target frameworks (`Python`, `Java`, `TypeScript`, `JavaScript`) produce identical execution semantics.
-
-### 6.2 Corporate Risk Mitigation
-- **Non-Destructive Safe Probing**: Destructive operations (`DELETE`, `POST /admin`, drop, remove) are filtered out automatically by corporate keyword safeguards.
-- **Zero Data Leakage**: No network requests or telemetry were transmitted outside the local machine.
-- **Headless Execution**: Compatible with Windows Desktop environments and corporate CI/CD pipelines.
-
----
-*Generated by Offline Playwright Desktop Agent - Phase 2*

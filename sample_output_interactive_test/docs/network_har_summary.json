@@ -1,0 +1,91 @@
+[
+  {
+    "url": "http://127.0.0.1:63032/api/user",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [
+      "id",
+      "name",
+      "roles",
+      "email"
+    ],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "http://127.0.0.1:63032/api/feature-flags",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 401,
+    "request_payload_keys": [],
+    "response_keys": [
+      "error",
+      "code"
+    ],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "http://127.0.0.1:63032/api/admin/settings",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 403,
+    "request_payload_keys": [],
+    "response_keys": [
+      "error",
+      "requiredRole"
+    ],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "http://127.0.0.1:63032/api/legacy-endpoint",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 404,
+    "request_payload_keys": [],
+    "response_keys": [
+      "error",
+      "path"
+    ],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "http://127.0.0.1:63032/api/validate",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status_code": 400,
+    "request_payload_keys": [
+      "email",
+      "terms"
+    ],
+    "response_keys": [
+      "error",
+      "fields"
+    ],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "http://127.0.0.1:63032/api/config",
+    "method": "GET",
+    "resource_type": "xhr",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [
+      "key",
+      "value"
+    ],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "http://127.0.0.1:63032/api/preferences",
+    "method": "PUT",
+    "resource_type": "fetch",
+    "status_code": 204,
+    "request_payload_keys": [
+      "theme",
+      "locale"
+    ],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  }
+]

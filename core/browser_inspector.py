@@ -322,6 +322,45 @@ def render_locator(strategy: str, value: str, role: str = "") -> Dict[str, str]:
 class BrowserInspector:
     """Inspects a URL: DOM locators, ARIA snapshot and XHR/fetch API telemetry."""
 
+    # Active persistent session handle shared across runs if interactive/headed mode kept open
+    _active_session: Optional[Dict[str, Any]] = None
+
+    @classmethod
+    async def close_persistent_browser(cls) -> None:
+        """Explicitly terminate any persistent browser session kept open."""
+        if cls._active_session:
+            session = cls._active_session
+            cls._active_session = None
+            try:
+                if session.get("context"):
+                    await session["context"].close()
+            except Exception:
+                pass
+            try:
+                if session.get("browser"):
+                    await session["browser"].close()
+            except Exception:
+                pass
+            try:
+                if session.get("pw"):
+                    await session["pw"].stop()
+            except Exception:
+                pass
+            logger.info("Persistent browser session closed successfully.")
+
+    @classmethod
+    def close_persistent_browser_sync(cls) -> None:
+        """Synchronous wrapper to close persistent browser session."""
+        if cls._active_session:
+            try:
+                loop = asyncio.get_event_loop()
+                if loop.is_running():
+                    loop.create_task(cls.close_persistent_browser())
+                else:
+                    loop.run_until_complete(cls.close_persistent_browser())
+            except Exception:
+                asyncio.run(cls.close_persistent_browser())
+
     def __init__(
         self,
         channels: Sequence[Optional[str]] = DEFAULT_CHANNELS,
@@ -368,46 +407,104 @@ class BrowserInspector:
         user_flow_text: str,
         headless: bool = True,
         progress_callback: Optional[ProgressCallback] = None,
+        pause_for_user: bool = False,
+        capture_trigger: Optional[Any] = None,
     ) -> InspectionReport:
-        """Inspect ``target_url`` and return a fully populated :class:`InspectionReport`."""
+        """Inspect ``target_url`` and return a fully populated :class:`InspectionReport`.
+
+        If ``pause_for_user`` is True, launches a visible browser, navigates to ``target_url``,
+        attaches network & event listeners across all context pages, and waits until
+        ``capture_trigger`` is set before capturing DOM, ARIA snapshot, and network contracts.
+        """
         self._reset_state()
         self._progress_cb = progress_callback
         target_url = self._normalize_url(target_url)
 
-        async with async_playwright() as pw:
-            await self._emit("launch_browser", 5, "Launching Browser")
-            browser, channel = await self._launch_browser(pw, headless)
-            try:
-                context = await browser.new_context(
-                    viewport={"width": self.viewport[0], "height": self.viewport[1]},
-                    ignore_https_errors=True,  # corporate / internal certificates
+        # In interactive manual session, browser must be visible
+        actual_headless = False if pause_for_user else headless
+        keep_browser_open = (not actual_headless) or pause_for_user
+
+        # If previous persistent session exists, close it first
+        if self._active_session:
+            await self.close_persistent_browser()
+
+        pw = await async_playwright().start()
+        await self._emit("launch_browser", 5, "Launching Browser (Interactive Session)" if pause_for_user else "Launching Browser")
+        browser, channel = await self._launch_browser(pw, actual_headless)
+        try:
+            context = await browser.new_context(
+                viewport={"width": self.viewport[0], "height": self.viewport[1]},
+                ignore_https_errors=True,  # corporate / internal certificates
+            )
+            page = await context.new_page()
+            page.set_default_timeout(15_000 if pause_for_user else 10_000)
+
+            await self._emit("attach_network", 15, "Attaching Network Listeners")
+            self._attach_listeners(context, page, interactive_mode=pause_for_user)
+
+            await self._emit("navigate", 25, f"Navigating to URL: {target_url}")
+            self._current_action = "page_load"
+            await self._navigate(page, target_url)
+
+            if pause_for_user:
+                await self._emit(
+                    "interactive_session",
+                    30,
+                    "Interactive Browser open. Perform logins, file uploads, or multi-tab actions. Click 'Capture State' when ready.",
                 )
-                page = await context.new_page()
-                page.set_default_timeout(10_000)
+                self._current_action = "manual_interaction"
+                await self._wait_for_user_capture(capture_trigger, context)
+                await self._emit("interactive_session", 33, "Capture trigger received. Analyzing active page state...")
 
-                await self._emit("attach_network", 15, "Attaching Network Listeners")
-                self._attach_listeners(context, page)
+            # Identify active page (last active or first page)
+            active_page = context.pages[-1] if context.pages else page
+            page_title = await self._safe_title(active_page)
 
-                await self._emit("navigate", 25, f"Navigating to URL: {target_url}")
-                self._current_action = "page_load"
-                await self._navigate(page, target_url)
-                page_title = await self._safe_title(page)
+            await self._emit("extract_dom", 35, "Extracting DOM & ARIA Locators")
+            elements, live_locators = await self._extract_elements(active_page)
+            aria_snapshot = await self._capture_aria_snapshot(active_page)
+            await self._emit("extract_dom", 40, f"Extracted {len(elements)} interactive elements from active page")
 
-                await self._emit("extract_dom", 35, "Extracting DOM & ARIA Locators")
-                elements, live_locators = await self._extract_elements(page)
-                aria_snapshot = await self._capture_aria_snapshot(page)
-                await self._emit("extract_dom", 40, f"Extracted {len(elements)} interactive elements")
-
+            probes: List[str] = []
+            if not pause_for_user:
                 await self._emit("flow_probes", 45, "Executing Safe Flow Probes & Capturing APIs")
-                probes = await self._run_flow_probes(page, target_url, user_flow_text, elements, live_locators)
+                probes = await self._run_flow_probes(active_page, target_url, user_flow_text, elements, live_locators)
+            else:
+                probes = ["manual:user_session_captured"]
 
-                self._current_action = "background"
-                await self._wait_for_network_quiet(quiet_ms=500, timeout_ms=3_000)
-                if self._pending_tasks:
-                    await asyncio.gather(*self._pending_tasks, return_exceptions=True)
+            self._current_action = "background"
+            await self._wait_for_network_quiet(quiet_ms=500, timeout_ms=3_000)
+            if self._pending_tasks:
+                await asyncio.gather(*self._pending_tasks, return_exceptions=True)
+
+            if keep_browser_open:
+                # Retain browser context in memory for user inspection or manual interaction
+                BrowserInspector._active_session = {
+                    "pw": pw,
+                    "browser": browser,
+                    "context": context,
+                    "page": active_page,
+                }
+                logger.info("Retained persistent browser session open.")
+            else:
                 await context.close()
-            finally:
                 await browser.close()
+                await pw.stop()
+        except Exception:
+            # On unexpected failure, ensure cleanup
+            try:
+                await context.close()
+            except Exception:
+                pass
+            try:
+                await browser.close()
+            except Exception:
+                pass
+            try:
+                await pw.stop()
+            except Exception:
+                pass
+            raise
 
         report = InspectionReport(
             target_url=target_url,
@@ -472,14 +569,45 @@ class BrowserInspector:
             return ""
 
     # --------------------------------------------------------------- network
-    def _attach_listeners(self, context: BrowserContext, page: Page) -> None:
+    def _attach_listeners(self, context: BrowserContext, page: Page, interactive_mode: bool = False) -> None:
+        self._attach_page_network(page)
+
+        if interactive_mode:
+            # In interactive mode, attach network listeners dynamically to any new tab/popup
+            def on_new_page(new_p: Page) -> None:
+                self._attach_page_network(new_p)
+                # Keep new pages open for manual user interactions
+            context.on("page", on_new_page)
+        else:
+            # Automated mode: dismiss confirm/alert dialogs and close auxiliary popups
+            page.on("dialog", lambda dialog: self._spawn(dialog.dismiss()))
+            context.on("page", lambda new_page: self._spawn(new_page.close()) if new_page is not page else None)
+
+    def _attach_page_network(self, page: Page) -> None:
         page.on("request", self._on_request)
         page.on("requestfinished", self._on_request_done)
         page.on("requestfailed", self._on_request_failed)
         page.on("response", self._on_response)
-        # Safety: dismiss any confirm()/alert() and close popups opened by probes.
-        page.on("dialog", lambda dialog: self._spawn(dialog.dismiss()))
-        context.on("page", lambda new_page: self._spawn(new_page.close()) if new_page is not page else None)
+
+    async def _wait_for_user_capture(self, capture_trigger: Optional[Any], context: BrowserContext) -> None:
+        """Asynchronously wait for the user to trigger state capture from the GUI."""
+        if capture_trigger is None:
+            # Fallback if no trigger provided: wait 10 seconds
+            await asyncio.sleep(10.0)
+            return
+
+        # Check if capture_trigger is an asyncio.Event or threading.Event
+        if isinstance(capture_trigger, asyncio.Event):
+            while not capture_trigger.is_set():
+                if not context.pages:
+                    break
+                await asyncio.sleep(0.2)
+        else:
+            # Handle threading.Event or custom object with .is_set()
+            while not getattr(capture_trigger, "is_set", lambda: False)():
+                if not context.pages:
+                    break
+                await asyncio.sleep(0.2)
 
     def _spawn(self, coro: Awaitable[Any]) -> None:
         task = asyncio.ensure_future(coro)

@@ -107,9 +107,9 @@ def test_gui_automated() -> int:
         check("[PIPELINE SUCCESS]" in console_content, "Console log captured pipeline success event")
         check("IntentParserNode" in console_content and "BrowserInspector" in console_content, "Console log contains node telemetry")
 
-        # 6. Verify Tab 2 (Test Plan IEEE 829 Markdown)
+        # 6. Verify Tab 2 (Test Plan IEEE 829 Markdown strictly adhering to PLAN_TEMPLATE.md)
         plan_content = app.plan_textbox.get("0.0", "end")
-        check("# IEEE 829 CORPORATE TEST PLAN" in plan_content, "Tab 2 contains IEEE 829 Corporate Test Plan")
+        check("# Purpose" in plan_content and "# Steps and Expected Results" in plan_content, "Tab 2 contains PLAN_TEMPLATE.md IEEE 829 Corporate Test Plan")
         check("UI Component & Multi-Language Locator Inventory" in plan_content, "Tab 2 contains locator inventory")
 
         # 7. Verify Tab 3 (Generated Files Previewer)

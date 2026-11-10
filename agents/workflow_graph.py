@@ -25,6 +25,8 @@ async def browser_inspector_node(state: AgentState) -> Dict[str, Any]:
     target_url = state.get("target_url", "")
     user_flow_text = state.get("user_flow_text", "")
     headless = state.get("headless", True)
+    interactive_mode = state.get("interactive_mode", False)
+    capture_trigger = state.get("capture_trigger_event")
     parent_progress_cb = state.get("progress_callback")
 
     async def scaled_progress(node_name: str, percent: float, message: str) -> None:
@@ -46,6 +48,8 @@ async def browser_inspector_node(state: AgentState) -> Dict[str, Any]:
         user_flow_text=user_flow_text,
         headless=headless,
         progress_callback=scaled_progress,
+        pause_for_user=interactive_mode,
+        capture_trigger=capture_trigger,
     )
 
     return {"inspection_report": report.model_dump()}

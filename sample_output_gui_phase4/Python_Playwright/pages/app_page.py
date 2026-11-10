@@ -6,7 +6,7 @@ from pages.base_page import BasePage
 
 
 class AppPage(BasePage):
-    def __init__(self, page: Page, base_url: str = "http://127.0.0.1:59064/"):
+    def __init__(self, page: Page, base_url: str = "http://127.0.0.1:50992/"):
         super().__init__(page, base_url)
 
     # -----------------------------------------------------------------------

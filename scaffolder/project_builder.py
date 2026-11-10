@@ -85,12 +85,19 @@ class ProjectScaffolder:
         target_langs = context.get("target_languages", [])
 
         # -------------------------------------------------------------------
-        # 1. Master README.md
+        # 1. Master README.md & Docs copy
         # -------------------------------------------------------------------
         readme_content = self.registry.render("master_readme", context)
         readme_path = out_path / "README.md"
         readme_path.write_text(readme_content, encoding="utf-8")
         created_files.append(str(readme_path))
+
+        docs_dir = out_path / "docs"
+        docs_dir.mkdir(parents=True, exist_ok=True)
+        test_plan_path = docs_dir / "Test_Plan_IEEE829.md"
+        if not test_plan_path.exists() and state.get("test_plan_markdown"):
+            test_plan_path.write_text(state["test_plan_markdown"], encoding="utf-8")
+            created_files.append(str(test_plan_path))
 
         # -------------------------------------------------------------------
         # 2. Python Playwright Suite
@@ -106,6 +113,9 @@ class ProjectScaffolder:
                 (py_root / "pages" / "app_page.py", "python_app_page", ""),
                 (py_root / "tests" / "__init__.py", "", ""),
                 (py_root / "tests" / "test_automation_suite.py", "python_test_suite", ""),
+                (py_root / "tests" / "001_primary_user_flow_and_api_verification.py", "python_test_scenario_1", ""),
+                (py_root / "tests" / "002_page_load_and_core_ui_sanity.py", "python_test_scenario_2", ""),
+                (py_root / "tests" / "003_api_health_and_contract_matrix.py", "python_test_scenario_3", ""),
                 (py_root / "conftest.py", "python_conftest", ""),
                 (py_root / "pytest.ini", "python_pytest_ini", ""),
                 (py_root / "requirements.txt", "python_requirements", ""),
@@ -131,6 +141,9 @@ class ProjectScaffolder:
                 (pages_dir / "BasePage.java", "java_base_page", ""),
                 (pages_dir / "AppPage.java", "java_app_page", ""),
                 (tests_dir / "AutomationSuiteTest.java", "java_test_suite", ""),
+                (tests_dir / "Test001PrimaryUserFlowAndApiVerification.java", "java_test_scenario_1", ""),
+                (tests_dir / "Test002PageLoadAndCoreUiSanity.java", "java_test_scenario_2", ""),
+                (tests_dir / "Test003ApiHealthAndContractMatrix.java", "java_test_scenario_3", ""),
             ]
             for file_path, tpl_name, raw_content in files:
                 content = self.registry.render(tpl_name, context) if tpl_name else raw_content
@@ -150,6 +163,9 @@ class ProjectScaffolder:
                 (ts_root / "playwright.config.ts", "ts_playwright_config", ""),
                 (ts_root / "pages" / "AppPage.ts", "ts_app_page", ""),
                 (ts_root / "tests" / "automation_suite.spec.ts", "ts_test_suite", ""),
+                (ts_root / "tests" / "001_primary_user_flow_and_api_verification.spec.ts", "ts_test_scenario_1", ""),
+                (ts_root / "tests" / "002_page_load_and_core_ui_sanity.spec.ts", "ts_test_scenario_2", ""),
+                (ts_root / "tests" / "003_api_health_and_contract_matrix.spec.ts", "ts_test_scenario_3", ""),
             ]
             for file_path, tpl_name, raw_content in files:
                 content = self.registry.render(tpl_name, context) if tpl_name else raw_content
@@ -169,6 +185,9 @@ class ProjectScaffolder:
                 (js_root / "playwright.config.js", "js_playwright_config", ""),
                 (js_root / "pages" / "AppPage.js", "js_app_page", ""),
                 (js_root / "tests" / "automation_suite.spec.js", "js_test_suite", ""),
+                (js_root / "tests" / "001_primary_user_flow_and_api_verification.spec.js", "js_test_scenario_1", ""),
+                (js_root / "tests" / "002_page_load_and_core_ui_sanity.spec.js", "js_test_scenario_2", ""),
+                (js_root / "tests" / "003_api_health_and_contract_matrix.spec.js", "js_test_scenario_3", ""),
             ]
             for file_path, tpl_name, raw_content in files:
                 content = self.registry.render(tpl_name, context) if tpl_name else raw_content

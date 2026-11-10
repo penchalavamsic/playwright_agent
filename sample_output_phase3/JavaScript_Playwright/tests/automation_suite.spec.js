@@ -33,11 +33,11 @@ test.describe('Corporate Automation Suite: Acme QA Portal', () => {
 
   test('TC-03: API Contract Matrix Verification', async () => {
     const endpoints = [
-      { url: 'http://127.0.0.1:60063/api/user', status: 200 },
-      { url: 'http://127.0.0.1:60063/api/feature-flags', status: 401 },
-      { url: 'http://127.0.0.1:60063/api/legacy-endpoint', status: 404 },
-      { url: 'http://127.0.0.1:60063/api/admin/settings', status: 403 },
-      { url: 'http://127.0.0.1:60063/api/validate', status: 400 },
+      { url: 'http://127.0.0.1:54697/api/user', status: 200 },
+      { url: 'http://127.0.0.1:54697/api/feature-flags', status: 401 },
+      { url: 'http://127.0.0.1:54697/api/admin/settings', status: 403 },
+      { url: 'http://127.0.0.1:54697/api/validate', status: 400 },
+      { url: 'http://127.0.0.1:54697/api/legacy-endpoint', status: 404 },
     ];
     expect(endpoints.length).toBeGreaterThan(0);
   });

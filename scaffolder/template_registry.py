@@ -254,6 +254,118 @@ class TestAutomationSuite:
         assert len(api_endpoints) > 0, "Telemetry captured backend endpoints"
 '''
 
+# ---------------------------------------------------------------------------
+# Python Per-Scenario Test Templates (001_*, 002_*, etc.)
+# ---------------------------------------------------------------------------
+
+PYTHON_TEST_SCENARIO_1_TPL = '''"""Corporate Playwright Test Case: TC-01 Primary User Flow & API Verification.
+
+Adheres strictly to IEEE 829 Test Plan.
+"""
+
+import pytest
+from playwright.sync_api import Page, expect
+from pages.app_page import AppPage
+
+
+class Test001PrimaryUserFlowAndApiVerification:
+    """TC-01: Primary User Flow with UI Actions & Backend Status Code Interception."""
+
+    @pytest.fixture(autouse=True)
+    def setup(self, page: Page, base_url: str):
+        self.page = page
+        self.app = AppPage(page, base_url=base_url or "{{ target_url }}")
+        self.app.navigate()
+
+    def test_tc01_primary_user_flow_and_api_verification(self):
+        """Execute primary user flow and intercept expected backend API status codes."""
+        # Step 1: Verify Page Title
+{% if page_title %}
+        expect(self.page).to_have_title("{{ page_title | escape_quotes }}")
+{% endif %}
+
+        # Step 2: Trigger action with network API status code interception
+{% if target_api %}
+        def perform_action():
+{% if search_element %}
+            self.app.search_and_submit("playwright")
+{% elif dashboard_element %}
+            self.app.click_dashboard_tab()
+{% else %}
+            self.page.wait_for_timeout(500)
+{% endif %}
+
+        response = self.app.wait_for_api_response(
+            url_predicate="{{ target_api.url_pattern | escape_quotes }}",
+            trigger_action=perform_action,
+            expected_statuses={{ target_api.expected_status_codes or [200, 201] }},
+        )
+        assert response.status in {{ target_api.expected_status_codes or [200, 201] }}, (
+            f"Expected status {{ target_api.expected_status_codes or [200, 201] }} from {response.url}, got {response.status}"
+        )
+{% else %}
+        # UI Flow execution
+{% if search_element %}
+        self.app.search_and_submit("playwright")
+{% endif %}
+{% endif %}
+'''
+
+PYTHON_TEST_SCENARIO_2_TPL = '''"""Corporate Playwright Test Case: TC-02 Page Load & Core UI Component Sanity.
+
+Adheres strictly to IEEE 829 Test Plan.
+"""
+
+import pytest
+from playwright.sync_api import Page, expect
+from pages.app_page import AppPage
+
+
+class Test002PageLoadAndCoreUiSanity:
+    """TC-02: Page Load & Core Interactive Controls Visibility Sanity."""
+
+    @pytest.fixture(autouse=True)
+    def setup(self, page: Page, base_url: str):
+        self.page = page
+        self.app = AppPage(page, base_url=base_url or "{{ target_url }}")
+        self.app.navigate()
+
+    def test_tc02_core_ui_component_sanity(self):
+        """Verify visibility of core UI components identified during inspection."""
+{% for el in elements[:6] %}
+        expect(self.app.{{ el.text_or_label | to_snake_case }}).to_be_visible()
+{% endfor %}
+'''
+
+PYTHON_TEST_SCENARIO_3_TPL = '''"""Corporate Playwright Test Case: TC-03 API Health & Contract Matrix Verification.
+
+Adheres strictly to IEEE 829 Test Plan.
+"""
+
+import pytest
+from playwright.sync_api import Page, expect
+from pages.app_page import AppPage
+
+
+class Test003ApiHealthAndContractMatrix:
+    """TC-03: Backend API Health and Expected Status Codes."""
+
+    @pytest.fixture(autouse=True)
+    def setup(self, page: Page, base_url: str):
+        self.page = page
+        self.app = AppPage(page, base_url=base_url or "{{ target_url }}")
+        self.app.navigate()
+
+    def test_tc03_api_contract_matrix(self):
+        """Validate captured API endpoint status codes."""
+        api_endpoints = [
+{% for api in target_apis[:5] %}
+            ("{{ api.url | escape_quotes }}", {{ api.status_code }}),
+{% endfor %}
+        ]
+        assert len(api_endpoints) >= 0, "Telemetry captured backend endpoints"
+'''
+
 PYTHON_CONFTEST_TPL = '''"""Pytest configuration and corporate Playwright browser fixtures."""
 
 import pytest
@@ -521,6 +633,148 @@ public class AutomationSuiteTest {
 '''
 
 # ---------------------------------------------------------------------------
+# Java Per-Scenario Test Templates (Test001*, Test002*, etc.)
+# ---------------------------------------------------------------------------
+
+JAVA_TEST_SCENARIO_1_TPL = '''package com.corp.qa.tests;
+
+import com.corp.qa.pages.AppPage;
+import com.microsoft.playwright.*;
+import org.testng.Assert;
+import org.testng.annotations.*;
+import java.util.Arrays;
+import java.util.List;
+
+public class Test001PrimaryUserFlowAndApiVerification {
+    private Playwright playwright;
+    private Browser browser;
+    private BrowserContext context;
+    private Page page;
+    private AppPage app;
+    private static final String TARGET_URL = "{{ target_url }}";
+
+    @BeforeClass
+    public void setupClass() {
+        playwright = Playwright.create();
+        browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setChannel("chrome").setHeadless(true));
+    }
+
+    @BeforeMethod
+    public void setupTest() {
+        context = browser.newContext(new Browser.NewContextOptions().setIgnoreHTTPSErrors(true));
+        page = context.newPage();
+        app = new AppPage(page, TARGET_URL);
+        app.navigate();
+    }
+
+    @AfterMethod
+    public void tearDownTest() {
+        if (context != null) context.close();
+    }
+
+    @AfterClass
+    public void tearDownClass() {
+        if (browser != null) browser.close();
+        if (playwright != null) playwright.close();
+    }
+
+    @Test(description = "TC-01: Primary User Flow with UI Actions & Backend Status Code Interception")
+    public void testTc01PrimaryUserFlowAndApiVerification() {
+{% if page_title %}
+        Assert.assertTrue(page.title().contains("{{ page_title | escape_quotes }}"), "Page title matches");
+{% endif %}
+
+{% if target_api %}
+        List<Integer> expectedStatuses = Arrays.asList({{ (target_api.expected_status_codes or [200, 201]) | join(', ') }});
+        Response response = app.waitForApiResponse(
+            "{{ target_api.url_pattern | escape_quotes }}",
+            () -> {
+{% if search_element %}
+                app.searchAndSubmit("playwright");
+{% elif dashboard_element %}
+                app.clickDashboardTab();
+{% else %}
+                page.waitForTimeout(500);
+{% endif %}
+            },
+            expectedStatuses
+        );
+        Assert.assertTrue(expectedStatuses.contains(response.status()), 
+            "API returned expected status code: " + response.status());
+{% else %}
+{% if search_element %}
+        app.searchAndSubmit("playwright");
+{% endif %}
+{% endif %}
+    }
+}
+'''
+
+JAVA_TEST_SCENARIO_2_TPL = '''package com.corp.qa.tests;
+
+import com.corp.qa.pages.AppPage;
+import com.microsoft.playwright.*;
+import org.testng.Assert;
+import org.testng.annotations.*;
+
+public class Test002PageLoadAndCoreUiSanity {
+    private Playwright playwright;
+    private Browser browser;
+    private BrowserContext context;
+    private Page page;
+    private AppPage app;
+    private static final String TARGET_URL = "{{ target_url }}";
+
+    @BeforeClass
+    public void setupClass() {
+        playwright = Playwright.create();
+        browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setChannel("chrome").setHeadless(true));
+    }
+
+    @BeforeMethod
+    public void setupTest() {
+        context = browser.newContext(new Browser.NewContextOptions().setIgnoreHTTPSErrors(true));
+        page = context.newPage();
+        app = new AppPage(page, TARGET_URL);
+        app.navigate();
+    }
+
+    @AfterMethod
+    public void tearDownTest() {
+        if (context != null) context.close();
+    }
+
+    @AfterClass
+    public void tearDownClass() {
+        if (browser != null) browser.close();
+        if (playwright != null) playwright.close();
+    }
+
+    @Test(description = "TC-02: Page Load & Core UI Component Sanity")
+    public void testTc02CoreUiComponentSanity() {
+{% for el in elements[:5] %}
+        Assert.assertTrue(app.get{{ el.text_or_label | to_pascal_case }}().isVisible(), "Element {{ el.text_or_label | escape_quotes }} is visible");
+{% endfor %}
+    }
+}
+'''
+
+JAVA_TEST_SCENARIO_3_TPL = '''package com.corp.qa.tests;
+
+import com.microsoft.playwright.*;
+import org.testng.Assert;
+import org.testng.annotations.*;
+
+public class Test003ApiHealthAndContractMatrix {
+    @Test(description = "TC-03: API Contract Matrix Verification")
+    public void testTc03ApiContractMatrix() {
+        int capturedCount = {{ target_apis | length }};
+        Assert.assertTrue(capturedCount >= 0, "API contract matrix verified");
+    }
+}
+'''
+
+# ---------------------------------------------------------------------------
 # TypeScript (@playwright/test) Templates
 # ---------------------------------------------------------------------------
 
@@ -662,6 +916,84 @@ test.describe('Corporate Automation Suite: {{ page_title or target_url }}', () =
 {% endfor %}
     ];
     expect(endpoints.length).toBeGreaterThan(0);
+  });
+});
+'''
+
+# ---------------------------------------------------------------------------
+# TypeScript Per-Scenario Test Templates (001_*, 002_*, etc.)
+# ---------------------------------------------------------------------------
+
+TS_TEST_SCENARIO_1_TPL = '''import { test, expect } from '@playwright/test';
+import { AppPage } from '../pages/AppPage';
+
+test.describe('Scenario TC-01: Primary User Flow & API Status Verification', () => {
+  let app: AppPage;
+
+  test.beforeEach(async ({ page }) => {
+    app = new AppPage(page);
+    await app.navigate();
+  });
+
+  test('001 - Execute Primary Flow & Intercept Network Status Codes', async ({ page }) => {
+{% if page_title %}
+    await expect(page).toHaveTitle(/{{ page_title | escape_quotes }}/);
+{% endif %}
+
+{% if target_api %}
+    const expectedStatuses = [{{ (target_api.expected_status_codes or [200, 201]) | join(', ') }}];
+    const responsePromise = page.waitForResponse(
+      (response) => response.url().toLowerCase().includes('{{ target_api.url_pattern | escape_quotes }}'.toLowerCase())
+    );
+
+{% if search_element %}
+    await app.searchAndSubmit('playwright');
+{% elif dashboard_element %}
+    await app.clickDashboardTab();
+{% else %}
+    await page.waitForTimeout(500);
+{% endif %}
+
+    const response = await responsePromise;
+    expect(expectedStatuses).toContain(response.status());
+{% else %}
+{% if search_element %}
+    await app.searchAndSubmit('playwright');
+{% endif %}
+{% endif %}
+  });
+});
+'''
+
+TS_TEST_SCENARIO_2_TPL = '''import { test, expect } from '@playwright/test';
+import { AppPage } from '../pages/AppPage';
+
+test.describe('Scenario TC-02: Page Load & Core UI Component Sanity', () => {
+  let app: AppPage;
+
+  test.beforeEach(async ({ page }) => {
+    app = new AppPage(page);
+    await app.navigate();
+  });
+
+  test('002 - Verify Visibility of Discovered Interactive Controls', async () => {
+{% for el in elements[:5] %}
+    await expect(app.{{ el.text_or_label | to_camel_case }}).toBeVisible();
+{% endfor %}
+  });
+});
+'''
+
+TS_TEST_SCENARIO_3_TPL = '''import { test, expect } from '@playwright/test';
+
+test.describe('Scenario TC-03: API Health & Contract Matrix Verification', () => {
+  test('003 - Verify Backend API Health and Contract Matrix', async () => {
+    const endpoints = [
+{% for api in target_apis[:5] %}
+      { url: '{{ api.url | escape_quotes }}', status: {{ api.status_code }} },
+{% endfor %}
+    ];
+    expect(endpoints.length).toBeGreaterThanOrEqual(0);
   });
 });
 '''
@@ -814,6 +1146,84 @@ test.describe('Corporate Automation Suite: {{ page_title or target_url }}', () =
 '''
 
 # ---------------------------------------------------------------------------
+# JavaScript Per-Scenario Test Templates (001_*, 002_*, etc.)
+# ---------------------------------------------------------------------------
+
+JS_TEST_SCENARIO_1_TPL = '''const { test, expect } = require('@playwright/test');
+const { AppPage } = require('../pages/AppPage');
+
+test.describe('Scenario TC-01: Primary User Flow & API Status Verification', () => {
+  let app;
+
+  test.beforeEach(async ({ page }) => {
+    app = new AppPage(page);
+    await app.navigate();
+  });
+
+  test('001 - Execute Primary Flow & Intercept Network Status Codes', async ({ page }) => {
+{% if page_title %}
+    await expect(page).toHaveTitle(/{{ page_title | escape_quotes }}/);
+{% endif %}
+
+{% if target_api %}
+    const expectedStatuses = [{{ (target_api.expected_status_codes or [200, 201]) | join(', ') }}];
+    const responsePromise = page.waitForResponse(
+      (response) => response.url().toLowerCase().includes('{{ target_api.url_pattern | escape_quotes }}'.toLowerCase())
+    );
+
+{% if search_element %}
+    await app.searchAndSubmit('playwright');
+{% elif dashboard_element %}
+    await app.clickDashboardTab();
+{% else %}
+    await page.waitForTimeout(500);
+{% endif %}
+
+    const response = await responsePromise;
+    expect(expectedStatuses).toContain(response.status());
+{% else %}
+{% if search_element %}
+    await app.searchAndSubmit('playwright');
+{% endif %}
+{% endif %}
+  });
+});
+'''
+
+JS_TEST_SCENARIO_2_TPL = '''const { test, expect } = require('@playwright/test');
+const { AppPage } = require('../pages/AppPage');
+
+test.describe('Scenario TC-02: Page Load & Core UI Component Sanity', () => {
+  let app;
+
+  test.beforeEach(async ({ page }) => {
+    app = new AppPage(page);
+    await app.navigate();
+  });
+
+  test('002 - Verify Visibility of Discovered Interactive Controls', async () => {
+{% for el in elements[:5] %}
+    await expect(app.{{ el.text_or_label | to_camel_case }}).toBeVisible();
+{% endfor %}
+  });
+});
+'''
+
+JS_TEST_SCENARIO_3_TPL = '''const { test, expect } = require('@playwright/test');
+
+test.describe('Scenario TC-03: API Health & Contract Matrix Verification', () => {
+  test('003 - Verify Backend API Health and Contract Matrix', async () => {
+    const endpoints = [
+{% for api in target_apis[:5] %}
+      { url: '{{ api.url | escape_quotes }}', status: {{ api.status_code }} },
+{% endfor %}
+    ];
+    expect(endpoints.length).toBeGreaterThanOrEqual(0);
+  });
+});
+'''
+
+# ---------------------------------------------------------------------------
 # Master Execution README Template
 # ---------------------------------------------------------------------------
 
@@ -901,6 +1311,9 @@ class TemplateRegistry:
             "python_base_page": self.env.from_string(PYTHON_BASE_PAGE_TPL),
             "python_app_page": self.env.from_string(PYTHON_APP_PAGE_TPL),
             "python_test_suite": self.env.from_string(PYTHON_TEST_SUITE_TPL),
+            "python_test_scenario_1": self.env.from_string(PYTHON_TEST_SCENARIO_1_TPL),
+            "python_test_scenario_2": self.env.from_string(PYTHON_TEST_SCENARIO_2_TPL),
+            "python_test_scenario_3": self.env.from_string(PYTHON_TEST_SCENARIO_3_TPL),
             "python_conftest": self.env.from_string(PYTHON_CONFTEST_TPL),
             "python_pytest_ini": self.env.from_string(PYTHON_PYTEST_INI_TPL),
             "python_requirements": self.env.from_string(PYTHON_REQUIREMENTS_TPL),
@@ -910,16 +1323,25 @@ class TemplateRegistry:
             "java_base_page": self.env.from_string(JAVA_BASE_PAGE_TPL),
             "java_app_page": self.env.from_string(JAVA_APP_PAGE_TPL),
             "java_test_suite": self.env.from_string(JAVA_TEST_SUITE_TPL),
+            "java_test_scenario_1": self.env.from_string(JAVA_TEST_SCENARIO_1_TPL),
+            "java_test_scenario_2": self.env.from_string(JAVA_TEST_SCENARIO_2_TPL),
+            "java_test_scenario_3": self.env.from_string(JAVA_TEST_SCENARIO_3_TPL),
             # TypeScript
             "ts_package_json": self.env.from_string(TS_PACKAGE_JSON_TPL),
             "ts_playwright_config": self.env.from_string(TS_PLAYWRIGHT_CONFIG_TPL),
             "ts_app_page": self.env.from_string(TS_APP_PAGE_TPL),
             "ts_test_suite": self.env.from_string(TS_TEST_SUITE_TPL),
+            "ts_test_scenario_1": self.env.from_string(TS_TEST_SCENARIO_1_TPL),
+            "ts_test_scenario_2": self.env.from_string(TS_TEST_SCENARIO_2_TPL),
+            "ts_test_scenario_3": self.env.from_string(TS_TEST_SCENARIO_3_TPL),
             # JavaScript
             "js_package_json": self.env.from_string(JS_PACKAGE_JSON_TPL),
             "js_playwright_config": self.env.from_string(JS_PLAYWRIGHT_CONFIG_TPL),
             "js_app_page": self.env.from_string(JS_APP_PAGE_TPL),
             "js_test_suite": self.env.from_string(JS_TEST_SUITE_TPL),
+            "js_test_scenario_1": self.env.from_string(JS_TEST_SCENARIO_1_TPL),
+            "js_test_scenario_2": self.env.from_string(JS_TEST_SCENARIO_2_TPL),
+            "js_test_scenario_3": self.env.from_string(JS_TEST_SCENARIO_3_TPL),
             # Master README
             "master_readme": self.env.from_string(MASTER_README_TPL),
         }

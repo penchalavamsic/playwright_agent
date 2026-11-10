@@ -13,7 +13,7 @@ public class AutomationSuiteTest {
     private BrowserContext context;
     private Page page;
     private AppPage app;
-    private static final String TARGET_URL = "http://127.0.0.1:59064/";
+    private static final String TARGET_URL = "http://127.0.0.1:50992/";
 
     @BeforeClass
     public void setupClass() {

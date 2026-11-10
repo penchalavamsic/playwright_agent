@@ -5,7 +5,7 @@ START -> intent_parser -> browser_inspector -> test_planner -> END
 
 Verifies:
 1. Progress callbacks transition cleanly across all milestones (15% to 75%).
-2. ./sample_output/docs/Test_Plan_IEEE829.md is generated with locator tables, API matrix, and test scenarios.
+2. ./sample_output/docs/Test_Plan_IEEE829.md is generated adhering strictly to PLAN_TEMPLATE.md.
 3. ./sample_output/docs/network_har_summary.json is created.
 4. Structured TestScenarioSpec objects are created.
 """
@@ -103,7 +103,7 @@ async def main() -> int:
     check(any(0.64 <= p <= 0.66 for p in pct_values), "Milestone 65% (TestPlannerNode) reported")
     check(any(0.74 <= p <= 0.76 for p in pct_values), "Milestone 75% (TestPlannerNode completion) reported")
 
-    # 3. Output files verification
+    # 3. Output files verification & PLAN_TEMPLATE.md format conformance
     plan_file = OUTPUT_DIR / "docs" / "Test_Plan_IEEE829.md"
     har_file = OUTPUT_DIR / "docs" / "network_har_summary.json"
 
@@ -112,12 +112,27 @@ async def main() -> int:
 
     if plan_file.exists():
         content = plan_file.read_text(encoding="utf-8")
-        check("# IEEE 829 CORPORATE TEST PLAN" in content, "Document contains IEEE 829 standard header")
-        check("## 3. UI Component & Multi-Language Locator Inventory" in content, "Document contains Multi-Language Locator Inventory")
-        check("## 4. Captured Network API & Status Code Verification Matrix" in content, "Document contains Network API Verification Matrix")
-        check("## 5. Detailed Test Scenarios & Execution Steps" in content, "Document contains Detailed Test Scenarios section")
-        check("page.get_by_test_id" in content or "page.locator" in content, "Document includes exact Playwright locator code")
+        # Assert frontmatter keys
+        check("test_id:" in content and "access_profile:" in content and "plan_status:" in content, "Plan frontmatter contains standard YAML metadata")
+        # Assert Jira-style title format
+        check('To verify the functionality of "' in content and '" → "' in content, "Plan uses required Jira-style title format")
+        # Assert exact required section headers from PLAN_TEMPLATE.md
+        check("# Purpose" in content, "Document contains # Purpose")
+        check("# Preconditions" in content, "Document contains # Preconditions")
+        check("# Test Data" in content, "Document contains # Test Data")
+        check("# Steps and Expected Results" in content, "Document contains # Steps and Expected Results")
+        check("# Network Verification" in content, "Document contains # Network Verification")
+        check("# Expected Final Result" in content, "Document contains # Expected Final Result")
+        check("# Classification" in content, "Document contains # Classification")
+        check("# Restrictions" in content, "Document contains # Restrictions")
+        check("# Generation Status" in content, "Document contains # Generation Status")
+        check("# Dynamic Plan Rules" in content, "Document contains # Dynamic Plan Rules")
+        # Assert dynamic rules 1 to 11
+        check("1. Use only behavior verified through Playwright MCP." in content, "Dynamic rule 1 present")
+        check("11. Plans must use this Jira-style title format:" in content, "Dynamic rule 11 present")
+        # Assert network verification details
         check("200" in content and "201" in content, "Document includes status code assertions (200, 201)")
+        check("Request URL:" in content and "HTTP Method:" in content, "Network Verification contains required request fields")
 
     if har_file.exists():
         har_data = json.loads(har_file.read_text(encoding="utf-8"))
@@ -136,4 +151,3 @@ async def main() -> int:
 
 if __name__ == "__main__":
     sys.exit(asyncio.run(main()))
-

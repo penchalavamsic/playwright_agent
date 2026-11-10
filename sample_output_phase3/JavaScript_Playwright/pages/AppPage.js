@@ -5,7 +5,7 @@ class AppPage {
    * @param {import('@playwright/test').Page} page
    * @param {string} baseUrl
    */
-  constructor(page, baseUrl = 'http://127.0.0.1:60063/') {
+  constructor(page, baseUrl = 'http://127.0.0.1:54697/') {
     this.page = page;
     this.baseUrl = baseUrl;
   }

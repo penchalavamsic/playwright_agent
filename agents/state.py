@@ -68,7 +68,9 @@ class AgentState(TypedDict, total=False):
     headless: bool
     generate_test_plan: bool
     generate_scripts: bool
-    progress_callback: Any  # Callable[[str, float, str], None]
+    interactive_mode: bool                  # Phase 4.1: Manual persistent session mode
+    capture_trigger_event: Any              # asyncio.Event or threading.Event for capture step
+    progress_callback: Any                  # Callable[[str, float, str], None]
 
     # Node outputs
     parsed_flow_steps: List[Dict[str, Any]]  # Serialized ParsedFlowStep dicts

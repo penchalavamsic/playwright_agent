@@ -1,7 +1,8 @@
 """Deterministic IEEE 829 Corporate Test Plan and Scenario Generator Node.
 
 Correlates DOM Element inventory + Network Telemetry (APIs) + Parsed Intents
-into professional IEEE 829 Test Plans and structured Playwright test scenarios.
+into professional IEEE 829 Test Plans and structured Playwright test scenarios
+strictly following PLAN_TEMPLATE.md standards.
 Zero LLM calls - 100% offline and deterministic.
 """
 
@@ -117,11 +118,70 @@ def _generate_markdown_test_plan(
     apis: List[Dict[str, Any]],
     scenarios: List[TestScenarioSpec],
 ) -> str:
-    """Render a fully compliant IEEE 829 Standard Test Plan in GitHub-Flavored Markdown."""
-    timestamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
-    url_host = urlparse(target_url).netloc or target_url
+    """Render a fully compliant IEEE 829 Standard Test Plan adhering strictly to PLAN_TEMPLATE.md."""
+    clean_page = page_title.strip() if page_title else "Application"
+    module_name = clean_page.split()[0] if clean_page else "Core"
+    section_name = "Primary Navigation" if any(s.action_type in ("CLICK", "NAVIGATE") for s in parsed_steps) else "Main"
+    
+    # Identify key control and action from parsed steps
+    control_name = "Action Control"
+    action_name = "Execute Flow"
+    for s in parsed_steps:
+        if s.action_type == "CLICK":
+            control_name = s.target_keyword.capitalize() or "Button"
+            action_name = f"Click {control_name}"
+            break
+        elif s.action_type in ("SEARCH", "FILL"):
+            control_name = s.target_keyword.capitalize() or "Search Input"
+            action_name = f"Input '{s.input_value}' and Submit"
+            break
 
-    # Format locators table (Top 25 elements to keep documentation concise yet complete)
+    # Jira-style title format per Rule 11
+    jira_title = f'To verify the functionality of "{module_name}" → "{section_name}" → "{control_name}" → "{action_name}"'
+    test_id = f"TP-IEEE829-{int(datetime.datetime.now().timestamp())}"
+
+    # Target API details for Network Verification section
+    target_api = None
+    for a in apis:
+        if a.get("status_code") in (200, 201):
+            target_api = a
+            break
+    if not target_api and apis:
+        target_api = apis[0]
+
+    api_url = target_api.get("url", "${LIMAS_BASE_URL}/api") if target_api else "${LIMAS_BASE_URL}/api"
+    api_method = target_api.get("method", "GET") if target_api else "GET"
+    api_status = target_api.get("status_code", 200) if target_api else 200
+    expected_status_str = "200, 201" if api_status in (200, 201) else str(api_status)
+    api_payload_presence = "Yes (JSON keys: " + ", ".join(target_api.get("response_keys", [])[:5]) + ")" if target_api and target_api.get("response_keys") else "No / Standard response payload"
+
+    # Format Steps and Expected Results section
+    steps_formatted = []
+    step_idx = 1
+    for sc in scenarios:
+        for s in sc.steps:
+            loc_disp = s.locators.get("python", "N/A")
+            loc_str = f" using locator `{loc_disp}`" if loc_disp and loc_disp != "N/A" else ""
+            input_str = f" with value '{s.input_data}'" if s.input_data else ""
+            status_str = f" Expected status: {s.expected_status_codes}." if s.expected_status_codes else ""
+            step_text = (
+                f"{step_idx}. Action: {s.action} on {s.element_name}{input_str}{loc_str}.\n"
+                f"   Expected Result: {s.description}. Successfully interact without DOM ambiguity.{status_str}"
+            )
+            steps_formatted.append(step_text)
+            step_idx += 1
+            if step_idx > 12:  # Keep clear and concise
+                break
+        if step_idx > 12:
+            break
+    steps_block = "\n\n".join(steps_formatted) if steps_formatted else (
+        "1. Action: Navigate to ${LIMAS_BASE_URL}.\n"
+        "   Expected Result: Application loads successfully with HTTP 200.\n\n"
+        "2. Action: Verify presence of core controls.\n"
+        "   Expected Result: Controls are visible and ready for interaction."
+    )
+
+    # Format Multi-Language Locators Table (Appendix for execution teams)
     loc_rows = []
     for el in elements[:25]:
         eid = el.get("element_id", "")
@@ -134,9 +194,9 @@ def _generate_markdown_test_plan(
         loc_rows.append(f"| {eid} | {tag_role} | {label} | {py_loc} | {java_loc} | {ts_loc} |")
     locators_table = "\n".join(loc_rows) if loc_rows else "| - | - | - | - | - | - |"
 
-    # Format API telemetry table
+    # Format Network Verification Table
     api_rows = []
-    for a in apis:
+    for a in apis[:15]:
         method = a.get("method", "GET")
         url_path = urlparse(a.get("url", "")).path or a.get("url", "")
         status = a.get("status_code", 0)
@@ -146,107 +206,116 @@ def _generate_markdown_test_plan(
         api_rows.append(f"| `{method}` | `{url_path}` | `{status}` | `{target_status}` | `{resp_keys}` | {action} |")
     apis_table = "\n".join(api_rows) if api_rows else "| - | - | - | - | - | - |"
 
-    # Format Scenarios section
-    scenario_sections = []
-    for sc in scenarios:
-        steps_md = []
-        for s in sc.steps:
-            loc_disp = s.locators.get("python", "N/A")
-            if loc_disp != "N/A":
-                loc_disp = f"`{loc_disp}`"
-            codes_disp = ", ".join(str(c) for c in s.expected_status_codes) or "N/A"
-            steps_md.append(f"| {s.step_number} | **{s.action}** | {s.description} | {loc_disp} | `{codes_disp}` |")
-        steps_table = (
-            "| Step | Action | Description | Playwright Locator (Python) | Expected Status |\n"
-            "| :--- | :--- | :--- | :--- | :--- |\n" + "\n".join(steps_md)
-        )
-        scenario_sections.append(
-            f"### Scenario: [{sc.scenario_id}] {sc.title}\n\n"
-            f"- **Classification**: `{sc.category}`\n\n"
-            f"{steps_table}\n"
-        )
-    scenarios_content = "\n".join(scenario_sections)
+    md = f"""---
+test_id: "{test_id}"
+title: "{jira_title}"
+module: "{module_name}"
+page: "{clean_page}"
+section: "{section_name}"
+control: "{control_name}"
+action: "{action_name}"
+access_profile: "ADMIN"
+priority: "High"
+classification: "Read-only"
+test_type: "Automated End-to-End & API Contract"
+automation_candidate: true
+plan_status: "approved"
+script_status: "generated"
+environment_variables:
+  - "LIMAS_BASE_URL"
+  - "TEST_ACCESS_PROFILE"
+test_data:
+  target_url: "{target_url}"
+  flow_prompt: "{user_flow_text}"
+related_script: "tests/test_automation_suite.py"
+---
 
-    md = f"""# IEEE 829 CORPORATE TEST PLAN & AUTOMATION SPECIFICATION
+# Purpose
 
-**Document Reference**: `TP-IEEE829-AUTOGEN-{int(datetime.datetime.now().timestamp())}`  
-**Standard**: IEEE 829-2008 Standard for Software and System Test Documentation  
-**Generated On**: `{timestamp}`  
-**Host Target**: `{url_host}`  
-**Target URL**: `{target_url}`  
-**Page Title**: `{page_title}`  
-**Automation Engine**: 100% Offline Zero-API Playwright Desktop Agent  
+Verify the end-to-end functionality and backend API status code contracts for {module_name} ({clean_page}) when executing the user flow: "{user_flow_text}".
+
+# Preconditions
+
+- `${{LIMAS_BASE_URL}}` is reachable (configured for target: `{target_url}`).
+- Credentials for `${{TEST_ACCESS_PROFILE}}` are configured.
+- The required role and test data are available.
+- The starting page is accessible without security blockades.
+
+# Test Data
+
+Use environment variables, runtime fixtures, or configuration keys:
+- `${{LIMAS_BASE_URL}}`: `{target_url}`
+- Access Profile: `ADMIN`
+- Target Locators: Prioritized Playwright locators (`data-testid` &rarr; `id` &rarr; `role+name`).
+
+# Steps and Expected Results
+
+{steps_block}
+
+# Network Verification
+
+- Request URL: `{api_url}`
+- HTTP Method: `{api_method}`
+- Expected Status: `[{expected_status_str}]`
+- Payload Presence: {api_payload_presence}
+- Visible UI Result: Core interactive elements update state and remain responsive.
+
+### Captured Network API & Status Code Verification Matrix
+
+| Method | Endpoint Path | Observed Status | Target Assertion Status | Response Payload Keys | Triggered By Action |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+{apis_table}
+
+# Expected Final Result
+
+One clear and independently verifiable result: The automation flow completes deterministically with 100% UI locator fidelity and all backend API calls return expected status codes ({expected_status_str}).
+
+# Classification
+
+- Read-only or Data-changing: Read-only (Non-destructive safe probes only)
+- Category: Positive, API, Functional E2E
+
+# Restrictions
+
+- Do not include credentials, tokens, cookies, authorization codes, or sensitive payloads.
+- Do not repeat data-changing submissions.
+- Do not manually navigate to simulate a successful result.
+- Do not use static environment-specific data.
+
+# Generation Status
+
+- Test script generation: Complete (Python, Java, TypeScript, JavaScript)
+- CI/CD execution: Ready
+- Healing: Ready
+
+# Dynamic Plan Rules
+
+1. Use only behavior verified through Playwright MCP.
+2. Verify one atomic behavior per plan.
+3. Do not hardcode application URLs.
+4. Do not hardcode usernames or passwords.
+5. Do not hardcode user names, emails, request IDs, license IDs, hardware IDs, dates, User Groups, Profiles, Roles, feature names, versions, or local paths.
+6. Use environment variables, access-profiles.json, runtime fixtures, or test-data configuration.
+7. Select exactly one access profile:
+   - SUPER_USER
+   - ADMIN
+   - SUPER_USER_ADMIN_USER
+8. Keep every plan shareable between environments and team members.
+9. CI/CD owns test execution.
+10. The Healer may propose test-only changes later but must not change expected LIMAS behavior.
+11. Plans must use this Jira-style title format:
+
+To verify the functionality of "<Module>" → "<Section>" → "<Control>" → "<Action>"
 
 ---
 
-## 1. Test Plan Identifier & Executive Summary
-
-### 1.1 Scope of Automation
-This deterministic Test Plan defines the automated validation requirements for **{page_title or target_url}**.
-All interactive controls, live DOM hierarchy, and backend XHR/Fetch communication have been cataloged
-via non-destructive browser telemetry.
-
-- **Total Interactive UI Controls Cataloged**: `{len(elements)}`
-- **Total Backend Endpoints Monitored**: `{len(apis)}`
-- **Target Automation Languages**: `Python`, `Java (JUnit 5)`, `TypeScript`, `JavaScript`
-- **Execution Mode**: Local Corporate Channel (`chrome` / `msedge`), 100% Offline, Zero Cloud Dependencies.
-
-### 1.2 User Flow Objectives
-The corporate user declared the following functional flow requirement:
-> *"{user_flow_text}"*
-
----
-
-## 2. Test Items & Features to be Tested
-
-The following functional objectives were decomposed into deterministic test items:
-"""
-    for s in parsed_steps:
-        md += f"- **Step {s.step_order} [{s.action_type}]**: Target: `{s.target_keyword}` | Value: `{s.input_value or 'N/A'}` | Target Status Codes: `{s.expected_status_codes or 'N/A'}`\n"
-
-    md += f"""
----
-
-## 3. UI Component & Multi-Language Locator Inventory
+## Appendix: UI Component & Multi-Language Locator Inventory
 
 Prioritized corporate locator hierarchy: `data-testid` &rarr; `id` &rarr; `role + name` &rarr; `placeholder` &rarr; `label` &rarr; `text` &rarr; `css`.
 
 | Element ID | Tag / Role | Label / Text | Python Playwright | Java Playwright | TS / JS Playwright |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 {locators_table}
-
----
-
-## 4. Captured Network API & Status Code Verification Matrix
-
-Real-time telemetry captured during navigation and safe flow probing:
-
-| Method | Endpoint Path | Observed Status | Target Assertion Status | Response Payload Keys | Triggered By Action |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-{apis_table}
-
----
-
-## 5. Detailed Test Scenarios & Execution Steps
-
-{scenarios_content}
-
----
-
-## 6. Pass/Fail Criteria & Risk Mitigation
-
-### 6.1 Pass Criteria
-1. **Zero UI Divergence**: Every prioritized locator uniquely identifies exactly 1 DOM node without ambiguity.
-2. **Deterministic HTTP Contract**: Captured API endpoints must return one of the declared target status codes (`200` or `201`).
-3. **Multi-Language Parity**: All 4 target frameworks (`Python`, `Java`, `TypeScript`, `JavaScript`) produce identical execution semantics.
-
-### 6.2 Corporate Risk Mitigation
-- **Non-Destructive Safe Probing**: Destructive operations (`DELETE`, `POST /admin`, drop, remove) are filtered out automatically by corporate keyword safeguards.
-- **Zero Data Leakage**: No network requests or telemetry were transmitted outside the local machine.
-- **Headless Execution**: Compatible with Windows Desktop environments and corporate CI/CD pipelines.
-
----
-*Generated by Offline Playwright Desktop Agent - Phase 2*
 """
     return md.strip()
 
@@ -425,7 +494,6 @@ def test_planner_node(state: AgentState) -> Dict[str, Any]:
     # -------------------------------------------------------------------------
     s3_steps: List[TestStepSpec] = []
     s3_num = 1
-    # Check top captured APIs
     target_apis = [a for a in apis if a.get("status_code") in (200, 201)]
     if not target_apis:
         target_apis = apis[:5]
@@ -457,7 +525,7 @@ def test_planner_node(state: AgentState) -> Dict[str, Any]:
 
     scenarios = [scenario_1, scenario_2, scenario_3]
 
-    # Generate the Markdown Test Plan
+    # Generate the Markdown Test Plan adhering strictly to PLAN_TEMPLATE.md
     md_content = _generate_markdown_test_plan(
         target_url=target_url,
         page_title=page_title,
@@ -471,6 +539,7 @@ def test_planner_node(state: AgentState) -> Dict[str, Any]:
     # Save outputs if output_dir specified
     created_files: List[str] = list(state.get("generated_files", []))
     if output_dir:
+        # Save unified Master Test Plan at root docs/
         docs_dir = Path(output_dir) / "docs"
         docs_dir.mkdir(parents=True, exist_ok=True)
 
@@ -486,7 +555,7 @@ def test_planner_node(state: AgentState) -> Dict[str, Any]:
         state,
         "TestPlannerNode",
         0.75,
-        "IEEE 829 Test Plan & Scenarios generated successfully.",
+        "IEEE 829 Test Plan strictly adhering to PLAN_TEMPLATE.md generated successfully.",
     )
 
     return {
@@ -494,4 +563,3 @@ def test_planner_node(state: AgentState) -> Dict[str, Any]:
         "test_scenarios": [sc.model_dump() for sc in scenarios],
         "generated_files": created_files,
     }
-

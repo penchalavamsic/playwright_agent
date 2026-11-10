@@ -13,12 +13,15 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 TARGET_EXE = ROOT / "dist" / "PlaywrightEnterpriseQAStudio" / "PlaywrightEnterpriseQAStudio.exe"
+TARGET_RELEASE_EXE = ROOT / "dist_release" / "PlaywrightEnterpriseQAStudio" / "PlaywrightEnterpriseQAStudio.exe"
 
 
 def test_phase5_smoke() -> int:
     print("=" * 80)
     print("PHASE 5 STANDALONE WINDOWS EXECUTABLE SMOKE TEST")
     print("=" * 80)
+
+    exe_target = TARGET_RELEASE_EXE if TARGET_RELEASE_EXE.exists() else TARGET_EXE
 
     passed = 0
     failed = 0
@@ -33,25 +36,25 @@ def test_phase5_smoke() -> int:
             print(f"  [FAIL] {desc}")
 
     # 1. Assert Executable File Existence
-    check(TARGET_EXE.exists(), f"PlaywrightEnterpriseQAStudio.exe exists at {TARGET_EXE}")
+    check(exe_target.exists(), f"PlaywrightEnterpriseQAStudio.exe exists at {exe_target}")
 
-    if not TARGET_EXE.exists():
+    if not exe_target.exists():
         print(f"\n[FAIL] Executable not found. Please run build_exe.py first.")
         return 1
 
     # 2. Assert Valid Binary Size
-    size_mb = TARGET_EXE.stat().st_size / (1024 * 1024)
+    size_mb = exe_target.stat().st_size / (1024 * 1024)
     check(size_mb > 0.05, f"Executable binary size is valid ({size_mb:.2f} MB)")
 
     # 3. Assert Directory Structure inside dist/
-    dist_dir = TARGET_EXE.parent
+    dist_dir = exe_target.parent
     check((dist_dir / "_internal").exists() or (dist_dir / "base_library.zip").exists(), "PyInstaller internal dependency bundles exist")
 
     # 4. Smoke test: Run executable with --help in CLI mode
     print("\nExecuting Smoke Test: PlaywrightEnterpriseQAStudio.exe --help ...")
     try:
         proc = subprocess.run(
-            [str(TARGET_EXE), "--help"],
+            [str(exe_target), "--help"],
             capture_output=True,
             text=True,
             timeout=15,
