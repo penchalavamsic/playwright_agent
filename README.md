@@ -1,18 +1,29 @@
 # Offline Playwright Enterprise QA Agent Studio
 
-A **100% Offline, Zero-API Windows Desktop Agent** that deterministically inspects web applications and synthesizes complete corporate Page Object Model (POM) automation suites in **Python**, **Java**, **TypeScript**, and **JavaScript** alongside comprehensive **IEEE 829 Standard Test Plans**.
+A **100% Offline, Zero-API Windows Desktop Agent** that deterministically inspects live web applications, captures real screenshots, screen recordings (`.webm`), and Playwright traces (`trace.zip`), and synthesizes complete corporate Page Object Model (POM) automation suites in **Python**, **Java**, **TypeScript**, and **JavaScript** alongside **IEEE 829 Standard Test Plans** and **Self-Contained Enterprise Test Evidence Reports**.
 
 ---
 
 ## 🌟 Key Corporate Architectural Features
 
-- **100% Offline & Zero-API**: Zero external LLM API calls, zero cloud dependencies, and zero local model weights. Everything executes via deterministic rule-based algorithms and AST/Jinja2 synthesis.
-- **Enterprise Browser Re-use**: Communicates directly with the workstation's pre-installed Google Chrome (`channel="chrome"`) or Microsoft Edge (`channel="msedge"`), eliminating external binary downloads.
-- **Real-Time Telemetry & Safe Probing**: Discovers all interactive DOM controls using corporate locator prioritization (`data-testid` &rarr; `id` &rarr; `role + name` &rarr; `placeholder` &rarr; `label` &rarr; `text` &rarr; `css`) while intercepting XHR/Fetch network contracts and HTTP status codes (`200`, `201`, `400`, `401`, `403`, `500`).
-- **5-Node LangGraph State Machine**: Deterministic stateful pipeline:
+- **100% Offline & Zero-API**: Zero external LLM API calls, zero cloud dependencies, zero external CDN links in generated reports, and zero local model weights. Everything runs locally on the Windows workstation via deterministic rule-based parsing and Jinja2 synthesis.
+- **Enterprise Browser Re-use & Bundled Media Runtime**: Connects directly to pre-installed Microsoft Edge (`channel="msedge"`) or Google Chrome (`channel="chrome"`), with Playwright's driver and `ffmpeg` bundled into the `.exe` for offline `.webm` video recording.
+- **Multi-Account `.env` & Role-Based Profile Switching (Phase 6)**:
+  - Local credential vault stored in `<project_root>/.qa_studio_project.json` (Base64-encoded passwords) and written to `.env`, `.env.example`, `access-profiles.json`, and `.gitignore`.
+  - Dynamic profile selection via GUI dropdown (`None (Public URL)`, `SUPER_USER`, `ADMIN`, `SUPER_USER_ADMIN_USER`, or any custom role) **or** automatic detection from user flow prompts (e.g., `"as super user..."`, `"login as admin..."`).
+  - Automated login execution during live browser inspection and zero hardcoded usernames, passwords, tokens, or URLs in any generated script or test plan (`BASE_URL` and `TEST_ACCESS_PROFILE` resolved dynamically at runtime).
+- **Timestamped & Multi-Day Persistent Workspaces**:
+  - New runs automatically create `<Output_Folder>/<sanitized_domain>_<YYYY-MM-DD_HH-MM-SS>/` (e.g., `saucedemo_com_2026-11-21_14-32-42/`).
+  - **📂 Open Existing Project** reloads an existing project's URL, saved role accounts, target languages, and sequential test counter (`001`, `002`, `003`, ...), appending new tests and IEEE 829 plan sections across multi-day runs without overwriting prior files.
+- **Interactive Persistent Session Mode**: Supports manual two-step workflows (Step A: keep visible browser open for SSO/MFA/OTP/multi-page navigation &rarr; Step B: capture active DOM state, screenshots, video, trace, and generate suites).
+- **Self-Contained Enterprise Test Evidence Reporting (Phase 7)**:
+  - Generates `Complete-Suite-Test-Report/index.html` with inline CSS/JS (zero external CDNs), executive KPI cards, filter/search controls, step-by-step screenshots, playable `video.webm` screen recordings, downloadable `trace.zip`, captured API status matrices, and per-test IEEE 829 plans.
+  - Dynamically resolves the target application name and domain (zero hardcoded app names).
+  - Embeds native screenshot, video, and report generation into all 4 generated Playwright frameworks (`conftest.py` for Python, `BaseTest.java` + `EnterpriseReportListener.java` for Java/TestNG, and `enterprise-reporter.js` for TypeScript/JavaScript).
+- **5-Node LangGraph State Machine**:
   `START` &rarr; `IntentParser` &rarr; `BrowserInspector` &rarr; `TestPlanner` &rarr; `CodeSynthesizer` &rarr; `ProjectScaffolder` &rarr; `END`.
-- **CustomTkinter Desktop GUI**: Modern 60fps dark-themed interface with thread-safe `queue.Queue` streaming, 5-node visual progress cards, live counters, and multi-tab output inspector.
-- **Self-Contained Standalone Executable**: Packaged into a portable Windows `.exe` (`dist/PlaywrightEnterpriseQAStudio/PlaywrightEnterpriseQAStudio.exe`) via PyInstaller.
+- **CustomTkinter Desktop GUI**: Dark-themed desktop interface with thread-safe `queue.Queue` streaming, 5-node visual pipeline cards, live telemetry counters, **📂 Open Existing Project**, **🔑 Role-Based Access Profiles (.env)** vault, **📊 Open Test Report** launcher, and multi-tab output previewer.
+- **Standalone Windows Executable**: Packaged into `dist_release/PlaywrightEnterpriseQAStudio/PlaywrightEnterpriseQAStudio.exe` via PyInstaller.
 
 ---
 
@@ -21,60 +32,71 @@ A **100% Offline, Zero-API Windows Desktop Agent** that deterministically inspec
 ```
 playwright_agent/
 │
-├── core/                                # Phase 1: Browser Telemetry Engine
+├── core/                                # Core Telemetry, Persistence & Reporting
 │   ├── models.py                        # Pydantic models (DOMElement, CapturedAPI, InspectionReport)
-│   └── browser_inspector.py             # Playwright DOM inspection & safe network probing engine
+│   ├── browser_inspector.py             # Playwright DOM inspector, auto-login, screenshots, video & trace capture
+│   ├── workspace_manager.py             # Phase 6: Multi-day .qa_studio_project.json, .env, access-profiles.json, domain+timestamp folders
+│   └── report_generator.py              # Phase 7: Self-contained offline Complete-Suite-Test-Report generator
 │
-├── agents/                              # Phase 2 & 3: LangGraph Pipeline Nodes
+├── agents/                              # LangGraph Deterministic Pipeline Nodes
 │   ├── state.py                         # AgentState TypedDict, ParsedFlowStep, TestScenarioSpec
-│   ├── intent_parser.py                 # IntentParserNode (Rule-based NLP flow tokenizer)
-│   ├── planner_node.py                  # TestPlannerNode (IEEE 829 Test Plan generator)
+│   ├── intent_parser.py                 # IntentParserNode (Flow NLP tokenizer, role detector & output dir resolver)
+│   ├── planner_node.py                  # TestPlannerNode (Append-safe IEEE 829 Test Plan generator)
 │   ├── code_synthesizer_node.py         # CodeSynthesizerNode & ProjectScaffolderNode
 │   └── workflow_graph.py                # 5-node StateGraph pipeline definition
 │
-├── scaffolder/                          # Phase 3: Multi-Language Code Scaffolder
-│   ├── template_registry.py             # Jinja2 environment with safe identifier filters
-│   └── project_builder.py               # Multi-language corporate project directory builder
+├── scaffolder/                          # Multi-Language Code Scaffolder
+│   ├── template_registry.py             # Jinja2 templates for Python, Java, TS, JS (LoginPage, BaseTest, reporters)
+│   └── project_builder.py               # Multi-language corporate repository & evidence builder
 │
-├── gui/                                 # Phase 4: Desktop Studio GUI
-│   └── app_window.py                    # CustomTkinter Enterprise QA Agent Studio
+├── gui/                                 # Desktop Studio GUI
+│   └── app_window.py                    # CustomTkinter Studio (Project Loader, Role Vault, Interactive Mode, Report Launcher)
 │
+├── PLAN_TEMPLATE.md                     # Corporate IEEE 829 Test Plan template rules
 ├── main.py                              # Desktop Application & CLI Entry Point
-├── build_exe.py                         # Automated PyInstaller packaging script
-├── PlaywrightEnterpriseQAStudio.spec    # PyInstaller distribution specification
-├── requirements.txt                     # Dependencies
+├── build_exe.py                         # Automated PyInstaller packaging script (outputs to dist_release/)
+├── PlaywrightEnterpriseQAStudio.spec    # PyInstaller spec (bundles Playwright driver & ffmpeg)
+├── requirements.txt                     # Python dependencies
 │
-├── test_phase1.py                       # Phase 1 verification harness
-├── test_phase2.py                       # Phase 2 verification harness
-├── test_phase3.py                       # Phase 3 verification harness
-├── test_phase4.py                       # Phase 4 verification harness
-└── test_phase5.py                       # Phase 5 smoke test verification harness
+├── test_phase1.py                       # Phase 1: Browser Inspector & DOM Telemetry verification
+├── test_phase2.py                       # Phase 2: LangGraph Pipeline & IEEE 829 Planner verification
+├── test_phase3.py                       # Phase 3: Multi-Language POM Code Synthesizer verification
+├── test_phase4.py                       # Phase 4: CustomTkinter Desktop GUI verification
+├── test_interactive_mode.py             # Phase 4.1: Interactive Two-Step Session verification
+├── test_phase5.py                       # Phase 5: Standalone Executable smoke test
+├── test_phase6.py                       # Phase 6: Multi-Account .env & Multi-Day Workspace verification
+└── test_phase7.py                       # Phase 7: Self-Contained Enterprise Reporting & Real Media verification
 ```
 
 ---
 
 ## 🚀 Quickstart Guide
 
-### 1. Launching the Windows Desktop GUI
-Run the compiled standalone executable directly (no Python needed):
+### 1. Launching the Standalone Windows Desktop App
+Run the compiled executable directly (no Python installation required):
 ```powershell
-& "E:\MySpace\playwright_agent\dist\PlaywrightEnterpriseQAStudio\PlaywrightEnterpriseQAStudio.exe"
+& "E:\MySpace\Projects\playwright_agent\dist_release\PlaywrightEnterpriseQAStudio\PlaywrightEnterpriseQAStudio.exe"
 ```
-Or run directly from the Python virtual environment:
+Or launch from the Python virtual environment:
 ```powershell
 .\.venv\Scripts\python.exe main.py
 ```
 
 ### 2. Running in Headless CLI Mode
 ```powershell
-.\.venv\Scripts\python.exe main.py --cli --url "http://localhost:3000" --flow "Search for 'user', click dashboard, and verify 200 status code" --output "./my_test_suite"
+.\.venv\Scripts\python.exe main.py --cli --url "https://www.saucedemo.com" --flow "Search for 'backpack', click 'Cart' and verify 200 status code" --output "./Test"
 ```
+
+### 3. Rebuilding the Standalone `.exe`
+```powershell
+.\.venv\Scripts\python.exe build_exe.py
+```
+The compiled executable and bundled runtime are written to:
+`dist_release\PlaywrightEnterpriseQAStudio\PlaywrightEnterpriseQAStudio.exe`
 
 ---
 
-## 🧪 Comprehensive Verification Suites
-
-All 5 phases include dedicated automated test suites that run 100% offline against an embedded test portal:
+## 🧪 Verification Suites
 
 ```powershell
 # Phase 1: Browser Inspector & DOM Telemetry
@@ -89,42 +111,69 @@ All 5 phases include dedicated automated test suites that run 100% offline again
 # Phase 4: CustomTkinter Desktop GUI & Queue Polling
 .\.venv\Scripts\python.exe test_phase4.py
 
+# Phase 4.1: Interactive Two-Step Persistent Browser Mode
+.\.venv\Scripts\python.exe test_interactive_mode.py
+
 # Phase 5: Standalone PyInstaller Executable Smoke Test
 .\.venv\Scripts\python.exe test_phase5.py
+
+# Phase 6: Multi-Account .env, Dynamic Role Selection & Multi-Day Persistence
+.\.venv\Scripts\python.exe test_phase6.py
+
+# Phase 7: Self-Contained Enterprise Reporting, Zero-Leak Sweep & Real Media Capture
+.\.venv\Scripts\python.exe test_phase7.py
 ```
 
 ---
 
 ## 📁 Generated Deliverables Structure
 
-When the pipeline executes, it generates a complete corporate directory hierarchy:
+Each new run creates a self-contained timestamped workspace inside the chosen output folder:
 
 ```
-output_workspace/
+<Output_Folder>/<sanitized_domain>_<YYYY-MM-DD_HH-MM-SS>/
 │
-├── docs/
-│   ├── Test_Plan_IEEE829.md             # Formal IEEE 829 Corporate Test Plan
-│   └── network_har_summary.json         # Captured API telemetry & status codes
-│
+├── .env                                 # Local BASE_URL, TEST_ACCESS_PROFILE, and role credentials (gitignored)
+├── .env.example                         # Safe placeholder template for Git sharing
+├── .gitignore                           # Ignores .env, .qa_studio_project.json, caches, build artifacts
+├── .qa_studio_project.json              # Local multi-day workspace state, sequence counter & encoded vault
+├── access-profiles.json                 # Maps role names to environment variable keys
 ├── README.md                            # Multi-framework execution manual
 │
-├── Python_Playwright/                   # pytest-playwright POM Framework
-│   ├── pages/ (base_page.py, app_page.py)
-│   ├── tests/ (test_automation_suite.py)
-│   ├── conftest.py, pytest.ini, requirements.txt
+├── Complete-Suite-Test-Report/          # Phase 7: 100% Offline Enterprise Test Evidence Report
+│   ├── index.html                       # Self-contained HTML report (zero external CDNs)
+│   ├── README.txt                       # Offline viewing instructions
+│   ├── report-summary.json              # Machine-readable KPI & scenario summary
+│   └── Evidence/
+│       ├── Plans/<TEST_ID>/             # Per-test IEEE 829 markdown plans
+│       ├── Screenshots/<TEST_ID>/       # Real step PNGs & final-screenshot.png
+│       ├── Recording/<TEST_ID>/         # Playable Playwright video.webm
+│       └── Trace/<TEST_ID>/             # Playwright trace.zip archive
 │
-├── Java_Playwright/                     # JUnit 5 / TestNG + Maven Framework
+├── docs/
+│   ├── Test_Plan_IEEE829.md             # Master append-safe IEEE 829 Corporate Test Plan
+│   └── network_har_summary.json         # Captured API telemetry & status codes
+│
+├── Python_Playwright/                   # pytest-playwright POM Framework + Report Hooks
+│   ├── pages/ (base_page.py, login_page.py, app_page.py)
+│   ├── tests/ (001_<flow>.py, test_automation_suite.py, test_ui_sanity_check.py, test_api_contract_matrix.py)
+│   └── conftest.py, pytest.ini, requirements.txt
+│
+├── Java_Playwright/                     # TestNG + Maven Framework + EnterpriseReportListener
 │   ├── pom.xml, testng.xml
-│   └── src/ (BasePage.java, AppPage.java, AutomationSuiteTest.java)
+│   └── src/
+│       ├── main/java/com/corp/qa/pages/ (BasePage.java, LoginPage.java, AppPage.java)
+│       └── test/java/com/corp/qa/
+│           ├── listeners/ (EnterpriseReportListener.java)
+│           └── tests/ (BaseTest.java, Test001<Flow>.java, AutomationSuiteTest.java, ...)
 │
-├── TypeScript_Playwright/               # @playwright/test TypeScript Framework
-│   ├── package.json, playwright.config.ts
-│   ├── pages/ (AppPage.ts)
-│   └── tests/ (automation_suite.spec.ts)
+├── TypeScript_Playwright/               # @playwright/test TypeScript Framework + Custom Reporter
+│   ├── package.json, playwright.config.ts, enterprise-reporter.js
+│   ├── pages/ (LoginPage.ts, AppPage.ts)
+│   └── tests/ (001_<flow>.spec.ts, automation_suite.spec.ts, ui_sanity_check.spec.ts, api_contract_matrix.spec.ts)
 │
-└── JavaScript_Playwright/               # @playwright/test JavaScript Framework
-    ├── package.json, playwright.config.js
-    ├── pages/ (AppPage.js)
-    └── tests/ (automation_suite.spec.js)
+└── JavaScript_Playwright/               # @playwright/test JavaScript Framework + Custom Reporter
+    ├── package.json, playwright.config.js, enterprise-reporter.js
+    ├── pages/ (LoginPage.js, AppPage.js)
+    └── tests/ (001_<flow>.spec.js, automation_suite.spec.js, ui_sanity_check.spec.js, api_contract_matrix.spec.js)
 ```
-
