@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LIMAS 3.0 Detailed Test Evidence Report — authentication — SUPER_USER_ADMIN_USER</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; max-width: 100%; margin: 0; overflow-x: hidden; }
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; color: #333; line-height: 1.6; }
+
+.report-header { width: 100%; max-width: 100%; min-width: 0; background: #1a1a2e; color: #fff; padding: 24px; }
+.report-header h1 { margin: 0; max-width: 100%; white-space: normal; overflow-wrap: anywhere; word-break: normal; font-size: 1.4em; }
+
+.summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; width: 100%; margin-top: 16px; }
+.summary-card { min-width: 0; max-width: 100%; overflow: hidden; background: rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; text-align: center; }
+.summary-card .summary-value { max-width: 100%; white-space: normal; overflow-wrap: anywhere; word-break: break-word; text-align: center; line-height: 1.2; font-size: 1.6em; font-weight: bold; }
+.summary-card.profile .summary-value { font-size: clamp(15px, 1.8vw, 26px); }
+.summary-card .summary-label { font-size: 0.75em; opacity: 0.8; margin-top: 4px; }
+.summary-card.passed .summary-value { color: #4caf50; }
+.summary-card.failed .summary-value { color: #f44336; }
+
+.container { max-width: 1100px; margin: 0 auto; padding: 24px 16px; }
+
+.test-card { background: #fff; border-radius: 8px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow: hidden; }
+.test-card.failed { border-left: 4px solid #f44336; }
+.test-card.passed { border-left: 4px solid #4caf50; }
+
+.test-card-heading { display: grid; grid-template-columns: minmax(150px, auto) minmax(0, 1fr); align-items: start; gap: 16px; }
+.test-id-col { font-family: monospace; font-weight: 700; white-space: nowrap; }
+.test-title-col { min-width: 0; white-space: normal; overflow-wrap: anywhere; }
+
+.test-header { display: flex; align-items: center; padding: 12px 16px; cursor: pointer; gap: 12px; user-select: none; }
+.test-header:hover { background: #f0f0f0; }
+.test-status { padding: 2px 10px; border-radius: 12px; font-size: 0.75em; font-weight: bold; white-space: nowrap; }
+.test-status.passed { background: #e8f5e9; color: #2e7d32; }
+.test-status.failed { background: #ffebee; color: #c62828; }
+.test-duration { color: #666; font-size: 0.85em; min-width: 60px; text-align: right; white-space: nowrap; }
+.expand-icon { transition: transform 0.2s; }
+.test-card.expanded .expand-icon { transform: rotate(180deg); }
+.test-body { display: none; padding: 0 16px 16px; }
+.test-card.expanded .test-body { display: block; }
+
+.test-meta { display: flex; flex-wrap: wrap; gap: 24px; margin-bottom: 12px; font-size: 0.9em; color: #555; }
+.steps { margin: 12px 0; }
+.steps ol { padding-left: 24px; }
+.screenshots { margin: 16px 0; }
+.ss-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+.ss-item { text-align: center; min-width: 0; }
+.ss-item img { width: 100%; border-radius: 4px; border: 1px solid #ddd; cursor: pointer; transition: transform 0.15s; }
+.ss-item img:hover { transform: scale(1.02); }
+.ss-item span { display: block; font-size: 0.8em; color: #666; margin-top: 4px; overflow-wrap: anywhere; }
+.video-container { margin: 16px 0; }
+.trace-section, .api-summary, .test-plan, .actual-result, .test-summary { margin: 16px 0; overflow-wrap: anywhere; }
+.final-ss { margin: 16px 0; }
+.final-ss img { border-radius: 4px; border: 1px solid #ddd; max-width: 100%; }
+.errors { background: #fff3e0; border: 1px solid #ff9800; border-radius: 4px; padding: 12px; margin: 16px 0; }
+.errors pre { font-size: 0.85em; overflow-x: auto; white-space: pre-wrap; word-break: break-word; }
+.ind-link { margin: 16px 0; padding: 12px; background: #e3f2fd; border-radius: 4px; font-size: 0.9em; }
+h3 { font-size: 1.1em; margin: 12px 0 6px; border-bottom: 1px solid #eee; padding-bottom: 4px; }
+h4 { font-size: 1em; margin: 10px 0 4px; color: #555; }
+code { background: #f4f4f4; padding: 1px 4px; border-radius: 3px; font-size: 0.9em; white-space: pre-wrap; word-break: break-word; }
+pre { background: #f4f4f4; padding: 8px; border-radius: 4px; font-size: 0.85em; overflow-x: auto; white-space: pre-wrap; word-break: break-word; }
+p { margin: 4px 0; }
+a { color: #1976d2; }
+.no-evidence { background: #f9f9f9; border: 1px dashed #ccc; border-radius: 4px; padding: 12px; margin: 12px 0; color: #888; font-style: italic; }
+.report-container { width: 100%; max-width: 100%; min-width: 0; }
+
+@media (max-width: 700px) {
+  .test-card-heading { grid-template-columns: 1fr; gap: 6px; }
+  .test-header { flex-wrap: wrap; }
+  .summary-grid { grid-template-columns: repeat(3, 1fr); }
+}
+</style>
+</head>
+<body>
+<div class="report-header">
+  <h1>LIMAS 3.0 Detailed Test Evidence Report — authentication — SUPER_USER_ADMIN_USER</h1>
+  <div class="summary-grid">
+    <div class="summary-card"><div class="summary-value">18</div><div class="summary-label">Total</div></div>
+    <div class="summary-card passed"><div class="summary-value">18</div><div class="summary-label">Passed</div></div>
+    <div class="summary-card failed"><div class="summary-value">0</div><div class="summary-label">Failed</div></div>
+    <div class="summary-card"><div class="summary-value">0</div><div class="summary-label">Flaky</div></div>
+    <div class="summary-card"><div class="summary-value">0</div><div class="summary-label">Skipped</div></div>
+    <div class="summary-card"><div class="summary-value">99.73s</div><div class="summary-label">Duration</div></div>
+    <div class="summary-card"><div class="summary-value">2026-11-20</div><div class="summary-label">Date</div></div>
+    <div class="summary-card"><div class="summary-value">Edge</div><div class="summary-label">Browser</div></div>
+    <div class="summary-card profile"><div class="summary-value">SUPER_USER_ADMIN_USER</div><div class="summary-label">Profile</div></div>
+  </div>
+</div>
+<div class="container">
+  
+  <div class="test-card passed" id="test-0">
+    <div class="test-header" onclick="toggleExpand('test-0')">
+      <div class="test-card-heading">
+        <span class="test-id-col">LIMAS-AUTH-009</span>
+        <span class="test-title-col">&quot;Authentication&quot; → &quot;Login page&quot; → &quot;Branding visibility&quot;</span>
+      </div>
+      <span class="test-status passed">PASSED</span>
+      <span class="test-duration">3.00s</span>
+      <span class="expand-icon">▼</span>
+    </div>
+    <div class="test-body">
+      <div class="test-meta">
+        <span><strong>Profile:</strong> SUPER_USER_ADMIN_USER</span>
+        <span><strong>Module:</strong> Authentication</span>
+        <span><strong>Plan:</strong> Plans/LIMAS-AUTH-009/LIMAS-AUTH-009-branding-visibility.md</span>
+      </div>
+      <div class="steps"><h4>Test Steps</h4><ol><li>Navigate to LIMAS login page</li><li>Verify KPIT and LIMAS branding logos</li></ol></div>
+      <div class="test-summary"><h2>Test: LIMAS-AUTH-009</h2></p><p><strong>Module:</strong> Authentication<br><strong>Access Profile:</strong> SUPER_USER_ADMIN_USER<br><strong>Spec:</strong> authentication/LIMAS-AUTH-009-branding-visibility.spec.ts<br><strong>Plan:</strong> LIMAS-AUTH-009-branding-visibility.md</p><p><h3>Purpose</h3><br>Verify that the LIMAS login page displays both KPIT and LIMAS branding logos.</p><p><h3>Preconditions</h3><br><li><code>${LIMAS_BASE_URL}</code> is reachable.</li></p><p><h3>Expected Result</h3><br>The login page displays both KPIT and LIMAS logo images.</div>
+      <div class="test-plan">
+        <h4>Test Plan</h4>
+        <p>---<br>test_id: "LIMAS-AUTH-009"<br>title: "To verify the functionality of \"Authentication\" → \"Login page\" → \"Branding visibility\""<br>module: "Authentication"<br>page: "Login page"<br>section: "Branding"<br>control: "KPIT and LIMAS logos"<br>action: "Visibility"<br>access_profile: "SUPER_USER_ADMIN_USER"<br>priority: "High"<br>classification: "Read-only"<br>test_type: "Visual"<br>automation_candidate: true<br>plan_status: "reviewed"<br>script_status: "not-generated"<br>environment_variables:<br>  - LIMAS_BASE_URL<br>test_data: {}<br>related_script: ""<br>---</p><p><h2>Purpose</h2></p><p>Verify that the LIMAS login page displays both KPIT and LIMAS branding logos.</p><p><h2>Preconditions</h2></p><p><li><code>${LIMAS_BASE_URL}</code> is reachable.</li></p><p><h2>Test Data</h2></p><p>Use environment variables and runtime fixtures.</p><p><h2>Steps and Expected Results</h2></p><p>1. Action: Navigate to <code>${LIMAS_BASE_URL}</code>.<br>   Expected Result: The page loads at the login route.</p><p>2. Action: Inspect the branding area.<br>   Expected Result: The KPIT Logo image and LIMAS Logo image are both visible.</p><p><h2>Network Verification</h2></p><p><li>Request URL: <code>${LIMAS_BASE_URL}/</code></li><br><li>HTTP Method: GET</li><br><li>Expected Status: 200</li><br><li>Payload Presence: KPIT and LIMAS logo SVGs loaded</li><br><li>Visible UI Result: Two logo images rendered</li></p><p><h2>Expected Final Result</h2></p><p>The login page displays both KPIT and LIMAS logo images.</p><p><h2>Classification</h2></p><p><li>Read-only</li><br><li>Visual</li></p><p><h2>Restrictions</h2></p><p><li>Do not include credentials, tokens, cookies, authorization codes, or sensitive payloads.</li><br><li>Do not use static environment-specific data.</li></p><p><h2>Generation Status</h2></p><p><li>Test script generation: Pending</li><br><li>CI/CD execution: Pending</li><br><li>Healing: Pending</li></p>
+      </div>
+      <div class="screenshots"><h4>Step Screenshots</h4><div class="ss-grid"><div class="ss-item">
+        <a href="Evidence/Screenshots/LIMAS-AUTH-009/01-navigate-to-limas-login-page.png" target="_blank" rel="noopener">
+          <img src="Evidence/Screenshots/LIMAS-AUTH-009/01-navigate-to-limas-login-page.png" alt="01 Navigate To Limas Login Page" loading="lazy">
+        </a>
+        <span>01 Navigate To Limas Login Page</span>
+      </div><div class="ss-item">
+        <a href="Evidence/Screenshots/LIMAS-AUTH-009/02-verify-kpit-and-limas-branding-logos.png" target="_blank" rel="noopener">
+          <img src="Evidence/Screenshots/LIMAS-AUTH-009/02-verify-kpit-and-limas-branding-logos.png" alt="02 Verify Kpit And Limas Branding Logos" loading="lazy">
+        </a>
+        <span>02 Verify Kpit And Limas Branding Logos</span>
+      </div></div></div>
+      <div class="final-ss"><h4>Final Screenshot</h4><a href="Evidence/Screenshots/LIMAS-AUTH-009/final-screenshot.png" target="_blank" rel="noopener"><img src="Evidence/Screenshots/LIMAS-AUTH-009/final-screenshot.png" alt="Final state" loading="lazy" style="max-width:640px"></a></div>
+      <div class="video-container">
+      <h4>Screen Recording</h4>
+      <video controls preload="metadata" style="width:100%;max-width:640px">
+        <source src="Evidence/Recording/LIMAS-AUTH-009/video.webm" type="video/webm">
+        Video playback is not supported by this browser.
+      </video>
+      <p><a href="Evidence/Recording/LIMAS-AUTH-009/video.webm" download>Download video</a></p>
+    </div>
+      <div class="api-summary"><h4>API / Navigation Summary</h4><h2>API / Navigation Summary</h2></p><p><strong>Method:</strong> GET<br><strong>Pathname:</strong> /login<br><strong>Status:</strong> 200<br><strong>Trigger:</strong> Page navigation</div>
+      <div class="trace-section">
+      <h4>Trace</h4>
+      <p>Raw trace available for download: <a href="Evidence/Trace/LIMAS-AUTH-009/trace.zip" download>trace.zip</a></p>
+    </div>
+      <div class="actual-result"><h4>Actual Result</h4><h2>Actual Result</h2></p><p><strong>Status:</strong> passed<br><strong>Duration:</strong> 1.61s<br><strong>Final Route:</strong> httlogin</p><p>All assertions completed successfully.</div>
+      
+    </div>
+  </div>
+
+  <div class="test-card passed" id="test-1">
+    <div class="test-header" onclick="toggleExpand('test-1')">
+      <div class="test-card-heading">
+        <span class="test-id-col">LIMAS-AUTH-010</span>
+        <span class="test-title-col">&quot;Authentication&quot; → &quot;Login page&quot; → &quot;Sign In button&quot; → &quot;Enabled state&quot;</span>
+      </div>
+      <span class="test-status passed">PASSED</span>
+      <span class="test-duration">1.90s</span>
+      <span class="expand-icon">▼</span>
+    </div>
+    <div class="test-body">
+      <div class="test-meta">
+        <span><strong>Profile:</strong> SUPER_USER_ADMIN_USER</span>
+        <span><strong>Module:</strong> Authentication</span>
+        <span><strong>Plan:</strong> Plans/LIMAS-AUTH-010/LIMAS-AUTH-010-signin-enabled.md</span>
+      </div>
+      <div class="steps"><h4>Test Steps</h4><ol><li>Open LIMAS login page</li><li>Verify Sign In button visible and enabled</li></ol></div>
+      <div class="test-summary"><h2>Test: LIMAS-AUTH-010</h2></p><p><strong>Module:</strong> Authentication<br><strong>Access Profile:</strong> SUPER_USER_ADMIN_USER<br><strong>Spec:</strong> authentication/LIMAS-AUTH-010-signin-enabled.spec.ts<br><strong>Plan:</strong> LIMAS-AUTH-010-signin-enabled.md</p><p><h3>Purpose</h3><br>Verify that the Sign In button on the LIMAS login page is enabled and clickable.</p><p><h3>Preconditions</h3><br><li><code>${LIMAS_BASE_URL}</code> is reachable.</li></p><p><h3>Expected Result</h3><br>The Sign In button is in an enabled state.</div>
+      <div class="test-plan">
+        <h4>Test Plan</h4>
+        <p>---<br>test_id: "LIMAS-AUTH-010"<br>title: "To verify the functionality of \"Authentication\" → \"Login page\" → \"Sign In button\" → \"Enabled state\""<br>module: "Authentication"<br>page: "Login page"<br>section: "Sign In button"<br>control: "Sign In button"<br>action: "Enabled state"<br>access_profile: "SUPER_USER_ADMIN_USER"<br>priority: "High"<br>classification: "Read-only"<br>test_type: "Positive"<br>automation_candidate: true<br>plan_status: "reviewed"<br>script_status: "not-generated"<br>environment_variables:<br>  - LIMAS_BASE_URL<br>test_data: {}<br>related_script: ""<br>---</p><p><h2>Purpose</h2></p><p>Verify that the Sign In button on the LIMAS login page is enabled and clickable.</p><p><h2>Preconditions</h2></p><p><li><code>${LIMAS_BASE_URL}</code> is reachable.</li></p><p><h2>Test Data</h2></p><p>Use environment variables and runtime fixtures.</p><p><h2>Steps and Expected Results</h2></p><p>1. Action: Navigate to <code>${LIMAS_BASE_URL}</code>.<br>   Expected Result: Login page loads.</p><p>2. Action: Locate the Sign In button.<br>   Expected Result: The button is visible and not disabled.</p><p><h2>Network Verification</h2></p><p><li>Request URL: <code>${LIMAS_BASE_URL}/</code></li><br><li>HTTP Method: GET</li><br><li>Expected Status: 200</li><br><li>Payload Presence: Login page rendered</li><br><li>Visible UI Result: Sign In button enabled</li></p><p><h2>Expected Final Result</h2></p><p>The Sign In button is in an enabled state.</p><p><h2>Classification</h2></p><p><li>Read-only</li><br><li>Positive</li></p><p><h2>Restrictions</h2></p><p><li>Do not include credentials, tokens, cookies, authorization codes, or sensitive payloads.</li><br><li>Do not use static environment-specific data.</li></p><p><h2>Generation Status</h2></p><p><li>Test script generation: Pending</li><br><li>CI/CD execution: Pending</li><br><li>Healing: Pending</li></p>
+      </div>
+      <div class="screenshots"><h4>Step Screenshots</h4><div class="ss-grid"><div class="ss-item">
+        <a href="Evidence/Screenshots/LIMAS-AUTH-010/01-open-limas-login-page.png" target="_blank" rel="noopener">
+          <img src="Evidence/Screenshots/LIMAS-AUTH-010/01-open-limas-login-page.png" alt="01 Open Limas Login Page" loading="lazy">
+        </a>
+        <span>01 Open Limas Login Page</span>
+      </div><div class="ss-item">
+        <a href="Evidence/Screenshots/LIMAS-AUTH-010/02-verify-sign-in-button-visible-and-enabled.png" target="_blank" rel="noopener">
+          <img src="Evidence/Screenshots/LIMAS-AUTH-010/02-verify-sign-in-button-visible-and-enabled.png" alt="02 Verify Sign In Button Visible And Enabled" loading="lazy">
+        </a>
+        <span>02 Verify Sign In Button Visible And Enabled</span>
+      </div></div></div>
+      <div class="final-ss"><h4>Final Screenshot</h4><a href="Evidence/Screenshots/LIMAS-AUTH-010/final-screenshot.png" target="_blank" rel="noopener"><img src="Evidence/Screenshots/LIMAS-AUTH-010/final-screenshot.png" alt="Final state" loading="lazy" style="max-width:640px"></a></div>
+      <div class="video-container">
+      <h4>Screen Recording</h4>
+      <video controls preload="metadata" style="width:100%;max-width:640px">
+        <source src="Evidence/Recording/LIMAS-AUTH-010/video.webm" type="video/webm">
+        Video playback is not supported by this browser.
+      </video>
+      <p><a href="Evidence/Recording/LIMAS-AUTH-010/video.webm" download>Download video</a></p>
+    </div>
+      <div class="api-summary"><h4>API / Navigation Summary</h4><h2>API / Navigation Summary</h2></p><p><strong>Method:</strong> GET<br><strong>Pathname:</strong> /login<br><strong>Status:</strong> 200<br><strong>Trigger:</strong> Page navigation</div>
+      <div class="trace-section">
+      <h4>Trace</h4>
+      <p>Raw trace available for download: <a href="Evidence/Trace/LIMAS-AUTH-010/trace.zip" download>trace.zip</a></p>
+    </div>
+      <div class="actual-result"><h4>Actual Result</h4><h2>Actual Result</h2></p><p><strong>Status:</strong> passed<br><strong>Duration:</strong> 1.03s<br><strong>Final Route:</strong> httlogin</p><p>All assertions completed successfully.</div>
+      
+    </div>
+  </div>
+
+  <div class="test-card passed" id="test-2">
+    <div class="test-header" onclick="toggleExpand('test-2')">
+      <div class="test-card-heading">
+        <span class="test-id-col">LIMAS-AUTH-011</span>
+        <span class="test-title-col">&quot;Authentication&quot; → &quot;Sign In button&quot; → &quot;Navigate to Keycloak&quot;</span>
+      </div>
+      <span class="test-status passed">PASSED</span>
+      <span class="test-duration">3.44s</span>
+      <span class="expand-icon">▼</span>
+    </div>
+    <div class="test-body">
+      <div class="test-meta">
+        <span><strong>Profile:</strong> SUPER_USER_ADMIN_USER</span>
+        <span><strong>Module:</strong> Authentication</span>
+        <span><strong>Plan:</strong> Plans/LIMAS-AUTH-011/LIMAS-AUTH-011-signin-navigate-keycloak.md</span>
+      </div>
+      <div class="steps"><h4>Test Steps</h4><ol><li>Open LIMAS login page</li><li>Click LIMAS Sign In</li><li>Verify Keycloak heading visible</li></ol></div>
+      <div class="test-summary"><h2>Test: LIMAS-AUTH-011</h2></p><p><strong>Module:</strong> Authentication<br><strong>Access Profile:</strong> SUPER_USER_ADMIN_USER<br><strong>Spec:</strong> authentication/LIMAS-AUTH-011-signin-navigate-keycloak.spec.ts<br><strong>Plan:</strong> LIMAS-AUTH-011-signin-navigate-keycloak.md</p><p><h3>Purpose</h3><br>Verify that clicking the Sign In button navigates the user to the Keycloak authentication page.</p><p><h3>Preconditions</h3><br><li><code>${LIMAS_BASE_URL}</code> is reachable.</li></p><p><h3>Expected Result</h3><br>After clicking Sign In, the browser navigates to the Keycloak login page showing the "Sign in to your account" heading.</div>
+      <div class="test-plan">
+        <h4>Test Plan</h4>
+        <p>---<br>test_id: "LIMAS-AUTH-011"<br>title: "To verify the functionality of \"Authentication\" → \"Sign In button\" → \"Navigate to Keycloak\""<br>module: "Authentication"<br>page: "Login page"<br>section: "Sign In button"<br>control: "Sign In button"<br>action: "Navigation to Keycloak"<br>access_profile: "SUPER_USER_ADMIN_USER"<br>priority: "Critical"<br>classification: "Read-only"<br>test_type: "Positive"<br>automation_candidate: true<br>plan_status: "reviewed"<br>script_status: "not-generated"<br>environment_variables:<br>  - LIMAS_BASE_URL<br>test_data: {}<br>related_script: ""<br>---</p><p><h2>Purpose</h2></p><p>Verify that clicking the Sign In button navigates the user to the Keycloak authentication page.</p><p><h2>Preconditions</h2></p><p><li><code>${LIMAS_BASE_URL}</code> is reachable.</li></p><p><h2>Test Data</h2></p><p>Use environment variables and runtime fixtures.</p><p><h2>Steps and Expected Results</h2></p><p>1. Action: Navigate to <code>${LIMAS_BASE_URL}</code>.<br>   Expected Result: Login page loads with Sign In button visible.</p><p>2. Action: Click the Sign In button.<br>   Expected Result: Browser navigates to the Keycloak OpenID Connect authorization endpoint.</p><p>3. Action: Inspect the page after navigation.<br>   Expected Result: Keycloak login page is displayed with heading "Sign in to your account".</p><p><h2>Network Verification</h2></p><p><li>Request URL: Keycloak authorization endpoint (sanitized)</li><br><li>HTTP Method: GET (redirect)</li><br><li>Expected Status: 200</li><br><li>Payload Presence: Keycloak login form</li><br><li>Visible UI Result: Keycloak "Sign in to your account" heading visible</li></p><p><h2>Expected Final Result</h2></p><p>After clicking Sign In, the browser navigates to the Keycloak login page showing the "Sign in to your account" heading.</p><p><h2>Classification</h2></p><p><li>Read-only</li><br><li>Positive</li></p><p><h2>Restrictions</h2></p><p><li>Do not include credentials, tokens, cookies, authorization codes, or sensitive payloads.</li><br><li>Do not capture PKCE or state parameters.</li><br><li>Do not use static environment-specific data.</li></p><p><h2>Generation Status</h2></p><p><li>Test script generation: Pending</li><br><li>CI/CD execution: Pending</li><br><li>Healing: Pending</li></p>
+      </div>
+      <div class="screenshots"><h4>Step Screenshots</h4><div class="ss-grid"><div class="ss-item">
+        <a href="Evidence/Screenshots/LIMAS-AUTH-011/01-open-limas-login-page.png" target="_blank" rel="noopener">
+          <img src="Evidence/Screenshots/LIMAS-AUTH-011/01-open-limas-login-page.png" alt="01 Open Limas Login Page" loading="lazy">
+        </a>
+        <span>01 Open Limas Login Page</span>
+      </div><div class="ss-item">
+        <a href="Evidence/Screenshots/LIMAS-AUTH-011/02-click-limas-sign-in.png" target="_blank" rel="noopener">
+          <img src="Evidence/Screenshots/LIMAS-AUTH-011/02-click-limas-sign-in.png" alt="02 Click Limas Sign In" loading="lazy">
+        </a>
+        <span>02 Click Limas Sign In</span>
+      </div><div class="ss-item">
+        <a href="Evidence/Screenshots/LIMAS-AUTH-011/03-verify-keycloak-heading-visible.png" target="_blank" rel="noopener">
+          <img src="Evidence/Screenshots/LIMAS-AUTH-011/03-verify-keycloak-heading-visible.png" alt="03 Verify Keycloak Heading Visible" loading="lazy">
+        </a>
+        <span>03 Verify Keycloak Heading Visible</span>
+      </div></div></div>
+      <div class="final-ss"><h4>Final Screenshot</h4><a href="Evidence/Screenshots/LIMAS-AUTH-011/final-screenshot.png" target="_blank" rel="noopener"><img src="Evidence/Screenshots/LIMAS-AUTH-011/final-screenshot.png" alt="Final state" loading="lazy" style="max-width:640px"></a></div>
+      <div class="video-container">
+      <h4>Screen Recording</h4>
+      <video controls preload="metadata" style="width:100%;max-width:640px">
+        <source src="Evidence/Recording/LIMAS-AUTH-011/video.webm" type="video/webm">
+        Video playback is not supported by this browser.
+      </video>
+      <p><a href="Evidence/Recording/LIMAS-AUTH-011/video.webm" download>Download video</a></p>
+    </div>
+      <div class="api-summary"><h4>API / Navigation Summary</h4><h2>API / Navigation Summary</h2></p><p><strong>Method:</strong> GET<br><strong>Pathname:</strong> /auth<br><strong>Status:</strong> 200<br><strong>Trigger:</strong> Sign In click<br><strong>Redirects:</strong> /login → /realms/LIMAS/protocol/openid-connect/auth</div>
+      <div class="trace-section">
+      <h4>Trace</h4>
+      <p>Raw trace available for download: <a href="Evidence/Trace/LIMAS-AUTH-011/trace.zip" download>trace.zip</a></p>
+    </div>
+      <div class="actual-result"><h4>Actual Result</h4><h2>Actual Result</h2></p><p><strong>Status:</strong> passed<br><strong>Duration:</strong> 2.38s<br><strong>Final Route:</strong> httpauth</p><p>All assertions completed successfully.</div>
+      
+    </div>
+  </div>
+
+  <div class="test-card passed" id="test-3">
+    <div class="test-header" onclick="toggleExpand('test-3')">
+      <div class="test-card-heading">
+        <span class="test-id-col">LIMAS-AUTH-012</span>
+        <span class="test-title-col">&quot;Keycloak&quot; → &quot;Login page&quot; → &quot;Heading visibility&quot;</span>
+      </div>
+      <span class="test-status passed">PASSED</span>
+      <span class="test-duration">3.00s</span>
+      <span class="expand-icon">▼</span>
+    </div>
+    <div class="test-body">
+      <div class="test-meta">
+        <span><strong>Profile:</strong> SUPER_USER_ADMIN_USER</span>
+        <span><strong>Module:</strong> Keycloak</span>
+        <span><strong>Plan:</strong> Plans/LIMAS-AUTH-012/LIMAS-AUTH-012-keycloak-heading.md</span>
+      </div>
+      <div class="steps"><h4>Test Steps</h4><ol><li>Open LIMAS and click Sign In</li><li>Verify Keycloak heading</li></ol></div>
+      <div class="test-summary"><h2>Test: LIMAS-AUTH-012</h2></p><p><strong>Module:</strong> Keycloak<br><strong>Access Profile:</strong> SUPER_USER_ADMIN_USER<br><strong>Spec:</strong> authentication/LIMAS-AUTH-012-keycloak-heading.spec.ts<br><strong>Plan:</strong> LIMAS-AUTH-012-keycloak-heading.md</p><p><h3>Purpose</h3><br>Verify that the Keycloak login page displays the heading "Sign in to your account".</p><p><h3>Preconditions</h3><br><li><code>${LIMAS_BASE_URL}</code> is reachable.</li></p><p><h3>Expected Result</h3><br>The Keycloak page displays the heading "Sign in to your account".</div>
+      <div class="test-plan">
+        <h4>Test Plan</h4>
+        <p>---<br>test_id: "LIMAS-AUTH-012"<br>title: "To verify the functionality of \"Keycloak\" → \"Login page\" → \"Heading visibility\""<br>module: "Keycloak"<br>page: "Keycloak login"<br>section: "Heading"<br>control: "Sign in heading"<br>action: "Visibility"<br>access_profile: "SUPER_USER_ADMIN_USER"<br>priority: "High"<br>classification: "Read-only"<br>test_type: "Visual"<br>automation_candidate: true<br>plan_status: "reviewed"<br>script_status: "not-generated"<br>environment_variables:<br>  - LIMAS_BASE_URL<br>test_data: {}<br>related_script: ""<br>---</p><p><h2>Purpose</h2></p><p>Verify that the Keycloak login page displays the heading "Sign in to your account".</p><p><h2>Preconditions</h2></p><p><li><code>${LIMAS_BASE_URL}</code> is reachable.</li></p><p><h2>Test Data</h2></p><p>Use environment variables and runtime fixtures.</p><p><h2>Steps and Expected Results</h2></p><p>1. Action: Navigate to <code>${LIMAS_BASE_URL}</code> and click Sign In.<br>   Expected Result: Browser reaches the Keycloak login page.</p><p>2. Action: Inspect the page heading.<br>   Expected Result: A level-1 heading with text "Sign in to your account" is visible.</p><p><h2>Network Verification</h2></p><p><li>Request URL: Keycloak authorization endpoint (sanitized)</li><br><li>HTTP Method: GET</li><br><li>Expected Status: 200</li><br><li>Payload Presence: Keycloak login form</li><br><li>Visible UI Result: "Sign in to your account" heading</li></p><p><h2>Expected Final Result</h2></p><p>The Keycloak page displays the heading "Sign in to your account".</p><p><h2>Classification</h2></p><p><li>Read-only</li><br><li>Visual</li></p><p><h2>Restrictions</h2></p><p><li>Do not include credentials, tokens, cookies, authorization codes, or sensitive payloads.</li><br><li>Do not use static environment-specific data.</li></p><p><h2>Generation Status</h2></p><p><li>Test script generation: Pending</li><br><li>CI/CD execution: Pending</li><br><li>Healing: Pending</li></p>
+      </div>
+      <div class="screenshots"><h4>Step Screenshots</h4><div class="ss-grid"><div class="ss-item">
+        <a href="Evidence/Screenshots/LIMAS-AUTH-012/01-open-limas-and-click-sign-in.png" target="_blank" rel="noopener">
+          <img src="Evidence/Screenshots/LIMAS-AUTH-012/01-open-limas-and-click-sign-in.png" alt="01 Open Limas And Click Sign In" loading="lazy">
+        </a>
+        <span>01 Open Limas And Click Sign In</span>
+      </div><div class="ss-item">
+        <a href="Evidence/Screenshots/LIMAS-AUTH-012/02-verify-keycloak-heading.png" target="_blank" rel="noopener">
+          <img src="Evidence/Screenshots/LIMAS-AUTH-012/02-verify-keycloak-heading.png" alt="02 Verify Keycloak Heading" loading="lazy">
+        </a>
+        <span>02 Verify Keycloak Heading</span>
+      </div></div></div>
+      <div class="final-ss"><h4>Final Screenshot</h4><a href="Evidence/Screenshots/LIMAS-AUTH-012/final-screenshot.png" target="_blank" rel="noopener"><img src="Evidence/Screenshots/LIMAS-AUTH-012/final-screenshot.png" alt="Final state" loading="lazy" style="max-width:640px"></a></div>
+      <div class="video-container">
+      <h4>Screen Recording</h4>
+      <video controls preload="metadata" style="width:100%;max-width:640px">
+        <source src="Evidence/Recording/LIMAS-AUTH-012/video.webm" type="video/webm">
+        Video playback is not supported by this browser.
+      </video>
+      <p><a href="Evidence/Recording/LIMAS-AUTH-012/video.webm" download>Download video</a></p>
+    </div>
+      
+      <div class="trace-section">
+      <h4>Trace</h4>
+      <p>Raw trace available for download: <a href="Evidence/Trace/LIMAS-AUTH-012/trace.zip" download>trace.zip</a></p>
+    </div>
+      <div class="actual-result"><h4>Actual Result</h4><h2>Actual Result</h2></p><p><strong>Status:</strong> passed<br><strong>Duration:</strong> 2.03s<br><strong>Final Route:</strong> httpauth</p><p>All assertions completed successfully.</div>
+      
+    </div>
+  </div>
+
+  <div class="test-card passed" id="test-4">
+    <div class="test-header" onclick="toggleExpand('test-4')">
+      <div class="test-card-heading">
+        <span class="test-id-col">LIMAS-AUTH-013</span>
+        <span class="test-title-col">&quot;Keycloak&quot; → &quot;Username or email&quot; → &quot;Field visibility&quot;</span>
+      </div>
+      <span class="test-status passed">PASSED</span>
+      <span class="test-duration">3.39s</span>
+      <span class="expand-icon">▼</span>
+    </div>
+    <div class="test-body">
+      <div class="test-meta">
+        <span><strong>Profile:</strong> SUPER_USER_ADMIN_USER</span>
+        <span><strong>Module:</strong> Keycloak</span>
+        <span><strong>Plan:</strong> Plans/LIMAS-AUTH-013/LIMAS-AUTH-013-keycloak-username-visible.md</span>
+      </div>
+      <div class="steps"><h4>Test Steps</h4><ol><li>Open Keycloak login page</li><li>Verify Username field visible</li></ol></div>
+      <div class="test-summary"><h2>Test: LIMAS-AUTH-013</h2></p><p><strong>Module:</strong> Keycloak<br><strong>Access Profile:</strong> SUPER_USER_ADMIN_USER<br><strong>Spec:</strong> authentication/LIMAS-AUTH-013-keycloak-username-visible.spec.ts<br><strong>Plan:</strong> LIMAS-AUTH-013-keycloak-username-visible.md</p><p><h3>Purpose</h3><br>Verify that the Keycloak login form displays a "Username or email" text input field.</p><p><h3>Preconditions</h3><br><li><code>${LIMAS_BASE_URL}</code> is reachable.</li></p><p><h3>Expected Result</h3><br>The "Username or email" textbox is visible on the Keycloak page.</div>
+      <div class="test-plan">
+        <h4>Test Plan</h4>
+        <p>---<br>test_id: "LIMAS-AUTH-013"<br>title: "To verify the functionality of \"Keycloak\" → \"Username or email\" → \"Field visibility\""<br>module: "Keycloak"<br>page: "Keycloak login"<br>section: "Username or email"<br>control: "Username field"<br>action: "Visibility"<br>access_profile: "SUPER_USER_ADMIN_USER"<br>priority: "High"<br>classification: "Read-only"<br>test_type: "Visual"<br>automation_candidate: true<br>plan_status: "reviewed"<br>script_status: "not-generated"<br>environment_variables:<br>  - LIMAS_BASE_URL<br>test_data: {}<br>related_script: ""<br>---</p><p><h2>Purpose</h2></p><p>Verify that the Keycloak login form displays a "Username or email" text input field.</p><p><h2>Preconditions</h2></p><p><li><code>${LIMAS_BASE_URL}</code> is reachable.</li></p><p><h2>Test Data</h2></p><p>Use environment variables and runtime fixtures.</p><p><h2>Steps and Expected Results</h2></p><p>1. Action: Navigate to <code>${LIMAS_BASE_URL}</code> and click Sign In.<br>   Expected Result: Keycloak login page loads.</p><p>2. Action: Look for the username input field.<br>   Expected Result: A textbox labeled "Username or email" is visible.</p><p><h2>Network Verification</h2></p><p><li>Request URL: Keycloak authorization endpoint (sanitized)</li><br><li>HTTP Method: GET</li><br><li>Expected Status: 200</li><br><li>Payload Presence: Login form with username field</li><br><li>Visible UI Result: "Username or email" textbox visible</li></p><p><h2>Expected Final Result</h2></p><p>The "Username or email" textbox is visible on the Keycloak page.</p><p><h2>Classification</h2></p><p><li>Read-only</li><br><li>Visual</li></p><p><h2>Restrictions</h2></p><p><li>Do not include credentials, tokens, cookies, authorization codes, or sensitive payloads.</li><br><li>Do not use static environment-specific data.</li></p><p><h2>Generation Status</h2></p><p><li>Test script generation: Pending</li><br><li>CI/CD execution: Pending</li><br><li>Healing: Pending</li></p>
+      </div>
+      <div class="screenshots"><h4>Step Screenshots</h4><div class="ss-grid"><div class="ss-item">
+        <a href="Evidence/Screenshots/LIMAS-AUTH-013/01-open-keycloak-login-page.png" target="_blank" rel="noopener">
+          <img src="Evidence/Screenshots/LIMAS-AUTH-013/01-open-keycloak-login-page.png" alt="01 Open Keycloak Login Page" loading="lazy">
+        </a>
+        <span>01 Open Keycloak Login Page</span>
+      </div><div class="ss-item">
+        <a href="Evidence/Screenshots/LIMAS-AUTH-013/02-verify-username-field-visible.png" target="_blank" rel="noopener">
+          <img src="Evidence/Screenshots/LIMAS-AUTH-013/02-verify-username-field-visible.png" alt="02 Verify Username Field Visible" loading="lazy">
+        </a>
+        <span>02 Verify Username Field Visible</span>
+      </div></div></div>
+      <div class="final-ss"><h4>Final Screenshot</h4><a href="Evidence/Screenshots/LIMAS-AUTH-013/final-screenshot.png" target="_blank" rel="noopener"><img src="Evidence/Screenshots/LIMAS-AUTH-013/final-screenshot.png" alt="Final state" loading="lazy" style="max-width:640px"></a></div>
+      <div class="video-container">
+      <h4>Screen Recording</h4>
+      <video controls preload="metadata" style="width:100%;max-width:640px">
+        <source src="Evidence/Recording/LIMAS-AUTH-013/video.webm" type="video/webm">
+        Video playback is not supported by this browser.
+      </video>
+      <p><a href="Evidence/Recording/LIMAS-AUTH-013/video.webm" download>Download video</a></p>
+    </div>
+      
+      <div class="trace-section">
+      <h4>Trace</h4>
+      <p>Raw trace available for download: <a href="Evidence/Trace/LIMAS-AUTH-013/trace.zip" download>trace.zip</a></p>
+    </div>
+      <div class="actual-result"><h4>Actual Result</h4><h2>Actual Result</h2></p><p><strong>Status:</strong> passed<br><strong>Duration:</strong> 2.24s<br><strong>Final Route:</strong> httpauth</p><p>All assertions completed successfully.</div>
+      
+    </div>
+  </div>
+
+  <div class="test-card passed" id="test-5">
+    <div class="test-header" onclick="toggleExpand('test-5')">
+      <div class="test-card-heading">
+        <span class="test-id-col">LIMAS-AUTH-014</span>
+        <span class="test-title-col">&quot;Keycloak&quot; → &quot;Username or email&quot; → &quot;Field enabled state&quot;</span>
+      </div>
+      <span class="test-status passed">PASSED</span>
+      <span class="test-duration">3.71s</span>
+      <span class="expand-icon">▼</span>
+    </div>
+    <div class="test-body">
+      <div class="test-meta">
+        <span><strong>Profile:</strong> SUPER_USER_ADMIN_USER</span>
+        <span><strong>Module:</strong> Keycloak</span>
+        <span><strong>Plan:</strong> Plans/LIMAS-AUTH-014/LIMAS-AUTH-014-keycloak-username-enabled.md</span>
+      </div>
+      <div class="steps"><h4>Test Steps</h4><ol><li>Open Keycloak login page</li><li>Verify Username field visible and enabled</li></ol></div>
+      <div class="test-summary"><h2>Test: LIMAS-AUTH-014</h2></p><p><strong>Module:</strong> Keycloak<br><strong>Access Profile:</strong> SUPER_USER_ADMIN_USER<br><strong>Spec:</strong> authentication/LIMAS-AUTH-014-keycloak-username-enabled.spec.ts<br><strong>Plan:</strong> LIMAS-AUTH-014-keycloak-username-enabled.md</p><p><h3>Purpose</h3><br>Verify that the "Username or email" field on Keycloak is enabled and accepts input.</p><p><h3>Preconditions</h3><br><li><code>${LIMAS_BASE_URL}</code> is reachable.</li></p><p><h3>Expected Result</h3><br>The "Username or email" textbox is enabled.</div>
+      <div class="test-plan">
+        <h4>Test Plan</h4>
+        <p>---<br>test_id: "LIMAS-AUTH-014"<br>title: "To verify the functionality of \"Keycloak\" → \"Username or email\" → \"Field enabled state\""<br>module: "Keycloak"<br>page: "Keycloak login"<br>section: "Username or email"<br>control: "Username field"<br>action: "Enabled state"<br>access_profile: "SUPER_USER_ADMIN_USER"<br>priority: "High"<br>classification: "Read-only"<br>test_type: "Positive"<br>automation_candidate: true<br>plan_status: "reviewed"<br>script_status: "not-generated"<br>environment_variables:<br>  - LIMAS_BASE_URL<br>test_data: {}<br>related_script: ""<br>---</p><p><h2>Purpose</h2></p><p>Verify that the "Username or email" field on Keycloak is enabled and accepts input.</p><p><h2>Preconditions</h2></p><p><li><code>${LIMAS_BASE_URL}</code> is reachable.</li></p><p><h2>Test Data</h2></p><p>Use environment variables and runtime fixtures.</p><p><h2>Steps and Expected Results</h2></p><p>1. Action: Navigate to <code>${LIMAS_BASE_URL}</code> and click Sign In.<br>   Expected Result: Keycloak login page loads.</p><p>2. Action: Check the username field state.<br>   Expected Result: The "Username or email" textbox is enabled and not disabled.</p><p><h2>Network Verification</h2></p><p><li>Request URL: Keycloak authorization endpoint (sanitized)</li><br><li>HTTP Method: GET</li><br><li>Expected Status: 200</li><br><li>Payload Presence: Login form with username field</li><br><li>Visible UI Result: Username field enabled</li></p><p><h2>Expected Final Result</h2></p><p>The "Username or email" textbox is enabled.</p><p><h2>Classification</h2></p><p><li>Read-only</li><br><li>Positive</li></p><p><h2>Restrictions</h2></p><p><li>Do not include credentials, tokens, cookies, authorization codes, or sensitive payloads.</li><br><li>Do not use static environment-specific data.</li></p><p><h2>Generation Status</h2></p><p><li>Test script generation: Pending</li><br><li>CI/CD execution: Pending</li><br><li>Healing: Pending</li></p>
+      </div>
+      <div class="screenshots"><h4>Step Screenshots</h4><div class="ss-grid"><div class="ss-item">
+        <a href="Evidence/Screenshots/LIMAS-AUTH-014/01-open-keycloak-login-page.png" target="_blank" rel="noopener">
+          <img src="Evidence/Screenshots/LIMAS-AUTH-014/01-open-keycloak-login-page.png" alt="01 Open Keycloak Login Page" loading="lazy">
+        </a>
+        <span>01 Open Keycloak Login Page</span>
+      </div><div class="ss-item">
+        <a href="Evidence/Screenshots/LIMAS-AUTH-014/02-verify-username-field-visible-and-enabled.png" target="_blank" rel="noopener">
+          <img src="Evidence/Screenshots/LIMAS-AUTH-014/02-verify-username-field-visible-and-enabled.png" alt="02 Verify Username Field Visible And Enabled" loading="lazy">
+        </a>
+        <span>02 Verify Username Field Visible And Enabled</span>
+      </div></div></div>
+      <div class="final-ss"><h4>Final Screenshot</h4><a href="Evidence/Screenshots/LIMAS-AUTH-014/final-screenshot.png" target="_blank" rel="noopener"><img src="Evidence/Screenshots/LIMAS-AUTH-014/final-screenshot.png" alt="Final state" loading="lazy" style="max-width:640px"></a></div>
+      <div class="video-container">
+      <h4>Screen Recording</h4>
+      <video controls preload="metadata" style="width:100%;max-width:640px">
+        <source src="Evidence/Recording/LIMAS-AUTH-014/video.webm" type="video/webm">
+        Video playback is not supported by this browser.
+      </video>
+      <p><a href="Evidence/Recording/LIMAS-AUTH-014/video.webm" download>Download video</a></p>
+    </div>
+      
+      <div class="trace-section">
+      <h4>Trace</h4>
+      <p>Raw trace available for download: <a href="Evidence/Trace/LIMAS-AUTH-014/trace.zip" download>trace.zip</a></p>
+    </div>
+      <div class="actual-result"><h4>Actual Result</h4><h2>Actual Result</h2></p><p><strong>Status:</strong> passed<br><strong>Duration:</strong> 2.44s<br><strong>Final Route:</strong> httpauth</p><p>All assertions completed successfully.</div>
+      
+    </div>
+  </div>
+
+  <div class="test-card passed" id="test-6">
+    <div class="test-header" onclick="toggleExpand('test-6')">
+      <div class="test-card-heading">
+        <span class="test-id-col">LIMAS-AUTH-015</span>
+        <span class="test-title-col">&quot;Keycloak&quot; → &quot;Password&quot; → &quot;Field visibility&quot;</span>
+      </div>
+      <span class="test-status passed">PASSED</span>
+      <span class="test-duration">3.39s</span>
+      <span class="expand-icon">▼</span>
+    </div>
+    <div class="test-body">
+      <div class="test-meta">
+        <span><strong>Profile:</strong> SUPER_USER_ADMIN_USER</span>
+        <span><strong>Module:</strong> Keycloak</span>
+        <span><strong>Plan:</strong> Plans/LIMAS-AUTH-015/LIMAS-AUTH-015-keycloak-password-visible.md</span>
+      </div>
+      <div class="steps"><h4>Test Steps</h4><ol><li>Open Keycloak login page</li><li>Verify Password field visible</li></ol></div>
+      <div class="test-summary"><h2>Test: LIMAS-AUTH-015</h2></p><p><strong>Module:</strong> Keycloak<br><strong>Access Profile:</strong> SUPER_USER_ADMIN_USER<br><strong>Spec:</strong> authentication/LIMAS-AUTH-015-keycloak-password-visible.spec.ts<br><strong>Plan:</strong> LIMAS-AUTH-015-keycloak-password-visible.md</p><p><h3>Purpose</h3><br>Verify that the Keycloak login form displays a Password input field.</p><p><h3>Preconditions</h3><br><li><code>${LIMAS_BASE_URL}</code> is reachable.</li></p><p><h3>Expected Result</h3><br>The Password textbox is visible on the Keycloak page.</div>
+      <div class="test-plan">
+        <h4>Test Plan</h4>
+        <p>---<br>test_id: "LIMAS-AUTH-015"<br>title: "To verify the functionality of \"Keycloak\" → \"Password\" → \"Field visibility\""<br>module: "Keycloak"<br>page: "Keycloak login"<br>section: "Password"<br>control: "Password field"<br>action: "Visibility"<br>access_profile: "SUPER_USER_ADMIN_USER"<br>priority: "High"<br>classification: "Read-only"<br>test_type: "Visual"<br>automation_candidate: true<br>plan_status: "reviewed"<br>script_status: "not-generated"<br>environment_variables:<br>  - LIMAS_BASE_URL<br>test_data: {}<br>related_script: ""<br>---</p><p><h2>Purpose</h2></p><p>Verify that the Keycloak login form displays a Password input field.</p><p><h2>Preconditions</h2></p><p><li><code>${LIMAS_BASE_URL}</code> is reachable.</li></p><p><h2>Test Data</h2></p><p>Use environment variables and runtime fixtures.</p><p><h2>Steps and Expected Results</h2></p><p>1. Action: Navigate to <code>${LIMAS_BASE_URL}</code> and click Sign In.<br>   Expected Result: Keycloak login page loads.</p><p>2. Action: Look for the password input field.<br>   Expected Result: A textbox labeled "Password" is visible.</p><p><h2>Network Verification</h2></p><p><li>Request URL: Keycloak authorization endpoint (sanitized)</li><br><li>HTTP Method: GET</li><br><li>Expected Status: 200</li><br><li>Payload Presence: Login form with password field</li><br><li>Visible UI Result: "Password" textbox visible</li></p><p><h2>Expected Final Result</h2></p><p>The Password textbox is visible on the Keycloak page.</p><p><h2>Classification</h2></p><p><li>Read-only</li><br><li>Visual</li></p><p><h2>Restrictions</h2></p><p><li>Do not include credentials, tokens, cookies, authorization codes, or sensitive payloads.</li><br><li>Do not use static environment-specific data.</li></p><p><h2>Generation Status</h2></p><p><li>Test script generation: Pending</li><br><li>CI/CD execution: Pending</li><br><li>Healing: Pending</li></p>
+      </div>
+      <div class="screenshots"><h4>Step Screenshots</h4><div class="ss-grid"><div class="ss-item">
+        <a href="Evidence/Screenshots/LIMAS-AUTH-015/01-open-keycloak-login-page.png" target="_blank" rel="noopener">
+          <img src="Evidence/Screenshots/LIMAS-AUTH-015/01-open-keycloak-login-page.png" alt="01 Open Keycloak Login Page" loading="lazy">
+        </a>
+        <span>01 Open Keycloak Login Page</span>
+      </div><div class="ss-item">
+        <a href="Evidence/Screenshots/LIMAS-AUTH-015/02-verify-password-field-visible.png" target="_blank" rel="noopener">
+          <img src="Evidence/Screenshots/LIMAS-AUTH-015/02-verify-password-field-visible.png" alt="02 Verify Password Field Visible" loading="lazy">
+        </a>
+        <span>02 Verify Password Field Visible</span>
+      </div></div></div>
+      <div class="final-ss"><h4>Final Screenshot</h4><a href="Evidence/Screenshots/LIMAS-AUTH-015/final-screenshot.png" target="_blank" rel="noopener"><img src="Evidence/Screenshots/LIMAS-AUTH-015/final-screenshot.png" alt="Final state" loading="lazy" style="max-width:640px"></a></div>
+      <div class="video-container">
+      <h4>Screen Recording</h4>
+      <video controls preload="metadata" style="width:100%;max-width:640px">
+        <source src="Evidence/Recording/LIMAS-AUTH-015/video.webm" type="video/webm">
+        Video playback is not supported by this browser.
+      </video>
+      <p><a href="Evidence/Recording/LIMAS-AUTH-015/video.webm" download>Download video</a></p>
+    </div>
+      
+      <div class="trace-section">
+      <h4>Trace</h4>
+      <p>Raw trace available for download: <a href="Evidence/Trace/LIMAS-AUTH-015/trace.zip" download>trace.zip</a></p>
+    </div>
+      <div class="actual-result"><h4>Actual Result</h4><h2>Actual Result</h2></p><p><strong>Status:</strong> passed<br><strong>Duration:</strong> 2.22s<br><strong>Final Route:</strong> httpauth</p><p>All assertions completed successfully.</div>
+      
+    </div>
+  </div>
+
+  <div class="test-card passed" id="test-7">
+    <div class="test-header" onclick="toggleExpand('test-7')">
+      <div class="test-card-heading">
+        <span class="test-id-col">LIMAS-AUTH-016</span>
+        <span class="test-title-col">&quot;Keycloak&quot; → &quot;Password&quot; → &quot;Masked state&quot;</span>
+      </div>
+      <span class="test-status passed">PASSED</span>
+      <span class="test-duration">3.49s</span>
+      <span class="expand-icon">▼</span>
+    </div>
+    <div class="test-body">
+      <div class="test-meta">
+        <span><strong>Profile:</strong> SUPER_USER_ADMIN_USER</span>
+        <span><strong>Module:</strong> Keycloak</span>
+        <span><strong>Plan:</strong> Plans/LIMAS-AUTH-016/LIMAS-AUTH-016-keycloak-password-masked.md</span>
+      </div>
+      <div class="steps"><h4>Test Steps</h4><ol><li>Open Keycloak login page</li><li>Verify Password type is password and toggle visible</li></ol></div>
+      <div class="test-summary"><h2>Test: LIMAS-AUTH-016</h2></p><p><strong>Module:</strong> Keycloak<br><strong>Access Profile:</strong> SUPER_USER_ADMIN_USER<br><strong>Spec:</strong> authentication/LIMAS-AUTH-016-keycloak-password-masked.spec.ts<br><strong>Plan:</strong> LIMAS-AUTH-016-keycloak-password-masked.md</p><p><h3>Purpose</h3><br>Verify that the Password field on the Keycloak login page masks entered text by default.</p><p><h3>Preconditions</h3><br><li><code>${LIMAS_BASE_URL}</code> is reachable.</li></p><p><h3>Expected Result</h3><br>The Password field masks entered characters by default and provides a Show password toggle.</div>
+      <div class="test-plan">
+        <h4>Test Plan</h4>
+        <p>---<br>test_id: "LIMAS-AUTH-016"<br>title: "To verify the functionality of \"Keycloak\" → \"Password\" → \"Masked state\""<br>module: "Keycloak"<br>page: "Keycloak login"<br>section: "Password"<br>control: "Password field"<br>action: "Masked state"<br>access_profile: "SUPER_USER_ADMIN_USER"<br>priority: "Critical"<br>classification: "Read-only"<br>test_type: "Security"<br>automation_candidate: true<br>plan_status: "reviewed"<br>script_status: "not-generated"<br>environment_variables:<br>  - LIMAS_BASE_URL<br>test_data: {}<br>related_script: ""<br>---</p><p><h2>Purpose</h2></p><p>Verify that the Password field on the Keycloak login page masks entered text by default.</p><p><h2>Preconditions</h2></p><p><li><code>${LIMAS_BASE_URL}</code> is reachable.</li></p><p><h2>Test Data</h2></p><p>Use environment variables and runtime fixtures.</p><p><h2>Steps and Expected Results</h2></p><p>1. Action: Navigate to <code>${LIMAS_BASE_URL}</code> and click Sign In.<br>   Expected Result: Keycloak login page loads.</p><p>2. Action: Locate the Password field.<br>   Expected Result: The field has type "password" (masked). A "Show password" toggle button is also present.</p><p><h2>Network Verification</h2></p><p><li>Request URL: Keycloak authorization endpoint (sanitized)</li><br><li>HTTP Method: GET</li><br><li>Expected Status: 200</li><br><li>Payload Presence: Login form</li><br><li>Visible UI Result: Password field masked, Show password button visible</li></p><p><h2>Expected Final Result</h2></p><p>The Password field masks entered characters by default and provides a Show password toggle.</p><p><h2>Classification</h2></p><p><li>Read-only</li><br><li>Security</li></p><p><h2>Restrictions</h2></p><p><li>Do not include credentials, tokens, cookies, authorization codes, or sensitive payloads.</li><br><li>Do not use static environment-specific data.</li></p><p><h2>Generation Status</h2></p><p><li>Test script generation: Pending</li><br><li>CI/CD execution: Pending</li><br><li>Healing: Pending</li></p>
+      </div>
+      <div class="screenshots"><h4>Step Screenshots</h4><div class="ss-grid"><div class="ss-item">
+        <a href="Evidence/Screenshots/LIMAS-AUTH-016/01-open-keycloak-login-page.png" target="_blank" rel="noopener">
+          <img src="Evidence/Screenshots/LIMAS-AUTH-016/01-open-keycloak-login-page.png" alt="01 Open Keycloak Login Page" loading="lazy">
+        </a>
+        <span>01 Open Keycloak Login Page</span>
+      </div><div class="ss-item">
+        <a href="Evidence/Screenshots/LIMAS-AUTH-016/02-verify-password-type-is-password-and-toggle-visible.png" target="_blank" rel="noopener">
+          <img src="Evidence/Screenshots/LIMAS-AUTH-016/02-verify-password-type-is-password-and-toggle-visible.png" alt="02 Verify Password Type Is Password And Toggle Visible" loading="lazy">
+        </a>
+        <span>02 Verify Password Type Is Password And Toggle Visible</span>
+      </div></div></div>
+      <div class="final-ss"><h4>Final Screenshot</h4><a href="Evidence/Screenshots/LIMAS-AUTH-016/final-screenshot.png" target="_blank" rel="noopener"><img src="Evidence/Screenshots/LIMAS-AUTH-016/final-screenshot.png" alt="Final state" loading="lazy" style="max-width:640px"></a></div>
+      <div class="video-container">
+      <h4>Screen Recording</h4>
+      <video controls preload="metadata" style="width:100%;max-width:640px">
+        <source src="Evidence/Recording/LIMAS-AUTH-016/video.webm" type="video/webm">
+        Video playback is not supported by this browser.
+      </video>
+      <p><a href="Evidence/Recording/LIMAS-AUTH-016/video.webm" download>Download video</a></p>
+    </div>
+      
+      <div class="trace-section">
+      <h4>Trace</h4>
+      <p>Raw trace available for download: <a href="Evidence/Trace/LIMAS-AUTH-016/trace.zip" download>trace.zip</a></p>
+    </div>
+      <div class="actual-result"><h4>Actual Result</h4><h2>Actual Result</h2></p><p><strong>Status:</strong> passed<br><strong>Duration:</strong> 2.32s<br><strong>Final Route:</strong> httpauth</p><p>All assertions completed successfully.</div>
+      
+    </div>
+  </div>
+
+  <div class="test-card passed" id="test-8">
+    <div class="test-header" onclick="toggleExpand('test-8')">
+      <div class="test-card-heading">
+        <span class="test-id-col">LIMAS-AUTH-017</span>
+        <span class="test-title-col">&quot;Keycloak&quot; → &quot;Sign In&quot; → &quot;Button visibility&quot;</span>
+      </div>
+      <span class="test-status passed">PASSED</span>
+      <span class="test-duration">3.30s</span>
+      <span class="expand-icon">▼</span>
+    </div>
+    <div class="test-body">
+      <div class="test-meta">
+        <span><strong>Profile:</strong> SUPER_USER_ADMIN_USER</span>
+        <span><strong>Module:</strong> Keycloak</span>
+        <span><strong>Plan:</strong> Plans/LIMAS-AUTH-017/LIMAS-AUTH-017-keycloak-signin-visible.md</span>
+      </div>
+      <div class="steps"><h4>Test Steps</h4><ol><li>Open Keycloak login page</li><li>Verify Keycloak Sign In button visible</li></ol></div>
+      <div class="test-summary"><h2>Test: LIMAS-AUTH-017</h2></p><p><strong>Module:</strong> Keycloak<br><strong>Access Profile:</strong> SUPER_USER_ADMIN_USER<br><strong>Spec:</strong> authentication/LIMAS-AUTH-017-keycloak-signin-visible.spec.ts<br><strong>Plan:</strong> LIMAS-AUTH-017-keycloak-signin-visible.md</p><p><h3>Purpose</h3><br>Verify that the Keycloak Sign In button is visible on the login page.</p><p><h3>Preconditions</h3><br><li><code>${LIMAS_BASE_URL}</code> is reachable.</li></p><p><h3>Expected Result</h3><br>The Keycloak Sign In button is visible.</div>
+      <div class="test-plan">
+        <h4>Test Plan</h4>
+        <p>---<br>test_id: "LIMAS-AUTH-017"<br>title: "To verify the functionality of \"Keycloak\" → \"Sign In\" → \"Button visibility\""<br>module: "Keycloak"<br>page: "Keycloak login"<br>section: "Sign In"<br>control: "Sign In button"<br>action: "Visibility"<br>access_profile: "SUPER_USER_ADMIN_USER"<br>priority: "High"<br>classification: "Read-only"<br>test_type: "Visual"<br>automation_candidate: true<br>plan_status: "reviewed"<br>script_status: "not-generated"<br>environment_variables:<br>  - LIMAS_BASE_URL<br>test_data: {}<br>related_script: ""<br>---</p><p><h2>Purpose</h2></p><p>Verify that the Keycloak Sign In button is visible on the login page.</p><p><h2>Preconditions</h2></p><p><li><code>${LIMAS_BASE_URL}</code> is reachable.</li></p><p><h2>Test Data</h2></p><p>Use environment variables and runtime fixtures.</p><p><h2>Steps and Expected Results</h2></p><p>1. Action: Navigate to <code>${LIMAS_BASE_URL}</code> and click Sign In.<br>   Expected Result: Keycloak login page loads.</p><p>2. Action: Look for the Sign In button.<br>   Expected Result: A button labeled "Sign In" is visible.</p><p><h2>Network Verification</h2></p><p><li>Request URL: Keycloak authorization endpoint (sanitized)</li><br><li>HTTP Method: GET</li><br><li>Expected Status: 200</li><br><li>Payload Presence: Login form with Sign In button</li><br><li>Visible UI Result: Sign In button visible</li></p><p><h2>Expected Final Result</h2></p><p>The Keycloak Sign In button is visible.</p><p><h2>Classification</h2></p><p><li>Read-only</li><br><li>Visual</li></p><p><h2>Restrictions</h2></p><p><li>Do not include credentials, tokens, cookies, authorization codes, or sensitive payloads.</li><br><li>Do not use static environment-specific data.</li></p><p><h2>Generation Status</h2></p><p><li>Test script generation: Pending</li><br><li>CI/CD execution: Pending</li><br><li>Healing: Pending</li></p>
+      </div>
+      <div class="screenshots"><h4>Step Screenshots</h4><div class="ss-grid"><div class="ss-item">
+        <a href="Evidence/Screenshots/LIMAS-AUTH-017/01-open-keycloak-login-page.png" target="_blank" rel="noopener">
+          <img src="Evidence/Screenshots/LIMAS-AUTH-017/01-open-keycloak-login-page.png" alt="01 Open Keycloak Login Page" loading="lazy">
+        </a>
+        <span>01 Open Keycloak Login Page</span>
+      </div><div class="ss-item">
+        <a href="Evidence/Screenshots/LIMAS-AUTH-017/02-verify-keycloak-sign-in-button-visible.png" target="_blank" rel="noopener">
+          <img src="Evidence/Screenshots/LIMAS-AUTH-017/02-verify-keycloak-sign-in-button-visible.png" alt="02 Verify Keycloak Sign In Button Visible" loading="lazy">
+        </a>
+        <span>02 Verify Keycloak Sign In Button Visible</span>
+      </div></div></div>
+      <div class="final-ss"><h4>Final Screenshot</h4><a href="Evidence/Screenshots/LIMAS-AUTH-017/final-screenshot.png" target="_blank" rel="noopener"><img src="Evidence/Screenshots/LIMAS-AUTH-017/final-screenshot.png" alt="Final state" loading="lazy" style="max-width:640px"></a></div>
+      <div class="video-container">
+      <h4>Screen Recording</h4>
+      <video controls preload="metadata" style="width:100%;max-width:640px">
+        <source src="Evidence/Recording/LIMAS-AUTH-017/video.webm" type="video/webm">
+        Video playback is not supported by this browser.
+      </video>
+      <p><a href="Evidence/Recording/LIMAS-AUTH-017/video.webm" download>Download video</a></p>
+    </div>
+      
+      <div class="trace-section">
+      <h4>Trace</h4>
+      <p>Raw trace available for download: <a href="Evidence/Trace/LIMAS-AUTH-017/trace.zip" download>trace.zip</a></p>
+    </div>
+      <div class="actual-result"><h4>Actual Result</h4><h2>Actual Result</h2></p><p><strong>Status:</strong> passed<br><strong>Duration:</strong> 2.16s<br><strong>Final Route:</strong> httpauth</p><p>All assertions completed successfully.</div>
+      
+    </div>
+  </div>
+
+  <div class="test-card passed" id="test-9">
+    <div class="test-header" onclick="toggleExpand('test-9')">
+      <div class="test-card-heading">
+        <span class="test-id-col">LIMAS-AUTH-018</span>
+        <span class="test-title-col">&quot;Keycloak&quot; → &quot;Sign In&quot; → &quot;Button enabled state&quot;</span>
+      </div>
+      <span class="test-status passed">PASSED</span>
+      <span class="test-duration">3.94s</span>
+      <span class="expand-icon">▼</span>
+    </div>
+    <div class="test-body">
+      <div class="test-meta">
+        <span><strong>Profile:</strong> SUPER_USER_ADMIN_USER</span>
+        <span><strong>Module:</strong> Keycloak</span>
+        <span><strong>Plan:</strong> Plans/LIMAS-AUTH-018/LIMAS-AUTH-018-keycloak-signin-enabled.md</span>
+      </div>
+      <div class="steps"><h4>Test Steps</h4><ol><li>Open Keycloak login page</li><li>Verify Keycloak Sign In button visible and enabled</li></ol></div>
+      <div class="test-summary"><h2>Test: LIMAS-AUTH-018</h2></p><p><strong>Module:</strong> Keycloak<br><strong>Access Profile:</strong> SUPER_USER_ADMIN_USER<br><strong>Spec:</strong> authentication/LIMAS-AUTH-018-keycloak-signin-enabled.spec.ts<br><strong>Plan:</strong> LIMAS-AUTH-018-keycloak-signin-enabled.md</p><p><h3>Purpose</h3><br>Verify that the Keycloak Sign In button is enabled and clickable.</p><p><h3>Preconditions</h3><br><li><code>${LIMAS_BASE_URL}</code> is reachable.</li></p><p><h3>Expected Result</h3><br>The Keycloak Sign In button is enabled.</div>
+      <div class="test-plan">
+        <h4>Test Plan</h4>
+        <p>---<br>test_id: "LIMAS-AUTH-018"<br>title: "To verify the functionality of \"Keycloak\" → \"Sign In\" → \"Button enabled state\""<br>module: "Keycloak"<br>page: "Keycloak login"<br>section: "Sign In"<br>control: "Sign In button"<br>action: "Enabled state"<br>access_profile: "SUPER_USER_ADMIN_USER"<br>priority: "High"<br>classification: "Read-only"<br>test_type: "Positive"<br>automation_candidate: true<br>plan_status: "reviewed"<br>script_status: "not-generated"<br>environment_variables:<br>  - LIMAS_BASE_URL<br>test_data: {}<br>related_script: ""<br>---</p><p><h2>Purpose</h2></p><p>Verify that the Keycloak Sign In button is enabled and clickable.</p><p><h2>Preconditions</h2></p><p><li><code>${LIMAS_BASE_URL}</code> is reachable.</li></p><p><h2>Test Data</h2></p><p>Use environment variables and runtime fixtures.</p><p><h2>Steps and Expected Results</h2></p><p>1. Action: Navigate to <code>${LIMAS_BASE_URL}</code> and click Sign In.<br>   Expected Result: Keycloak login page loads.</p><p>2. Action: Check the Keycloak Sign In button state.<br>   Expected Result: The button is visible and enabled (not disabled).</p><p><h2>Network Verification</h2></p><p><li>Request URL: Keycloak authorization endpoint (sanitized)</li><br><li>HTTP Method: GET</li><br><li>Expected Status: 200</li><br><li>Payload Presence: Login form with Sign In button</li><br><li>Visible UI Result: Sign In button enabled</li></p><p><h2>Expected Final Result</h2></p><p>The Keycloak Sign In button is enabled.</p><p><h2>Classification</h2></p><p><li>Read-only</li><br><li>Positive</li></p><p><h2>Restrictions</h2></p><p><li>Do not include credentials, tokens, cookies, authorization codes, or sensitive payloads.</li><br><li>Do not use static environment-specific data.</li></p><p><h2>Generation Status</h2></p><p><li>Test script generation: Pending</li><br><li>CI/CD execution: Pending</li><br><li>Healing: Pending</li></p>
+      </div>
+      <div class="screenshots"><h4>Step Screenshots</h4><div class="ss-grid"><div class="ss-item">
+        <a href="Evidence/Screenshots/LIMAS-AUTH-018/01-open-keycloak-login-page.png" target="_blank" rel="noopener">
+          <img src="Evidence/Screenshots/LIMAS-AUTH-018/01-open-keycloak-login-page.png" alt="01 Open Keycloak Login Page" loading="lazy">
+        </a>
+        <span>01 Open Keycloak Login Page</span>
+      </div><div class="ss-item">
+        <a href="Evidence/Screenshots/LIMAS-AUTH-018/02-verify-keycloak-sign-in-button-visible-and-enabled.png" target="_blank" rel="noopener">
+          <img src="Evidence/Screenshots/LIMAS-AUTH-018/02-verify-keycloak-sign-in-button-visible-and-enabled.png" alt="02 Verify Keycloak Sign In Button Visible And Enabled" loading="lazy">
+        </a>
+        <span>02 Verify Keycloak Sign In Button Visible And Enabled</span>
+      </div></div></div>
+      <div class="final-ss"><h4>Final Screenshot</h4><a href="Evidence/Screenshots/LIMAS-AUTH-018/final-screenshot.png" target="_blank" rel="noopener"><img src="Evidence/Screenshots/LIMAS-AUTH-018/final-screenshot.png" alt="Final state" loading="lazy" style="max-width:640px"></a></div>
+      <div class="video-container">
+      <h4>Screen Recording</h4>
+      <video controls preload="metadata" style="width:100%;max-width:640px">
+        <source src="Evidence/Recording/LIMAS-AUTH-018/video.webm" type="video/webm">
+        Video playback is not supported by this browser.
+      </video>
+      <p><a href="Evidence/Recording/LIMAS-AUTH-018/video.webm" download>Download video</a></p>
+    </div>
+      
+      <div class="trace-section">
+      <h4>Trace</h4>
+      <p>Raw trace available for download: <a href="Evidence/Trace/LIMAS-AUTH-018/trace.zip" download>trace.zip</a></p>
+    </div>
+      <div class="actual-result"><h4>Actual Result</h4><h2>Actual Result</h2></p><p><strong>Status:</strong> passed<br><strong>Duration:</strong> 2.61s<br><strong>Final Route:</strong> httpauth</p><p>All assertions completed successfully.</div>
+      
+    </div>
+  </div>
+
+  <div class="test-card passed" id="test-10">
+    <div class="test-header" onclick="toggleExpand('test-10')">
+      <div class="test-card-heading">
+        <span class="test-id-col">LIMAS-AUTH-019</span>
+        <span class="test-title-col">&quot;Authentication&quot; → &quot;OAuth&quot; → &quot;Callback completion&quot;</span>
+      </div>
+      <span class="test-status passed">PASSED</span>
+      <span class="test-duration">5.33s</span>
+      <span class="expand-icon">▼</span>
+    </div>
+    <div class="test-body">
+      <div class="test-meta">
+        <span><strong>Profile:</strong> SUPER_USER_ADMIN_USER</span>
+        <span><strong>Module:</strong> Authentication</span>
+        <span><strong>Plan:</strong> Plans/LIMAS-AUTH-019/LIMAS-AUTH-019-oauth-callback.md</span>
+      </div>
+      <div class="steps"><h4>Test Steps</h4><ol><li>Authenticate via Keycloak login</li><li>Verify dashboard route and heading</li></ol></div>
+      <div class="test-summary"><h2>Test: LIMAS-AUTH-019</h2></p><p><strong>Module:</strong> Authentication<br><strong>Access Profile:</strong> SUPER_USER_ADMIN_USER<br><strong>Spec:</strong> authentication/LIMAS-AUTH-019-oauth-callback.spec.ts<br><strong>Plan:</strong> LIMAS-AUTH-019-oauth-callback.md</p><p><h3>Purpose</h3><br>Verify that after valid Keycloak credential submission, the OAuth callback completes and redirects to the application.</p><p><h3>Preconditions</h3><br><li><code>${LIMAS_BASE_URL}</code> is reachable.</li><br><li>Valid <code>${LIMAS_SUPER_USER_ADMIN_USER_USERNAME}</code> and <code>${LIMAS_SUPER_USER_ADMIN_USER_PASSWORD}</code> are configured in <code>.env</code>.</li><br><li>Access profile <code>SUPER_USER_ADMIN_USER</code> is configured in <code>access-profiles.json</code>.</li></p><p><h3>Expected Result</h3><br>The OAuth callback completes and redirects to the System User Dashboard.</div>
+      <div class="test-plan">
+        <h4>Test Plan</h4>
+        <p>---<br>test_id: "LIMAS-AUTH-019"<br>title: "To verify the functionality of \"Authentication\" → \"OAuth\" → \"Callback completion\""<br>module: "Authentication"<br>page: "OAuth callback"<br>section: "OAuth"<br>control: "Callback handler"<br>action: "Completion"<br>access_profile: "SUPER_USER_ADMIN_USER"<br>priority: "Critical"<br>classification: "Read-only"<br>test_type: "Session"<br>automation_candidate: true<br>plan_status: "reviewed"<br>script_status: "not-generated"<br>environment_variables:<br>  - LIMAS_BASE_URL<br>  - LIMAS_SUPER_USER_ADMIN_USER_USERNAME<br>  - LIMAS_SUPER_USER_ADMIN_USER_PASSWORD<br>test_data: {}<br>related_script: ""<br>---</p><p><h2>Purpose</h2></p><p>Verify that after valid Keycloak credential submission, the OAuth callback completes and redirects to the application.</p><p><h2>Preconditions</h2></p><p><li><code>${LIMAS_BASE_URL}</code> is reachable.</li><br><li>Valid <code>${LIMAS_SUPER_USER_ADMIN_USER_USERNAME}</code> and <code>${LIMAS_SUPER_USER_ADMIN_USER_PASSWORD}</code> are configured in <code>.env</code>.</li><br><li>Access profile <code>SUPER_USER_ADMIN_USER</code> is configured in <code>access-profiles.json</code>.</li></p><p><h2>Test Data</h2></p><p>Credential variable names from the <code>SUPER_USER_ADMIN_USER</code> profile are read at runtime.</p><p><h2>Steps and Expected Results</h2></p><p>1. Action: Navigate to <code>${LIMAS_BASE_URL}</code>, click Sign In.<br>   Expected Result: Keycloak login page loads.</p><p>2. Action: Fill username and password from profile, click Keycloak Sign In.<br>   Expected Result: Browser processes OAuth callback at <code>/auth/callback</code>.</p><p>3. Action: Wait for final redirect.<br>   Expected Result: Browser lands on <code>/system-user-dashboard</code>.</p><p><h2>Network Verification</h2></p><p><li>Request URL: <code>/auth/callback</code> (sanitized query params)</li><br><li>HTTP Method: GET</li><br><li>Expected Status: 200 → redirect</li><br><li>Payload Presence: OAuth redirect response</li><br><li>Visible UI Result: System User Dashboard loads</li></p><p><h2>Expected Final Result</h2></p><p>The OAuth callback completes and redirects to the System User Dashboard.</p><p><h2>Classification</h2></p><p><li>Read-only</li><br><li>Session</li></p><p><h2>Restrictions</h2></p><p><li>Do not include credentials, tokens, cookies, authorization codes, or sensitive payloads.</li><br><li>Do not capture authorization-code or state parameters.</li><br><li>Do not use static environment-specific data.</li></p><p><h2>Generation Status</h2></p><p><li>Test script generation: Pending</li><br><li>CI/CD execution: Pending</li><br><li>Healing: Pending</li></p>
+      </div>
+      <div class="screenshots"><h4>Step Screenshots</h4><div class="ss-grid"><div class="ss-item">
+        <a href="Evidence/Screenshots/LIMAS-AUTH-019/01-authenticate-via-keycloak-login.png" target="_blank" rel="noopener">
+          <img src="Evidence/Screenshots/LIMAS-AUTH-019/01-authenticate-via-keycloak-login.png" alt="01 Authenticate Via Keycloak Login" loading="lazy">
+        </a>
+        <span>01 Authenticate Via Keycloak Login</span>
+      </div><div class="ss-item">
+        <a href="Evidence/Screenshots/LIMAS-AUTH-019/02-verify-dashboard-route-and-heading.png" target="_blank" rel="noopener">
+          <img src="Evidence/Screenshots/LIMAS-AUTH-019/02-verify-dashboard-route-and-heading.png" alt="02 Verify Dashboard Route And Heading" loading="lazy">
+        </a>
+        <span>02 Verify Dashboard Route And Heading</span>
+      </div></div></div>
+      <div class="final-ss"><h4>Final Screenshot</h4><a href="Evidence/Screenshots/LIMAS-AUTH-019/final-screenshot.png" target="_blank" rel="noopener"><img src="Evidence/Screenshots/LIMAS-AUTH-019/final-screenshot.png" alt="Final state" loading="lazy" style="max-width:640px"></a></div>
+      <div class="video-container">
+      <h4>Screen Recording</h4>
+      <video controls preload="metadata" style="width:100%;max-width:640px">
+        <source src="Evidence/Recording/LIMAS-AUTH-019/video.webm" type="video/webm">
+        Video playback is not supported by this browser.
+      </video>
+      <p><a href="Evidence/Recording/LIMAS-AUTH-019/video.webm" download>Download video</a></p>
+    </div>
+      <div class="api-summary"><h4>API / Navigation Summary</h4><h2>API / Navigation Summary</h2></p><p><strong>Method:</strong> GET<br><strong>Pathname:</strong> /auth/callback<br><strong>Status:</strong> 200<br><strong>Trigger:</strong> Keycloak redirect<br><strong>Redirects:</strong> /realms/LIMAS/protocol/openid-connect/auth → /auth/callback → /system-user-dashboard</div>
+      <div class="trace-section">
+      <h4>Trace</h4>
+      <p>Raw trace available for download: <a href="Evidence/Trace/LIMAS-AUTH-019/trace.zip" download>trace.zip</a></p>
+    </div>
+      <div class="actual-result"><h4>Actual Result</h4><h2>Actual Result</h2></p><p><strong>Status:</strong> passed<br><strong>Duration:</strong> 3.78s<br><strong>Final Route:</strong> httsystem-user-dashboard</p><p>All assertions completed successfully.</div>
+      
+    </div>
+  </div>
+
+  <div class="test-card passed" id="test-11">
+    <div class="test-header" onclick="toggleExpand('test-11')">
+      <div class="test-card-heading">
+        <span class="test-id-col">LIMAS-AUTH-020</span>
+        <span class="test-title-col">&quot;Authentication&quot; → &quot;Role routing&quot; → &quot;System User Dashboard heading&quot;</span>
+      </div>
+      <span class="test-status passed">PASSED</span>
+      <span class="test-duration">5.48s</span>
+      <span class="expand-icon">▼</span>
+    </div>
+    <div class="test-body">
+      <div class="test-meta">
+        <span><strong>Profile:</strong> SUPER_USER_ADMIN_USER</span>
+        <span><strong>Module:</strong> Authentication</span>
+        <span><strong>Plan:</strong> Plans/LIMAS-AUTH-020/LIMAS-AUTH-020-dashboard-heading.md</span>
+      </div>
+      <div class="steps"><h4>Test Steps</h4><ol><li>Authenticate via Keycloak login</li><li>Verify System User Dashboard heading</li></ol></div>
+      <div class="test-summary"><h2>Test: LIMAS-AUTH-020</h2></p><p><strong>Module:</strong> Authentication<br><strong>Access Profile:</strong> SUPER_USER_ADMIN_USER<br><strong>Spec:</strong> authentication/LIMAS-AUTH-020-dashboard-heading.spec.ts<br><strong>Plan:</strong> LIMAS-AUTH-020-dashboard-heading.md</p><p><h3>Purpose</h3><br>Verify that after successful SUPER_USER_ADMIN_USER login, the System User Dashboard heading is visible.</p><p><h3>Preconditions</h3><br><li><code>${LIMAS_BASE_URL}</code> is reachable.</li><br><li>Valid credentials for <code>SUPER_USER_ADMIN_USER</code> are configured.</li></p><p><h3>Expected Result</h3><br>The "System User Dashboard" heading is displayed on the page.</div>
+      <div class="test-plan">
+        <h4>Test Plan</h4>
+        <p>---<br>test_id: "LIMAS-AUTH-020"<br>title: "To verify the functionality of \"Authentication\" → \"Role routing\" → \"System User Dashboard heading\""<br>module: "Authentication"<br>page: "System User Dashboard"<br>section: "Heading"<br>control: "Dashboard heading"<br>action: "Visibility"<br>access_profile: "SUPER_USER_ADMIN_USER"<br>priority: "Critical"<br>classification: "Read-only"<br>test_type: "Visual"<br>automation_candidate: true<br>plan_status: "reviewed"<br>script_status: "not-generated"<br>environment_variables:<br>  - LIMAS_BASE_URL<br>  - LIMAS_SUPER_USER_ADMIN_USER_USERNAME<br>  - LIMAS_SUPER_USER_ADMIN_USER_PASSWORD<br>test_data: {}<br>related_script: ""<br>---</p><p><h2>Purpose</h2></p><p>Verify that after successful SUPER_USER_ADMIN_USER login, the System User Dashboard heading is visible.</p><p><h2>Preconditions</h2></p><p><li><code>${LIMAS_BASE_URL}</code> is reachable.</li><br><li>Valid credentials for <code>SUPER_USER_ADMIN_USER</code> are configured.</li></p><p><h2>Test Data</h2></p><p>Credential variable names from the profile are read at runtime.</p><p><h2>Steps and Expected Results</h2></p><p>1. Action: Navigate to <code>${LIMAS_BASE_URL}</code>, click Sign In, and complete Keycloak login with <code>SUPER_USER_ADMIN_USER</code> credentials.<br>   Expected Result: Browser redirects to <code>/system-user-dashboard</code>.</p><p>2. Action: Inspect the page heading.<br>   Expected Result: A level-1 heading with text "System User Dashboard" is visible.</p><p><h2>Network Verification</h2></p><p><li>Request URL: <code>/system-user-dashboard</code></li><br><li>HTTP Method: GET</li><br><li>Expected Status: 200</li><br><li>Payload Presence: Dashboard page</li><br><li>Visible UI Result: "System User Dashboard" heading visible</li></p><p><h2>Expected Final Result</h2></p><p>The "System User Dashboard" heading is displayed on the page.</p><p><h2>Classification</h2></p><p><li>Read-only</li><br><li>Visual</li></p><p><h2>Restrictions</h2></p><p><li>Do not include credentials, tokens, cookies, authorization codes, or sensitive payloads.</li><br><li>Do not use static environment-specific data.</li></p><p><h2>Generation Status</h2></p><p><li>Test script generation: Pending</li><br><li>CI/CD execution: Pending</li><br><li>Healing: Pending</li></p>
+      </div>
+      <div class="screenshots"><h4>Step Screenshots</h4><div class="ss-grid"><div class="ss-item">
+        <a href="Evidence/Screenshots/LIMAS-AUTH-020/01-authenticate-via-keycloak-login.png" target="_blank" rel="noopener">
+          <img src="Evidence/Screenshots/LIMAS-AUTH-020/01-authenticate-via-keycloak-login.png" alt="01 Authenticate Via Keycloak Login" loading="lazy">
+        </a>
+        <span>01 Authenticate Via Keycloak Login</span>
+      </div><div class="ss-item">
+        <a href="Evidence/Screenshots/LIMAS-AUTH-020/02-verify-system-user-dashboard-heading.png" target="_blank" rel="noopener">
+          <img src="Evidence/Screenshots/LIMAS-AUTH-020/02-verify-system-user-dashboard-heading.png" alt="02 Verify System User Dashboard Heading" loading="lazy">
+        </a>
+        <span>02 Verify System User Dashboard Heading</span>
+      </div></div></div>
+      <div class="final-ss"><h4>Final Screenshot</h4><a href="Evidence/Screenshots/LIMAS-AUTH-020/final-screenshot.png" target="_blank" rel="noopener"><img src="Evidence/Screenshots/LIMAS-AUTH-020/final-screenshot.png" alt="Final state" loading="lazy" style="max-width:640px"></a></div>
+      <div class="video-container">
+      <h4>Screen Recording</h4>
+      <video controls preload="metadata" style="width:100%;max-width:640px">
+        <source src="Evidence/Recording/LIMAS-AUTH-020/video.webm" type="video/webm">
+        Video playback is not supported by this browser.
+      </video>
+      <p><a href="Evidence/Recording/LIMAS-AUTH-020/video.webm" download>Download video</a></p>
+    </div>
+      
+      <div class="trace-section">
+      <h4>Trace</h4>
+      <p>Raw trace available for download: <a href="Evidence/Trace/LIMAS-AUTH-020/trace.zip" download>trace.zip</a></p>
+    </div>
+      <div class="actual-result"><h4>Actual Result</h4><h2>Actual Result</h2></p><p><strong>Status:</strong> passed<br><strong>Duration:</strong> 3.86s<br><strong>Final Route:</strong> httsystem-user-dashboard</p><p>All assertions completed successfully.</div>
+      
+    </div>
+  </div>
+
+  <div class="test-card passed" id="test-12">
+    <div class="test-header" onclick="toggleExpand('test-12')">
+      <div class="test-card-heading">
+        <span class="test-id-col">LIMAS-AUTH-021</span>
+        <span class="test-title-col">&quot;Authentication&quot; → &quot;Session&quot; → &quot;Authenticated route stability&quot;</span>
+      </div>
+      <span class="test-status passed">PASSED</span>
+      <span class="test-duration">8.28s</span>
+      <span class="expand-icon">▼</span>
+    </div>
+    <div class="test-body">
+      <div class="test-meta">
+        <span><strong>Profile:</strong> SUPER_USER_ADMIN_USER</span>
+        <span><strong>Module:</strong> Authentication</span>
+        <span><strong>Plan:</strong> Plans/LIMAS-AUTH-021/LIMAS-AUTH-021-route-stability.md</span>
+      </div>
+      <div class="steps"><h4>Test Steps</h4><ol><li>Authenticate and verify landing page</li><li>Verify route stability over time</li></ol></div>
+      <div class="test-summary"><h2>Test: LIMAS-AUTH-021</h2></p><p><strong>Module:</strong> Authentication<br><strong>Access Profile:</strong> SUPER_USER_ADMIN_USER<br><strong>Spec:</strong> authentication/LIMAS-AUTH-021-route-stability.spec.ts<br><strong>Plan:</strong> LIMAS-AUTH-021-route-stability.md</p><p><h3>Purpose</h3><br>Verify that the authenticated dashboard remains at the correct route after login without redirect loops.</p><p><h3>Preconditions</h3><br><li><code>${LIMAS_BASE_URL}</code> is reachable.</li><br><li>Valid credentials for <code>SUPER_USER_ADMIN_USER</code> are configured.</li></p><p><h3>Expected Result</h3><br>The authenticated session remains stable at <code>/system-user-dashboard</code> without redirect loops.</div>
+      <div class="test-plan">
+        <h4>Test Plan</h4>
+        <p>---<br>test_id: "LIMAS-AUTH-021"<br>title: "To verify the functionality of \"Authentication\" → \"Session\" → \"Authenticated route stability\""<br>module: "Authentication"<br>page: "System User Dashboard"<br>section: "Session"<br>control: "Route"<br>action: "Stability"<br>access_profile: "SUPER_USER_ADMIN_USER"<br>priority: "Critical"<br>classification: "Read-only"<br>test_type: "Session"<br>automation_candidate: true<br>plan_status: "reviewed"<br>script_status: "not-generated"<br>environment_variables:<br>  - LIMAS_BASE_URL<br>  - LIMAS_SUPER_USER_ADMIN_USER_USERNAME<br>  - LIMAS_SUPER_USER_ADMIN_USER_PASSWORD<br>test_data: {}<br>related_script: ""<br>---</p><p><h2>Purpose</h2></p><p>Verify that the authenticated dashboard remains at the correct route after login without redirect loops.</p><p><h2>Preconditions</h2></p><p><li><code>${LIMAS_BASE_URL}</code> is reachable.</li><br><li>Valid credentials for <code>SUPER_USER_ADMIN_USER</code> are configured.</li></p><p><h2>Test Data</h2></p><p>Credential variable names from the profile are read at runtime.</p><p><h2>Steps and Expected Results</h2></p><p>1. Action: Complete full Keycloak login and redirect to the dashboard.<br>   Expected Result: Final URL is <code>/system-user-dashboard</code>.</p><p>2. Action: Wait and observe for any redirect loops or unexpected navigation.<br>   Expected Result: The route remains stable at <code>/system-user-dashboard</code> without loops.</p><p><h2>Network Verification</h2></p><p><li>Request URL: <code>/system-user-dashboard</code></li><br><li>HTTP Method: GET</li><br><li>Expected Status: 200</li><br><li>Payload Presence: Dashboard content</li><br><li>Visible UI Result: Stable dashboard with no redirect loops</li></p><p><h2>Expected Final Result</h2></p><p>The authenticated session remains stable at <code>/system-user-dashboard</code> without redirect loops.</p><p><h2>Classification</h2></p><p><li>Read-only</li><br><li>Session</li></p><p><h2>Restrictions</h2></p><p><li>Do not include credentials, tokens, cookies, authorization codes, or sensitive payloads.</li><br><li>Do not use static environment-specific data.</li></p><p><h2>Generation Status</h2></p><p><li>Test script generation: Pending</li><br><li>CI/CD execution: Pending</li><br><li>Healing: Pending</li></p>
+      </div>
+      <div class="screenshots"><h4>Step Screenshots</h4><div class="ss-grid"><div class="ss-item">
+        <a href="Evidence/Screenshots/LIMAS-AUTH-021/01-authenticate-and-verify-landing-page.png" target="_blank" rel="noopener">
+          <img src="Evidence/Screenshots/LIMAS-AUTH-021/01-authenticate-and-verify-landing-page.png" alt="01 Authenticate And Verify Landing Page" loading="lazy">
+        </a>
+        <span>01 Authenticate And Verify Landing Page</span>
+      </div><div class="ss-item">
+        <a href="Evidence/Screenshots/LIMAS-AUTH-021/02-verify-route-stability-over-time.png" target="_blank" rel="noopener">
+          <img src="Evidence/Screenshots/LIMAS-AUTH-021/02-verify-route-stability-over-time.png" alt="02 Verify Route Stability Over Time" loading="lazy">
+        </a>
+        <span>02 Verify Route Stability Over Time</span>
+      </div></div></div>
+      <div class="final-ss"><h4>Final Screenshot</h4><a href="Evidence/Screenshots/LIMAS-AUTH-021/final-screenshot.png" target="_blank" rel="noopener"><img src="Evidence/Screenshots/LIMAS-AUTH-021/final-screenshot.png" alt="Final state" loading="lazy" style="max-width:640px"></a></div>
+      <div class="video-container">
+      <h4>Screen Recording</h4>
+      <video controls preload="metadata" style="width:100%;max-width:640px">
+        <source src="Evidence/Recording/LIMAS-AUTH-021/video.webm" type="video/webm">
+        Video playback is not supported by this browser.
+      </video>
+      <p><a href="Evidence/Recording/LIMAS-AUTH-021/video.webm" download>Download video</a></p>
+    </div>
+      
+      <div class="trace-section">
+      <h4>Trace</h4>
+      <p>Raw trace available for download: <a href="Evidence/Trace/LIMAS-AUTH-021/trace.zip" download>trace.zip</a></p>
+    </div>
+      <div class="actual-result"><h4>Actual Result</h4><h2>Actual Result</h2></p><p><strong>Status:</strong> passed<br><strong>Duration:</strong> 6.27s<br><strong>Final Route:</strong> httsystem-user-dashboard</p><p>All assertions completed successfully.</div>
+      
+    </div>
+  </div>
+
+  <div class="test-card passed" id="test-13">
+    <div class="test-header" onclick="toggleExpand('test-13')">
+      <div class="test-card-heading">
+        <span class="test-id-col">LIMAS-AUTH-022</span>
+        <span class="test-title-col">&quot;Authentication&quot; → &quot;Session&quot; → &quot;Page refresh persistence&quot;</span>
+      </div>
+      <span class="test-status passed">PASSED</span>
+      <span class="test-duration">8.34s</span>
+      <span class="expand-icon">▼</span>
+    </div>
+    <div class="test-body">
+      <div class="test-meta">
+        <span><strong>Profile:</strong> SUPER_USER_ADMIN_USER</span>
+        <span><strong>Module:</strong> Authentication</span>
+        <span><strong>Plan:</strong> Plans/LIMAS-AUTH-022/LIMAS-AUTH-022-refresh-persistence.md</span>
+      </div>
+      <div class="steps"><h4>Test Steps</h4><ol><li>Authenticate and verify dashboard</li><li>Refresh page and verify session persists</li></ol></div>
+      <div class="test-summary"><h2>Test: LIMAS-AUTH-022</h2></p><p><strong>Module:</strong> Authentication<br><strong>Access Profile:</strong> SUPER_USER_ADMIN_USER<br><strong>Spec:</strong> authentication/LIMAS-AUTH-022-refresh-persistence.spec.ts<br><strong>Plan:</strong> LIMAS-AUTH-022-refresh-persistence.md</p><p><h3>Purpose</h3><br>Verify that the authenticated session persists across a full page refresh.</p><p><h3>Preconditions</h3><br><li><code>${LIMAS_BASE_URL}</code> is reachable.</li><br><li>Valid credentials for <code>SUPER_USER_ADMIN_USER</code> are configured.</li></p><p><h3>Expected Result</h3><br>The authenticated dashboard persists across a page refresh.</div>
+      <div class="test-plan">
+        <h4>Test Plan</h4>
+        <p>---<br>test_id: "LIMAS-AUTH-022"<br>title: "To verify the functionality of \"Authentication\" → \"Session\" → \"Page refresh persistence\""<br>module: "Authentication"<br>page: "System User Dashboard"<br>section: "Session"<br>control: "Page refresh"<br>action: "Persistence"<br>access_profile: "SUPER_USER_ADMIN_USER"<br>priority: "Critical"<br>classification: "Read-only"<br>test_type: "Session"<br>automation_candidate: true<br>plan_status: "reviewed"<br>script_status: "not-generated"<br>environment_variables:<br>  - LIMAS_BASE_URL<br>  - LIMAS_SUPER_USER_ADMIN_USER_USERNAME<br>  - LIMAS_SUPER_USER_ADMIN_USER_PASSWORD<br>test_data: {}<br>related_script: ""<br>---</p><p><h2>Purpose</h2></p><p>Verify that the authenticated session persists across a full page refresh.</p><p><h2>Preconditions</h2></p><p><li><code>${LIMAS_BASE_URL}</code> is reachable.</li><br><li>Valid credentials for <code>SUPER_USER_ADMIN_USER</code> are configured.</li></p><p><h2>Test Data</h2></p><p>Credential variable names from the profile are read at runtime.</p><p><h2>Steps and Expected Results</h2></p><p>1. Action: Complete full Keycloak login and confirm the dashboard loads.<br>   Expected Result: System User Dashboard is visible.</p><p>2. Action: Refresh the page.<br>   Expected Result: The dashboard reloads without returning to the login page.</p><p>3. Action: Verify the dashboard heading after refresh.<br>   Expected Result: "System User Dashboard" heading is still visible and content is rendered.</p><p><h2>Network Verification</h2></p><p><li>Request URL: <code>/system-user-dashboard</code></li><br><li>HTTP Method: GET</li><br><li>Expected Status: 200</li><br><li>Payload Presence: Dashboard content</li><br><li>Visible UI Result: Dashboard rendered after refresh</li></p><p><h2>Expected Final Result</h2></p><p>The authenticated dashboard persists across a page refresh.</p><p><h2>Classification</h2></p><p><li>Read-only</li><br><li>Session</li></p><p><h2>Restrictions</h2></p><p><li>Do not include credentials, tokens, cookies, authorization codes, or sensitive payloads.</li><br><li>Do not use static environment-specific data.</li></p><p><h2>Generation Status</h2></p><p><li>Test script generation: Pending</li><br><li>CI/CD execution: Pending</li><br><li>Healing: Pending</li></p>
+      </div>
+      <div class="screenshots"><h4>Step Screenshots</h4><div class="ss-grid"><div class="ss-item">
+        <a href="Evidence/Screenshots/LIMAS-AUTH-022/01-authenticate-and-verify-dashboard.png" target="_blank" rel="noopener">
+          <img src="Evidence/Screenshots/LIMAS-AUTH-022/01-authenticate-and-verify-dashboard.png" alt="01 Authenticate And Verify Dashboard" loading="lazy">
+        </a>
+        <span>01 Authenticate And Verify Dashboard</span>
+      </div><div class="ss-item">
+        <a href="Evidence/Screenshots/LIMAS-AUTH-022/02-refresh-page-and-verify-session-persists.png" target="_blank" rel="noopener">
+          <img src="Evidence/Screenshots/LIMAS-AUTH-022/02-refresh-page-and-verify-session-persists.png" alt="02 Refresh Page And Verify Session Persists" loading="lazy">
+        </a>
+        <span>02 Refresh Page And Verify Session Persists</span>
+      </div></div></div>
+      <div class="final-ss"><h4>Final Screenshot</h4><a href="Evidence/Screenshots/LIMAS-AUTH-022/final-screenshot.png" target="_blank" rel="noopener"><img src="Evidence/Screenshots/LIMAS-AUTH-022/final-screenshot.png" alt="Final state" loading="lazy" style="max-width:640px"></a></div>
+      <div class="video-container">
+      <h4>Screen Recording</h4>
+      <video controls preload="metadata" style="width:100%;max-width:640px">
+        <source src="Evidence/Recording/LIMAS-AUTH-022/video.webm" type="video/webm">
+        Video playback is not supported by this browser.
+      </video>
+      <p><a href="Evidence/Recording/LIMAS-AUTH-022/video.webm" download>Download video</a></p>
+    </div>
+      
+      <div class="trace-section">
+      <h4>Trace</h4>
+      <p>Raw trace available for download: <a href="Evidence/Trace/LIMAS-AUTH-022/trace.zip" download>trace.zip</a></p>
+    </div>
+      <div class="actual-result"><h4>Actual Result</h4><h2>Actual Result</h2></p><p><strong>Status:</strong> passed<br><strong>Duration:</strong> 6.01s<br><strong>Final Route:</strong> httsystem-user-dashboard</p><p>All assertions completed successfully.</div>
+      
+    </div>
+  </div>
+
+  <div class="test-card passed" id="test-14">
+    <div class="test-header" onclick="toggleExpand('test-14')">
+      <div class="test-card-heading">
+        <span class="test-id-col">LIMAS-AUTH-023</span>
+        <span class="test-title-col">&quot;Authentication&quot; → &quot;Session&quot; → &quot;Redirect loop absence&quot;</span>
+      </div>
+      <span class="test-status passed">PASSED</span>
+      <span class="test-duration">10.78s</span>
+      <span class="expand-icon">▼</span>
+    </div>
+    <div class="test-body">
+      <div class="test-meta">
+        <span><strong>Profile:</strong> SUPER_USER_ADMIN_USER</span>
+        <span><strong>Module:</strong> Authentication</span>
+        <span><strong>Plan:</strong> Plans/LIMAS-AUTH-023/LIMAS-AUTH-023-redirect-loop-absence.md</span>
+      </div>
+      <div class="steps"><h4>Test Steps</h4><ol><li>Authenticate and verify landing</li><li>Verify no redirect to login after wait</li></ol></div>
+      <div class="test-summary"><h2>Test: LIMAS-AUTH-023</h2></p><p><strong>Module:</strong> Authentication<br><strong>Access Profile:</strong> SUPER_USER_ADMIN_USER<br><strong>Spec:</strong> authentication/LIMAS-AUTH-023-redirect-loop-absence.spec.ts<br><strong>Plan:</strong> LIMAS-AUTH-023-redirect-loop-absence.md</p><p><h3>Purpose</h3><br>Verify that the authentication flow does not create a redirect loop between the application and Keycloak.</p><p><h3>Preconditions</h3><br><li><code>${LIMAS_BASE_URL}</code> is reachable.</li><br><li>Valid credentials for <code>SUPER_USER_ADMIN_USER</code> are configured.</li></p><p><h3>Expected Result</h3><br>No redirect loop occurs after successful authentication.</div>
+      <div class="test-plan">
+        <h4>Test Plan</h4>
+        <p>---<br>test_id: "LIMAS-AUTH-023"<br>title: "To verify the functionality of \"Authentication\" → \"Session\" → \"Redirect loop absence\""<br>module: "Authentication"<br>page: "All authenticated pages"<br>section: "Session"<br>control: "Redirect behavior"<br>action: "Loop absence"<br>access_profile: "SUPER_USER_ADMIN_USER"<br>priority: "Critical"<br>classification: "Read-only"<br>test_type: "Session"<br>automation_candidate: true<br>plan_status: "reviewed"<br>script_status: "not-generated"<br>environment_variables:<br>  - LIMAS_BASE_URL<br>  - LIMAS_SUPER_USER_ADMIN_USER_USERNAME<br>  - LIMAS_SUPER_USER_ADMIN_USER_PASSWORD<br>test_data: {}<br>related_script: ""<br>---</p><p><h2>Purpose</h2></p><p>Verify that the authentication flow does not create a redirect loop between the application and Keycloak.</p><p><h2>Preconditions</h2></p><p><li><code>${LIMAS_BASE_URL}</code> is reachable.</li><br><li>Valid credentials for <code>SUPER_USER_ADMIN_USER</code> are configured.</li></p><p><h2>Test Data</h2></p><p>Credential variable names from the profile are read at runtime.</p><p><h2>Steps and Expected Results</h2></p><p>1. Action: Navigate to <code>${LIMAS_BASE_URL}</code> and complete full Keycloak login.<br>   Expected Result: User lands on the System User Dashboard.</p><p>2. Action: After reaching the dashboard, observe URL for a period.<br>   Expected Result: The URL does not bounce back to <code>/login</code> or the Keycloak authorization endpoint.</p><p><h2>Network Verification</h2></p><p><li>Request URL: <code>/system-user-dashboard</code></li><br><li>HTTP Method: GET</li><br><li>Expected Status: 200</li><br><li>Payload Presence: Stable dashboard</li><br><li>Visible UI Result: No redirect loop detected</li></p><p><h2>Expected Final Result</h2></p><p>No redirect loop occurs after successful authentication.</p><p><h2>Classification</h2></p><p><li>Read-only</li><br><li>Session</li></p><p><h2>Restrictions</h2></p><p><li>Do not include credentials, tokens, cookies, authorization codes, or sensitive payloads.</li><br><li>Do not use static environment-specific data.</li></p><p><h2>Generation Status</h2></p><p><li>Test script generation: Pending</li><br><li>CI/CD execution: Pending</li><br><li>Healing: Pending</li></p>
+      </div>
+      <div class="screenshots"><h4>Step Screenshots</h4><div class="ss-grid"><div class="ss-item">
+        <a href="Evidence/Screenshots/LIMAS-AUTH-023/01-authenticate-and-verify-landing.png" target="_blank" rel="noopener">
+          <img src="Evidence/Screenshots/LIMAS-AUTH-023/01-authenticate-and-verify-landing.png" alt="01 Authenticate And Verify Landing" loading="lazy">
+        </a>
+        <span>01 Authenticate And Verify Landing</span>
+      </div><div class="ss-item">
+        <a href="Evidence/Screenshots/LIMAS-AUTH-023/02-verify-no-redirect-to-login-after-wait.png" target="_blank" rel="noopener">
+          <img src="Evidence/Screenshots/LIMAS-AUTH-023/02-verify-no-redirect-to-login-after-wait.png" alt="02 Verify No Redirect To Login After Wait" loading="lazy">
+        </a>
+        <span>02 Verify No Redirect To Login After Wait</span>
+      </div></div></div>
+      <div class="final-ss"><h4>Final Screenshot</h4><a href="Evidence/Screenshots/LIMAS-AUTH-023/final-screenshot.png" target="_blank" rel="noopener"><img src="Evidence/Screenshots/LIMAS-AUTH-023/final-screenshot.png" alt="Final state" loading="lazy" style="max-width:640px"></a></div>
+      <div class="video-container">
+      <h4>Screen Recording</h4>
+      <video controls preload="metadata" style="width:100%;max-width:640px">
+        <source src="Evidence/Recording/LIMAS-AUTH-023/video.webm" type="video/webm">
+        Video playback is not supported by this browser.
+      </video>
+      <p><a href="Evidence/Recording/LIMAS-AUTH-023/video.webm" download>Download video</a></p>
+    </div>
+      
+      <div class="trace-section">
+      <h4>Trace</h4>
+      <p>Raw trace available for download: <a href="Evidence/Trace/LIMAS-AUTH-023/trace.zip" download>trace.zip</a></p>
+    </div>
+      <div class="actual-result"><h4>Actual Result</h4><h2>Actual Result</h2></p><p><strong>Status:</strong> passed<br><strong>Duration:</strong> 8.48s<br><strong>Final Route:</strong> httsystem-user-dashboard</p><p>All assertions completed successfully.</div>
+      
+    </div>
+  </div>
+
+  <div class="test-card passed" id="test-15">
+    <div class="test-header" onclick="toggleExpand('test-15')">
+      <div class="test-card-heading">
+        <span class="test-id-col">LIMAS-AUTH-024</span>
+        <span class="test-title-col">&quot;Authentication&quot; → &quot;Login page&quot; → &quot;Footer visibility&quot;</span>
+      </div>
+      <span class="test-status passed">PASSED</span>
+      <span class="test-duration">3.12s</span>
+      <span class="expand-icon">▼</span>
+    </div>
+    <div class="test-body">
+      <div class="test-meta">
+        <span><strong>Profile:</strong> SUPER_USER_ADMIN_USER</span>
+        <span><strong>Module:</strong> Authentication</span>
+        <span><strong>Plan:</strong> Plans/LIMAS-AUTH-024/LIMAS-AUTH-024-footer-visibility.md</span>
+      </div>
+      <div class="steps"><h4>Test Steps</h4><ol><li>Open LIMAS login page</li><li>Verify copyright notice</li></ol></div>
+      <div class="test-summary"><h2>Test: LIMAS-AUTH-024</h2></p><p><strong>Module:</strong> Authentication<br><strong>Access Profile:</strong> SUPER_USER_ADMIN_USER<br><strong>Spec:</strong> authentication/LIMAS-AUTH-024-footer-visibility.spec.ts<br><strong>Plan:</strong> LIMAS-AUTH-024-footer-visibility.md</p><p><h3>Purpose</h3><br>Verify that the LIMAS login page footer displays the KPIT copyright notice.</p><p><h3>Preconditions</h3><br><li><code>${LIMAS_BASE_URL}</code> is reachable.</li></p><p><h3>Expected Result</h3><br>The KPIT copyright notice is visible in the footer of the login page.</div>
+      <div class="test-plan">
+        <h4>Test Plan</h4>
+        <p>---<br>test_id: "LIMAS-AUTH-024"<br>title: "To verify the functionality of \"Authentication\" → \"Login page\" → \"Footer visibility\""<br>module: "Authentication"<br>page: "Login page"<br>section: "Footer"<br>control: "Copyright notice"<br>action: "Visibility"<br>access_profile: "SUPER_USER_ADMIN_USER"<br>priority: "High"<br>classification: "Read-only"<br>test_type: "Visual"<br>automation_candidate: true<br>plan_status: "reviewed"<br>script_status: "not-generated"<br>environment_variables:<br>  - LIMAS_BASE_URL<br>test_data: {}<br>related_script: ""<br>---</p><p><h2>Purpose</h2></p><p>Verify that the LIMAS login page footer displays the KPIT copyright notice.</p><p><h2>Preconditions</h2></p><p><li><code>${LIMAS_BASE_URL}</code> is reachable.</li></p><p><h2>Test Data</h2></p><p>Use environment variables and runtime fixtures.</p><p><h2>Steps and Expected Results</h2></p><p>1. Action: Navigate to <code>${LIMAS_BASE_URL}</code>.<br>   Expected Result: Login page loads.</p><p>2. Action: Inspect the footer area.<br>   Expected Result: Text "© KPIT Technologies Ltd. All rights reserved." is visible.</p><p><h2>Network Verification</h2></p><p><li>Request URL: <code>${LIMAS_BASE_URL}/</code></li><br><li>HTTP Method: GET</li><br><li>Expected Status: 200</li><br><li>Payload Presence: Login page with footer</li><br><li>Visible UI Result: Copyright notice visible</li></p><p><h2>Expected Final Result</h2></p><p>The KPIT copyright notice is visible in the footer of the login page.</p><p><h2>Classification</h2></p><p><li>Read-only</li><br><li>Visual</li></p><p><h2>Restrictions</h2></p><p><li>Do not include credentials, tokens, cookies, authorization codes, or sensitive payloads.</li><br><li>Do not use static environment-specific data.</li></p><p><h2>Generation Status</h2></p><p><li>Test script generation: Pending</li><br><li>CI/CD execution: Pending</li><br><li>Healing: Pending</li></p>
+      </div>
+      <div class="screenshots"><h4>Step Screenshots</h4><div class="ss-grid"><div class="ss-item">
+        <a href="Evidence/Screenshots/LIMAS-AUTH-024/01-open-limas-login-page.png" target="_blank" rel="noopener">
+          <img src="Evidence/Screenshots/LIMAS-AUTH-024/01-open-limas-login-page.png" alt="01 Open Limas Login Page" loading="lazy">
+        </a>
+        <span>01 Open Limas Login Page</span>
+      </div><div class="ss-item">
+        <a href="Evidence/Screenshots/LIMAS-AUTH-024/02-verify-copyright-notice.png" target="_blank" rel="noopener">
+          <img src="Evidence/Screenshots/LIMAS-AUTH-024/02-verify-copyright-notice.png" alt="02 Verify Copyright Notice" loading="lazy">
+        </a>
+        <span>02 Verify Copyright Notice</span>
+      </div></div></div>
+      <div class="final-ss"><h4>Final Screenshot</h4><a href="Evidence/Screenshots/LIMAS-AUTH-024/final-screenshot.png" target="_blank" rel="noopener"><img src="Evidence/Screenshots/LIMAS-AUTH-024/final-screenshot.png" alt="Final state" loading="lazy" style="max-width:640px"></a></div>
+      <div class="video-container">
+      <h4>Screen Recording</h4>
+      <video controls preload="metadata" style="width:100%;max-width:640px">
+        <source src="Evidence/Recording/LIMAS-AUTH-024/video.webm" type="video/webm">
+        Video playback is not supported by this browser.
+      </video>
+      <p><a href="Evidence/Recording/LIMAS-AUTH-024/video.webm" download>Download video</a></p>
+    </div>
+      
+      <div class="trace-section">
+      <h4>Trace</h4>
+      <p>Raw trace available for download: <a href="Evidence/Trace/LIMAS-AUTH-024/trace.zip" download>trace.zip</a></p>
+    </div>
+      <div class="actual-result"><h4>Actual Result</h4><h2>Actual Result</h2></p><p><strong>Status:</strong> passed<br><strong>Duration:</strong> 1.61s<br><strong>Final Route:</strong> httlogin</p><p>All assertions completed successfully.</div>
+      
+    </div>
+  </div>
+
+  <div class="test-card passed" id="test-16">
+    <div class="test-header" onclick="toggleExpand('test-16')">
+      <div class="test-card-heading">
+        <span class="test-id-col">LIMAS-AUTH-025</span>
+        <span class="test-title-col">&quot;Authentication&quot; → &quot;Keycloak&quot; → &quot;Show password toggle&quot; → &quot;Visibility&quot;</span>
+      </div>
+      <span class="test-status passed">PASSED</span>
+      <span class="test-duration">5.11s</span>
+      <span class="expand-icon">▼</span>
+    </div>
+    <div class="test-body">
+      <div class="test-meta">
+        <span><strong>Profile:</strong> SUPER_USER_ADMIN_USER</span>
+        <span><strong>Module:</strong> Keycloak</span>
+        <span><strong>Plan:</strong> Plans/LIMAS-AUTH-025/LIMAS-AUTH-025-show-password-toggle.md</span>
+      </div>
+      <div class="steps"><h4>Test Steps</h4><ol><li>Open Keycloak login page</li><li>Verify Show password button visible</li></ol></div>
+      <div class="test-summary"><h2>Test: LIMAS-AUTH-025</h2></p><p><strong>Module:</strong> Keycloak<br><strong>Access Profile:</strong> SUPER_USER_ADMIN_USER<br><strong>Spec:</strong> authentication/LIMAS-AUTH-025-show-password-toggle.spec.ts<br><strong>Plan:</strong> LIMAS-AUTH-025-show-password-toggle.md</p><p><h3>Purpose</h3><br>Verify that the Keycloak login form provides a "Show password" toggle button next to the Password field.</p><p><h3>Preconditions</h3><br><li><code>${LIMAS_BASE_URL}</code> is reachable.</li></p><p><h3>Expected Result</h3><br>A "Show password" toggle button is visible next to the Password field.</div>
+      <div class="test-plan">
+        <h4>Test Plan</h4>
+        <p>---<br>test_id: "LIMAS-AUTH-025"<br>title: "To verify the functionality of \"Authentication\" → \"Keycloak\" → \"Show password toggle\" → \"Visibility\""<br>module: "Keycloak"<br>page: "Keycloak login"<br>section: "Password"<br>control: "Show password button"<br>action: "Visibility"<br>access_profile: "SUPER_USER_ADMIN_USER"<br>priority: "High"<br>classification: "Read-only"<br>test_type: "Visual"<br>automation_candidate: true<br>plan_status: "reviewed"<br>script_status: "not-generated"<br>environment_variables:<br>  - LIMAS_BASE_URL<br>test_data: {}<br>related_script: ""<br>---</p><p><h2>Purpose</h2></p><p>Verify that the Keycloak login form provides a "Show password" toggle button next to the Password field.</p><p><h2>Preconditions</h2></p><p><li><code>${LIMAS_BASE_URL}</code> is reachable.</li></p><p><h2>Test Data</h2></p><p>Use environment variables and runtime fixtures.</p><p><h2>Steps and Expected Results</h2></p><p>1. Action: Navigate to <code>${LIMAS_BASE_URL}</code> and click Sign In.<br>   Expected Result: Keycloak login page loads.</p><p>2. Action: Locate the Password field area.<br>   Expected Result: A "Show password" button is present adjacent to the Password textbox.</p><p><h2>Network Verification</h2></p><p><li>Request URL: Keycloak authorization endpoint (sanitized)</li><br><li>HTTP Method: GET</li><br><li>Expected Status: 200</li><br><li>Payload Presence: Login form</li><br><li>Visible UI Result: "Show password" button visible</li></p><p><h2>Expected Final Result</h2></p><p>A "Show password" toggle button is visible next to the Password field.</p><p><h2>Classification</h2></p><p><li>Read-only</li><br><li>Visual</li></p><p><h2>Restrictions</h2></p><p><li>Do not include credentials, tokens, cookies, authorization codes, or sensitive payloads.</li><br><li>Do not use static environment-specific data.</li></p><p><h2>Generation Status</h2></p><p><li>Test script generation: Pending</li><br><li>CI/CD execution: Pending</li><br><li>Healing: Pending</li></p>
+      </div>
+      <div class="screenshots"><h4>Step Screenshots</h4><div class="ss-grid"><div class="ss-item">
+        <a href="Evidence/Screenshots/LIMAS-AUTH-025/01-open-keycloak-login-page.png" target="_blank" rel="noopener">
+          <img src="Evidence/Screenshots/LIMAS-AUTH-025/01-open-keycloak-login-page.png" alt="01 Open Keycloak Login Page" loading="lazy">
+        </a>
+        <span>01 Open Keycloak Login Page</span>
+      </div><div class="ss-item">
+        <a href="Evidence/Screenshots/LIMAS-AUTH-025/02-verify-show-password-button-visible.png" target="_blank" rel="noopener">
+          <img src="Evidence/Screenshots/LIMAS-AUTH-025/02-verify-show-password-button-visible.png" alt="02 Verify Show Password Button Visible" loading="lazy">
+        </a>
+        <span>02 Verify Show Password Button Visible</span>
+      </div></div></div>
+      <div class="final-ss"><h4>Final Screenshot</h4><a href="Evidence/Screenshots/LIMAS-AUTH-025/final-screenshot.png" target="_blank" rel="noopener"><img src="Evidence/Screenshots/LIMAS-AUTH-025/final-screenshot.png" alt="Final state" loading="lazy" style="max-width:640px"></a></div>
+      <div class="video-container">
+      <h4>Screen Recording</h4>
+      <video controls preload="metadata" style="width:100%;max-width:640px">
+        <source src="Evidence/Recording/LIMAS-AUTH-025/video.webm" type="video/webm">
+        Video playback is not supported by this browser.
+      </video>
+      <p><a href="Evidence/Recording/LIMAS-AUTH-025/video.webm" download>Download video</a></p>
+    </div>
+      
+      <div class="trace-section">
+      <h4>Trace</h4>
+      <p>Raw trace available for download: <a href="Evidence/Trace/LIMAS-AUTH-025/trace.zip" download>trace.zip</a></p>
+    </div>
+      <div class="actual-result"><h4>Actual Result</h4><h2>Actual Result</h2></p><p><strong>Status:</strong> passed<br><strong>Duration:</strong> 3.24s<br><strong>Final Route:</strong> httpauth</p><p>All assertions completed successfully.</div>
+      
+    </div>
+  </div>
+
+  <div class="test-card passed" id="test-17">
+    <div class="test-header" onclick="toggleExpand('test-17')">
+      <div class="test-card-heading">
+        <span class="test-id-col">LIMAS-AUTH-026</span>
+        <span class="test-title-col">&quot;Authentication&quot; → &quot;Post-login&quot; → &quot;User button visibility&quot;</span>
+      </div>
+      <span class="test-status passed">PASSED</span>
+      <span class="test-duration">6.83s</span>
+      <span class="expand-icon">▼</span>
+    </div>
+    <div class="test-body">
+      <div class="test-meta">
+        <span><strong>Profile:</strong> SUPER_USER_ADMIN_USER</span>
+        <span><strong>Module:</strong> Authentication</span>
+        <span><strong>Plan:</strong> Plans/LIMAS-AUTH-026/LIMAS-AUTH-026-user-button-visible.md</span>
+      </div>
+      <div class="steps"><h4>Test Steps</h4><ol><li>Authenticate via Keycloak login</li><li>Verify user identity button in header</li></ol></div>
+      <div class="test-summary"><h2>Test: LIMAS-AUTH-026</h2></p><p><strong>Module:</strong> Authentication<br><strong>Access Profile:</strong> SUPER_USER_ADMIN_USER<br><strong>Spec:</strong> authentication/LIMAS-AUTH-026-user-button-visible.spec.ts<br><strong>Plan:</strong> LIMAS-AUTH-026-user-button-visible.md</p><p><h3>Purpose</h3><br>Verify that after login, the header displays a user-identity button indicating the logged-in user.</p><p><h3>Preconditions</h3><br><li><code>${LIMAS_BASE_URL}</code> is reachable.</li><br><li>Valid credentials for <code>SUPER_USER_ADMIN_USER</code> are configured.</li></p><p><h3>Expected Result</h3><br>A user-identity button is visible in the dashboard header.</div>
+      <div class="test-plan">
+        <h4>Test Plan</h4>
+        <p>---<br>test_id: "LIMAS-AUTH-026"<br>title: "To verify the functionality of \"Authentication\" → \"Post-login\" → \"User button visibility\""<br>module: "Authentication"<br>page: "System User Dashboard"<br>section: "Header"<br>control: "User button"<br>action: "Visibility"<br>access_profile: "SUPER_USER_ADMIN_USER"<br>priority: "High"<br>classification: "Read-only"<br>test_type: "Visual"<br>automation_candidate: true<br>plan_status: "reviewed"<br>script_status: "not-generated"<br>environment_variables:<br>  - LIMAS_BASE_URL<br>  - LIMAS_SUPER_USER_ADMIN_USER_USERNAME<br>  - LIMAS_SUPER_USER_ADMIN_USER_PASSWORD<br>test_data: {}<br>related_script: ""<br>---</p><p><h2>Purpose</h2></p><p>Verify that after login, the header displays a user-identity button indicating the logged-in user.</p><p><h2>Preconditions</h2></p><p><li><code>${LIMAS_BASE_URL}</code> is reachable.</li><br><li>Valid credentials for <code>SUPER_USER_ADMIN_USER</code> are configured.</li></p><p><h2>Test Data</h2></p><p>Credential variable names from the profile are read at runtime.</p><p><h2>Steps and Expected Results</h2></p><p>1. Action: Complete full Keycloak login and reach the dashboard.<br>   Expected Result: System User Dashboard is visible.</p><p>2. Action: Inspect the header for user-identity elements.<br>   Expected Result: A button showing the user's initial(s) or identifier is visible in the header.</p><p><h2>Network Verification</h2></p><p><li>Request URL: <code>/system-user-dashboard</code></li><br><li>HTTP Method: GET</li><br><li>Expected Status: 200</li><br><li>Payload Presence: Dashboard with header</li><br><li>Visible UI Result: User button visible in header</li></p><p><h2>Expected Final Result</h2></p><p>A user-identity button is visible in the dashboard header.</p><p><h2>Classification</h2></p><p><li>Read-only</li><br><li>Visual</li></p><p><h2>Restrictions</h2></p><p><li>Do not include credentials, tokens, cookies, authorization codes, or sensitive payloads.</li><br><li>Do not use static environment-specific data.</li></p><p><h2>Generation Status</h2></p><p><li>Test script generation: Pending</li><br><li>CI/CD execution: Pending</li><br><li>Healing: Pending</li></p>
+      </div>
+      <div class="screenshots"><h4>Step Screenshots</h4><div class="ss-grid"><div class="ss-item">
+        <a href="Evidence/Screenshots/LIMAS-AUTH-026/01-authenticate-via-keycloak-login.png" target="_blank" rel="noopener">
+          <img src="Evidence/Screenshots/LIMAS-AUTH-026/01-authenticate-via-keycloak-login.png" alt="01 Authenticate Via Keycloak Login" loading="lazy">
+        </a>
+        <span>01 Authenticate Via Keycloak Login</span>
+      </div><div class="ss-item">
+        <a href="Evidence/Screenshots/LIMAS-AUTH-026/02-verify-user-identity-button-in-header.png" target="_blank" rel="noopener">
+          <img src="Evidence/Screenshots/LIMAS-AUTH-026/02-verify-user-identity-button-in-header.png" alt="02 Verify User Identity Button In Header" loading="lazy">
+        </a>
+        <span>02 Verify User Identity Button In Header</span>
+      </div></div></div>
+      <div class="final-ss"><h4>Final Screenshot</h4><a href="Evidence/Screenshots/LIMAS-AUTH-026/final-screenshot.png" target="_blank" rel="noopener"><img src="Evidence/Screenshots/LIMAS-AUTH-026/final-screenshot.png" alt="Final state" loading="lazy" style="max-width:640px"></a></div>
+      <div class="video-container">
+      <h4>Screen Recording</h4>
+      <video controls preload="metadata" style="width:100%;max-width:640px">
+        <source src="Evidence/Recording/LIMAS-AUTH-026/video.webm" type="video/webm">
+        Video playback is not supported by this browser.
+      </video>
+      <p><a href="Evidence/Recording/LIMAS-AUTH-026/video.webm" download>Download video</a></p>
+    </div>
+      
+      <div class="trace-section">
+      <h4>Trace</h4>
+      <p>Raw trace available for download: <a href="Evidence/Trace/LIMAS-AUTH-026/trace.zip" download>trace.zip</a></p>
+    </div>
+      <div class="actual-result"><h4>Actual Result</h4><h2>Actual Result</h2></p><p><strong>Status:</strong> passed<br><strong>Duration:</strong> 4.63s<br><strong>Final Route:</strong> httsystem-user-dashboard</p><p>All assertions completed successfully.</div>
+      
+    </div>
+  </div>
+</div>
+<script>
+function toggleExpand(id) {
+  document.getElementById(id).classList.toggle('expanded');
+}
+</script>
+</body>
+</html>

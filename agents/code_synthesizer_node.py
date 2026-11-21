@@ -70,6 +70,30 @@ def project_scaffolder_node(state: AgentState) -> Dict[str, Any]:
     if generate_scripts:
         scaffolder = ProjectScaffolder()
         created_paths = scaffolder.scaffold_project(output_dir, state)
+    else:
+        from core.workspace_manager import WorkspaceManager
+        wm = WorkspaceManager(output_dir)
+        for role, creds in (state.get("account_credentials") or {}).items():
+            if isinstance(creds, dict):
+                pw = creds.get("password", "")
+                if not pw and creds.get("password_b64"):
+                    pw = WorkspaceManager.decode_password(creds["password_b64"])
+                wm.add_or_update_account(role, creds.get("username", ""), pw)
+        active_profile = state.get("active_access_profile", "") or "PUBLIC"
+        seq_num = int(state.get("sequence_number") or wm.next_sequence_number())
+        created_paths.extend(wm.write_env_and_profiles(active_role=active_profile, target_url=state.get("target_url", "")))
+        from core.report_generator import EnterpriseReportGenerator
+        created_paths.extend(EnterpriseReportGenerator(output_dir).generate_from_agent_state(state))
+        wm.record_run(
+            sequence_number=seq_num,
+            test_id=f"TP-IEEE829-{seq_num:03d}",
+            title=f"plan_{seq_num:03d}",
+            access_profile=active_profile,
+            target_url=state.get("target_url", ""),
+            target_languages=state.get("target_languages", []),
+            files=created_paths,
+        )
+        created_paths.append(str(wm.save_project_state()))
 
     _emit_progress(
         state,

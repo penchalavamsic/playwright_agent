@@ -1,0 +1,275 @@
+{
+  "report_title": "Swag Labs Detailed Test Evidence Report \u2014 saucedemo.com \u2014 STANDARD_USER",
+  "app_display_name": "Swag Labs",
+  "domain_label": "saucedemo.com",
+  "module": "Swag",
+  "profile": "STANDARD_USER",
+  "target_url": "${BASE_URL}",
+  "browser": "Msedge",
+  "date": "2026-11-21",
+  "total": 3,
+  "passed": 3,
+  "failed": 0,
+  "flaky": 0,
+  "skipped": 0,
+  "pass_rate_pct": 100.0,
+  "duration_s": 8.9,
+  "test_cases": [
+    {
+      "test_id": "SWAG-001-01",
+      "slug": "primary-user-flow-api-status-verification",
+      "title": "\"Swag\" \u2192 \"Swag Labs\" \u2192 \"Primary User Flow & API Status Verification\"",
+      "raw_title": "Primary User Flow & API Status Verification",
+      "module": "Swag",
+      "page": "Swag Labs",
+      "profile": "STANDARD_USER",
+      "status": "passed",
+      "duration_s": 2.85,
+      "actual_duration_s": 2.4,
+      "final_route": "/api/summed-events/submit",
+      "spec_path": "tests/001_primary-user-flow-api-status-verification.spec.ts",
+      "plan_rel_path": "Plans/SWAG-001-01/SWAG-001-01-primary-user-flow-api-status-verification.md",
+      "plan_filename": "SWAG-001-01-primary-user-flow-api-status-verification.md",
+      "plan_markdown": "---\ntest_id: \"SWAG-001-01\"\ntitle: \"To verify the functionality of \\\"Swag\\\" \u2192 \\\"Swag Labs\\\" \u2192 \\\"Primary User Flow & API Status Verification\\\"\"\nmodule: \"Swag\"\npage: \"Swag Labs\"\nsection: \"Primary Flow\"\ncontrol: \"Interactive Controls\"\naction: \"Execution & Verification\"\naccess_profile: \"STANDARD_USER\"\npriority: \"High\"\nclassification: \"Read-only\"\ntest_type: \"Positive\"\nautomation_candidate: true\nplan_status: \"reviewed\"\nscript_status: \"generated\"\nenvironment_variables:\n  - BASE_URL\n  - TEST_ACCESS_PROFILE\ntest_data: {}\nrelated_script: \"tests/primary-user-flow-api-status-verification.spec.ts\"\n---\n\n# Purpose\n\nVerify the functionality of \"Swag\" \u2192 \"Swag Labs\" \u2192 \"Primary User Flow & API Status Verification\" under access profile `STANDARD_USER`.\n\n# Preconditions\n\n- `${BASE_URL}` is reachable.\n- Credentials for `${TEST_ACCESS_PROFILE}` (`STANDARD_USER`) are configured in `.env`.\n\n# Test Data\n\nUse environment variables and runtime fixtures.\n\n# Steps and Expected Results\n\n1. Action: Navigate to application URL: https://www.saucedemo.com.\n   Expected Result: Step completes deterministically without UI or network errors.\n\n2. Action: Fill value 'search' into control 'input'.\n   Expected Result: Step completes deterministically without UI or network errors.\n\n3. Action: Click interactive component 'LinkedIn'.\n   Expected Result: Step completes deterministically without UI or network errors.\n\n4. Action: Verify backend API response status ([200]) for endpoint '/api/summed-events/submit'.\n   Expected Result: Step completes deterministically without UI or network errors.\n\n# Network Verification\n\n- Request URL: `${BASE_URL}/api/summed-events/submit`\n- HTTP Method: POST\n- Expected Status: 401\n- Payload Presence: Verified response payload\n- Visible UI Result: Interactive controls visible and responsive\n\n# Expected Final Result\n\nAll steps and network status assertions succeed for SWAG-001-01.\n\n# Classification\n\n- Read-only\n- Positive\n\n# Restrictions\n\n- Do not include credentials, tokens, cookies, authorization codes, or sensitive payloads.\n- Do not use static environment-specific data.\n\n# Generation Status\n\n- Test script generation: Complete\n- CI/CD execution: Ready\n- Healing: Ready\n",
+      "purpose": "Verify Primary User Flow & API Status Verification for Swag Labs (Swag Labs) under access profile STANDARD_USER.",
+      "expected_result": "All UI locators resolve uniquely and backend endpoints return HTTP 401.",
+      "steps": [
+        "Navigate to application URL: https://www.saucedemo.com",
+        "Fill value 'search' into control 'input'",
+        "Click interactive component 'LinkedIn'",
+        "Verify backend API response status ([200]) for endpoint '/api/summed-events/submit'"
+      ],
+      "step_screenshots": [
+        {
+          "rel_path": "Evidence/Screenshots/SWAG-001-01/01-navigate-to-application-url-https-www-sa.png",
+          "caption": "01 Navigate To Application Url Https Www Sa"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/SWAG-001-01/02-fill-value-search-into-control-input.png",
+          "caption": "02 Fill Value Search Into Control Input"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/SWAG-001-01/03-click-interactive-component-linkedin.png",
+          "caption": "03 Click Interactive Component Linkedin"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/SWAG-001-01/04-verify-backend-api-response-status-200-f.png",
+          "caption": "04 Verify Backend Api Response Status 200 F"
+        }
+      ],
+      "final_screenshot": "Evidence/Screenshots/SWAG-001-01/final-screenshot.png",
+      "video_rel_path": "Evidence/Recording/SWAG-001-01/video.webm",
+      "trace_rel_path": "Evidence/Trace/SWAG-001-01/trace.zip",
+      "api_method": "POST",
+      "api_pathname": "/api/summed-events/submit",
+      "api_status": 401,
+      "api_trigger": "page_load",
+      "captured_apis": [
+        {
+          "url": "https://events.backtrace.io/api/summed-events/submit?universe=UNIVERSE&token=TOKEN",
+          "method": "POST",
+          "resource_type": "fetch",
+          "status_code": 401,
+          "request_payload_keys": [
+            "application",
+            "appversion",
+            "summed_events",
+            "metadata"
+          ],
+          "response_keys": [
+            "error"
+          ],
+          "triggered_by_action": "page_load"
+        },
+        {
+          "url": "https://events.backtrace.io/api/unique-events/submit?universe=UNIVERSE&token=TOKEN",
+          "method": "POST",
+          "resource_type": "fetch",
+          "status_code": 401,
+          "request_payload_keys": [
+            "application",
+            "appversion",
+            "unique_events",
+            "metadata"
+          ],
+          "response_keys": [
+            "error"
+          ],
+          "triggered_by_action": "page_load"
+        }
+      ],
+      "error_message": ""
+    },
+    {
+      "test_id": "SWAG-001-02",
+      "slug": "page-load-core-ui-component-sanity",
+      "title": "\"Swag\" \u2192 \"Swag Labs\" \u2192 \"Page Load & Core UI Component Sanity\"",
+      "raw_title": "Page Load & Core UI Component Sanity",
+      "module": "Swag",
+      "page": "Swag Labs",
+      "profile": "STANDARD_USER",
+      "status": "passed",
+      "duration_s": 3.9,
+      "actual_duration_s": 3.45,
+      "final_route": "/api/summed-events/submit",
+      "spec_path": "tests/001_page-load-core-ui-component-sanity.spec.ts",
+      "plan_rel_path": "Plans/SWAG-001-02/SWAG-001-02-page-load-core-ui-component-sanity.md",
+      "plan_filename": "SWAG-001-02-page-load-core-ui-component-sanity.md",
+      "plan_markdown": "---\ntest_id: \"SWAG-001-02\"\ntitle: \"To verify the functionality of \\\"Swag\\\" \u2192 \\\"Swag Labs\\\" \u2192 \\\"Page Load & Core UI Component Sanity\\\"\"\nmodule: \"Swag\"\npage: \"Swag Labs\"\nsection: \"Primary Flow\"\ncontrol: \"Interactive Controls\"\naction: \"Execution & Verification\"\naccess_profile: \"STANDARD_USER\"\npriority: \"High\"\nclassification: \"Read-only\"\ntest_type: \"Positive\"\nautomation_candidate: true\nplan_status: \"reviewed\"\nscript_status: \"generated\"\nenvironment_variables:\n  - BASE_URL\n  - TEST_ACCESS_PROFILE\ntest_data: {}\nrelated_script: \"tests/page-load-core-ui-component-sanity.spec.ts\"\n---\n\n# Purpose\n\nVerify the functionality of \"Swag\" \u2192 \"Swag Labs\" \u2192 \"Page Load & Core UI Component Sanity\" under access profile `STANDARD_USER`.\n\n# Preconditions\n\n- `${BASE_URL}` is reachable.\n- Credentials for `${TEST_ACCESS_PROFILE}` (`STANDARD_USER`) are configured in `.env`.\n\n# Test Data\n\nUse environment variables and runtime fixtures.\n\n# Steps and Expected Results\n\n1. Action: Open target URL: https://www.saucedemo.com.\n   Expected Result: Step completes deterministically without UI or network errors.\n\n2. Action: Verify Page Title equals or contains 'Swag Labs'.\n   Expected Result: Step completes deterministically without UI or network errors.\n\n3. Action: Verify visibility of core control 'Open Menu' (button).\n   Expected Result: Step completes deterministically without UI or network errors.\n\n4. Action: Verify visibility of core control 'All Items' (a).\n   Expected Result: Step completes deterministically without UI or network errors.\n\n5. Action: Verify visibility of core control 'Dynamic Catalog' (a).\n   Expected Result: Step completes deterministically without UI or network errors.\n\n6. Action: Verify visibility of core control 'About' (a).\n   Expected Result: Step completes deterministically without UI or network errors.\n\n7. Action: Verify visibility of core control 'Logout' (a).\n   Expected Result: Step completes deterministically without UI or network errors.\n\n# Network Verification\n\n- Request URL: `${BASE_URL}/api/summed-events/submit`\n- HTTP Method: POST\n- Expected Status: 401\n- Payload Presence: Verified response payload\n- Visible UI Result: Interactive controls visible and responsive\n\n# Expected Final Result\n\nAll steps and network status assertions succeed for SWAG-001-02.\n\n# Classification\n\n- Read-only\n- Positive\n\n# Restrictions\n\n- Do not include credentials, tokens, cookies, authorization codes, or sensitive payloads.\n- Do not use static environment-specific data.\n\n# Generation Status\n\n- Test script generation: Complete\n- CI/CD execution: Ready\n- Healing: Ready\n",
+      "purpose": "Verify Page Load & Core UI Component Sanity for Swag Labs (Swag Labs) under access profile STANDARD_USER.",
+      "expected_result": "All UI locators resolve uniquely and backend endpoints return HTTP 401.",
+      "steps": [
+        "Open target URL: https://www.saucedemo.com",
+        "Verify Page Title equals or contains 'Swag Labs'",
+        "Verify visibility of core control 'Open Menu' (button)",
+        "Verify visibility of core control 'All Items' (a)",
+        "Verify visibility of core control 'Dynamic Catalog' (a)",
+        "Verify visibility of core control 'About' (a)",
+        "Verify visibility of core control 'Logout' (a)"
+      ],
+      "step_screenshots": [
+        {
+          "rel_path": "Evidence/Screenshots/SWAG-001-02/01-open-target-url-https-www-saucedemo-com.png",
+          "caption": "01 Open Target Url Https Www Saucedemo Com"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/SWAG-001-02/02-verify-page-title-equals-or-contains-swa.png",
+          "caption": "02 Verify Page Title Equals Or Contains Swa"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/SWAG-001-02/03-verify-visibility-of-core-control-open-m.png",
+          "caption": "03 Verify Visibility Of Core Control Open M"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/SWAG-001-02/04-verify-visibility-of-core-control-all-it.png",
+          "caption": "04 Verify Visibility Of Core Control All It"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/SWAG-001-02/05-verify-visibility-of-core-control-dynami.png",
+          "caption": "05 Verify Visibility Of Core Control Dynami"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/SWAG-001-02/06-verify-visibility-of-core-control-about.png",
+          "caption": "06 Verify Visibility Of Core Control About"
+        }
+      ],
+      "final_screenshot": "Evidence/Screenshots/SWAG-001-02/final-screenshot.png",
+      "video_rel_path": "Evidence/Recording/SWAG-001-02/video.webm",
+      "trace_rel_path": "Evidence/Trace/SWAG-001-02/trace.zip",
+      "api_method": "POST",
+      "api_pathname": "/api/summed-events/submit",
+      "api_status": 401,
+      "api_trigger": "page_load",
+      "captured_apis": [
+        {
+          "url": "https://events.backtrace.io/api/summed-events/submit?universe=UNIVERSE&token=TOKEN",
+          "method": "POST",
+          "resource_type": "fetch",
+          "status_code": 401,
+          "request_payload_keys": [
+            "application",
+            "appversion",
+            "summed_events",
+            "metadata"
+          ],
+          "response_keys": [
+            "error"
+          ],
+          "triggered_by_action": "page_load"
+        },
+        {
+          "url": "https://events.backtrace.io/api/unique-events/submit?universe=UNIVERSE&token=TOKEN",
+          "method": "POST",
+          "resource_type": "fetch",
+          "status_code": 401,
+          "request_payload_keys": [
+            "application",
+            "appversion",
+            "unique_events",
+            "metadata"
+          ],
+          "response_keys": [
+            "error"
+          ],
+          "triggered_by_action": "page_load"
+        }
+      ],
+      "error_message": ""
+    },
+    {
+      "test_id": "SWAG-001-03",
+      "slug": "api-health-contract-matrix-verification",
+      "title": "\"Swag\" \u2192 \"Swag Labs\" \u2192 \"API Health & Contract Matrix Verification\"",
+      "raw_title": "API Health & Contract Matrix Verification",
+      "module": "Swag",
+      "page": "Swag Labs",
+      "profile": "STANDARD_USER",
+      "status": "passed",
+      "duration_s": 2.15,
+      "actual_duration_s": 1.7,
+      "final_route": "/api/summed-events/submit",
+      "spec_path": "tests/001_api-health-contract-matrix-verification.spec.ts",
+      "plan_rel_path": "Plans/SWAG-001-03/SWAG-001-03-api-health-contract-matrix-verification.md",
+      "plan_filename": "SWAG-001-03-api-health-contract-matrix-verification.md",
+      "plan_markdown": "---\ntest_id: \"SWAG-001-03\"\ntitle: \"To verify the functionality of \\\"Swag\\\" \u2192 \\\"Swag Labs\\\" \u2192 \\\"API Health & Contract Matrix Verification\\\"\"\nmodule: \"Swag\"\npage: \"Swag Labs\"\nsection: \"Primary Flow\"\ncontrol: \"Interactive Controls\"\naction: \"Execution & Verification\"\naccess_profile: \"STANDARD_USER\"\npriority: \"High\"\nclassification: \"Read-only\"\ntest_type: \"Positive\"\nautomation_candidate: true\nplan_status: \"reviewed\"\nscript_status: \"generated\"\nenvironment_variables:\n  - BASE_URL\n  - TEST_ACCESS_PROFILE\ntest_data: {}\nrelated_script: \"tests/api-health-contract-matrix-verification.spec.ts\"\n---\n\n# Purpose\n\nVerify the functionality of \"Swag\" \u2192 \"Swag Labs\" \u2192 \"API Health & Contract Matrix Verification\" under access profile `STANDARD_USER`.\n\n# Preconditions\n\n- `${BASE_URL}` is reachable.\n- Credentials for `${TEST_ACCESS_PROFILE}` (`STANDARD_USER`) are configured in `.env`.\n\n# Test Data\n\nUse environment variables and runtime fixtures.\n\n# Steps and Expected Results\n\n1. Action: Validate contract for POST /api/summed-events/submit (Expected Status: [401], Keys: ['error']).\n   Expected Result: Step completes deterministically without UI or network errors.\n\n2. Action: Validate contract for POST /api/unique-events/submit (Expected Status: [401], Keys: ['error']).\n   Expected Result: Step completes deterministically without UI or network errors.\n\n# Network Verification\n\n- Request URL: `${BASE_URL}/api/summed-events/submit`\n- HTTP Method: POST\n- Expected Status: 401\n- Payload Presence: Verified response payload\n- Visible UI Result: Interactive controls visible and responsive\n\n# Expected Final Result\n\nAll steps and network status assertions succeed for SWAG-001-03.\n\n# Classification\n\n- Read-only\n- Positive\n\n# Restrictions\n\n- Do not include credentials, tokens, cookies, authorization codes, or sensitive payloads.\n- Do not use static environment-specific data.\n\n# Generation Status\n\n- Test script generation: Complete\n- CI/CD execution: Ready\n- Healing: Ready\n",
+      "purpose": "Verify API Health & Contract Matrix Verification for Swag Labs (Swag Labs) under access profile STANDARD_USER.",
+      "expected_result": "All UI locators resolve uniquely and backend endpoints return HTTP 401.",
+      "steps": [
+        "Validate contract for POST /api/summed-events/submit (Expected Status: [401], Keys: ['error'])",
+        "Validate contract for POST /api/unique-events/submit (Expected Status: [401], Keys: ['error'])"
+      ],
+      "step_screenshots": [
+        {
+          "rel_path": "Evidence/Screenshots/SWAG-001-03/01-validate-contract-for-post-api-summed-ev.png",
+          "caption": "01 Validate Contract For Post Api Summed Ev"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/SWAG-001-03/02-validate-contract-for-post-api-unique-ev.png",
+          "caption": "02 Validate Contract For Post Api Unique Ev"
+        }
+      ],
+      "final_screenshot": "Evidence/Screenshots/SWAG-001-03/final-screenshot.png",
+      "video_rel_path": "Evidence/Recording/SWAG-001-03/video.webm",
+      "trace_rel_path": "Evidence/Trace/SWAG-001-03/trace.zip",
+      "api_method": "POST",
+      "api_pathname": "/api/summed-events/submit",
+      "api_status": 401,
+      "api_trigger": "page_load",
+      "captured_apis": [
+        {
+          "url": "https://events.backtrace.io/api/summed-events/submit?universe=UNIVERSE&token=TOKEN",
+          "method": "POST",
+          "resource_type": "fetch",
+          "status_code": 401,
+          "request_payload_keys": [
+            "application",
+            "appversion",
+            "summed_events",
+            "metadata"
+          ],
+          "response_keys": [
+            "error"
+          ],
+          "triggered_by_action": "page_load"
+        },
+        {
+          "url": "https://events.backtrace.io/api/unique-events/submit?universe=UNIVERSE&token=TOKEN",
+          "method": "POST",
+          "resource_type": "fetch",
+          "status_code": 401,
+          "request_payload_keys": [
+            "application",
+            "appversion",
+            "unique_events",
+            "metadata"
+          ],
+          "response_keys": [
+            "error"
+          ],
+          "triggered_by_action": "page_load"
+        }
+      ],
+      "error_message": ""
+    }
+  ]
+}

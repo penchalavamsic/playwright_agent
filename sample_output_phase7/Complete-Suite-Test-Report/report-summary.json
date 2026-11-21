@@ -1,0 +1,486 @@
+{
+  "report_title": "Shutterstock Detailed Test Evidence Report \u2014 shutterstock.com \u2014 ADMIN",
+  "app_display_name": "Shutterstock",
+  "domain_label": "shutterstock.com",
+  "module": "Shutterstock",
+  "profile": "ADMIN",
+  "target_url": "${BASE_URL}",
+  "browser": "Edge",
+  "date": "2026-11-21",
+  "total": 6,
+  "passed": 6,
+  "failed": 0,
+  "flaky": 0,
+  "skipped": 0,
+  "pass_rate_pct": 100.0,
+  "duration_s": 15.35,
+  "test_cases": [
+    {
+      "test_id": "SHUTTE-001-01",
+      "slug": "primary-user-flow-api-status-verification",
+      "title": "\"Shutterstock\" \u2192 \"Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music\" \u2192 \"Primary User Flow & API Status Verification\"",
+      "raw_title": "Primary User Flow & API Status Verification",
+      "module": "Shutterstock",
+      "page": "Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music",
+      "profile": "SUPER_USER",
+      "status": "passed",
+      "duration_s": 2.85,
+      "actual_duration_s": 2.4,
+      "final_route": "/api/v1/search",
+      "spec_path": "tests/001_primary-user-flow-api-status-verification.spec.ts",
+      "plan_rel_path": "Plans/SHUTTE-001-01/SHUTTE-001-01-primary-user-flow-api-status-verification.md",
+      "plan_filename": "SHUTTE-001-01-primary-user-flow-api-status-verification.md",
+      "plan_markdown": "---\ntest_id: \"SHUTTE-001-01\"\ntitle: \"To verify the functionality of \\\"Shutterstock\\\" \u2192 \\\"Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music\\\" \u2192 \\\"Primary User Flow & API Status Verification\\\"\"\nmodule: \"Shutterstock\"\npage: \"Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music\"\nsection: \"Primary Flow\"\ncontrol: \"Interactive Controls\"\naction: \"Execution & Verification\"\naccess_profile: \"SUPER_USER\"\npriority: \"High\"\nclassification: \"Read-only\"\ntest_type: \"Positive\"\nautomation_candidate: true\nplan_status: \"reviewed\"\nscript_status: \"generated\"\nenvironment_variables:\n  - BASE_URL\n  - TEST_ACCESS_PROFILE\ntest_data: {}\nrelated_script: \"tests/primary-user-flow-api-status-verification.spec.ts\"\n---\n\n# Purpose\n\nVerify the functionality of \"Shutterstock\" \u2192 \"Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music\" \u2192 \"Primary User Flow & API Status Verification\" under access profile `SUPER_USER`.\n\n# Preconditions\n\n- `${BASE_URL}` is reachable.\n- Credentials for `${TEST_ACCESS_PROFILE}` (`SUPER_USER`) are configured in `.env`.\n\n# Test Data\n\nUse environment variables and runtime fixtures.\n\n# Steps and Expected Results\n\n1. Action: Navigate to application URL: https://www.shutterstock.com.\n   Expected Result: Step completes deterministically without UI or network errors.\n\n2. Action: Search value 'dashboard' into control 'Search Input'.\n   Expected Result: Step completes deterministically without UI or network errors.\n\n3. Action: Click interactive component 'Dashboard Tab'.\n   Expected Result: Step completes deterministically without UI or network errors.\n\n4. Action: Verify backend API response status ([200, 201]) for endpoint '/api/v1/search'.\n   Expected Result: Step completes deterministically without UI or network errors.\n\n# Network Verification\n\n- Request URL: `${BASE_URL}/api/v1/search`\n- HTTP Method: GET\n- Expected Status: 200\n- Payload Presence: Verified response payload\n- Visible UI Result: Interactive controls visible and responsive\n\n# Expected Final Result\n\nAll steps and network status assertions succeed for SHUTTE-001-01.\n\n# Classification\n\n- Read-only\n- Positive\n\n# Restrictions\n\n- Do not include credentials, tokens, cookies, authorization codes, or sensitive payloads.\n- Do not use static environment-specific data.\n\n# Generation Status\n\n- Test script generation: Complete\n- CI/CD execution: Ready\n- Healing: Ready\n",
+      "purpose": "Verify Primary User Flow & API Status Verification for Shutterstock (Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music) under access profile SUPER_USER.",
+      "expected_result": "All UI locators resolve uniquely and backend endpoints return HTTP 200.",
+      "steps": [
+        "Navigate to application URL: https://www.shutterstock.com",
+        "Search value 'dashboard' into control 'Search Input'",
+        "Click interactive component 'Dashboard Tab'",
+        "Verify backend API response status ([200, 201]) for endpoint '/api/v1/search'"
+      ],
+      "step_screenshots": [
+        {
+          "rel_path": "Evidence/Screenshots/SHUTTE-001-01/01-navigate-to-application-url-https-www-sh.png",
+          "caption": "01 Navigate To Application Url Https Www Sh"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/SHUTTE-001-01/02-search-value-dashboard-into-control-sear.png",
+          "caption": "02 Search Value Dashboard Into Control Sear"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/SHUTTE-001-01/03-click-interactive-component-dashboard-ta.png",
+          "caption": "03 Click Interactive Component Dashboard Ta"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/SHUTTE-001-01/04-verify-backend-api-response-status-200-2.png",
+          "caption": "04 Verify Backend Api Response Status 200 2"
+        }
+      ],
+      "final_screenshot": "Evidence/Screenshots/SHUTTE-001-01/final-screenshot.png",
+      "video_rel_path": "Evidence/Recording/SHUTTE-001-01/video.webm",
+      "trace_rel_path": "Evidence/Trace/SHUTTE-001-01/trace.zip",
+      "api_method": "GET",
+      "api_pathname": "/api/v1/search",
+      "api_status": 200,
+      "api_trigger": "search_probe",
+      "captured_apis": [
+        {
+          "url": "https://www.shutterstock.com/api/v1/search",
+          "method": "GET",
+          "resource_type": "fetch",
+          "status_code": 200,
+          "request_payload_keys": [
+            "q"
+          ],
+          "response_keys": [
+            "status",
+            "items",
+            "total"
+          ],
+          "triggered_by_action": "search_probe"
+        },
+        {
+          "url": "https://www.shutterstock.com/api/v1/audit",
+          "method": "POST",
+          "resource_type": "xhr",
+          "status_code": 201,
+          "request_payload_keys": [
+            "action"
+          ],
+          "response_keys": [
+            "id",
+            "created_at"
+          ],
+          "triggered_by_action": "click:dashboard"
+        }
+      ],
+      "error_message": ""
+    },
+    {
+      "test_id": "SHUTTE-001-02",
+      "slug": "page-load-core-ui-component-sanity",
+      "title": "\"Shutterstock\" \u2192 \"Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music\" \u2192 \"Page Load & Core UI Component Sanity\"",
+      "raw_title": "Page Load & Core UI Component Sanity",
+      "module": "Shutterstock",
+      "page": "Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music",
+      "profile": "SUPER_USER",
+      "status": "passed",
+      "duration_s": 2.85,
+      "actual_duration_s": 2.4,
+      "final_route": "/api/v1/search",
+      "spec_path": "tests/001_page-load-core-ui-component-sanity.spec.ts",
+      "plan_rel_path": "Plans/SHUTTE-001-02/SHUTTE-001-02-page-load-core-ui-component-sanity.md",
+      "plan_filename": "SHUTTE-001-02-page-load-core-ui-component-sanity.md",
+      "plan_markdown": "---\ntest_id: \"SHUTTE-001-02\"\ntitle: \"To verify the functionality of \\\"Shutterstock\\\" \u2192 \\\"Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music\\\" \u2192 \\\"Page Load & Core UI Component Sanity\\\"\"\nmodule: \"Shutterstock\"\npage: \"Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music\"\nsection: \"Primary Flow\"\ncontrol: \"Interactive Controls\"\naction: \"Execution & Verification\"\naccess_profile: \"SUPER_USER\"\npriority: \"High\"\nclassification: \"Read-only\"\ntest_type: \"Positive\"\nautomation_candidate: true\nplan_status: \"reviewed\"\nscript_status: \"generated\"\nenvironment_variables:\n  - BASE_URL\n  - TEST_ACCESS_PROFILE\ntest_data: {}\nrelated_script: \"tests/page-load-core-ui-component-sanity.spec.ts\"\n---\n\n# Purpose\n\nVerify the functionality of \"Shutterstock\" \u2192 \"Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music\" \u2192 \"Page Load & Core UI Component Sanity\" under access profile `SUPER_USER`.\n\n# Preconditions\n\n- `${BASE_URL}` is reachable.\n- Credentials for `${TEST_ACCESS_PROFILE}` (`SUPER_USER`) are configured in `.env`.\n\n# Test Data\n\nUse environment variables and runtime fixtures.\n\n# Steps and Expected Results\n\n1. Action: Open target URL: https://www.shutterstock.com.\n   Expected Result: Step completes deterministically without UI or network errors.\n\n2. Action: Verify Page Title equals or contains 'Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music'.\n   Expected Result: Step completes deterministically without UI or network errors.\n\n3. Action: Verify visibility of core control 'Search Input' (input).\n   Expected Result: Step completes deterministically without UI or network errors.\n\n4. Action: Verify visibility of core control 'Dashboard Tab' (button).\n   Expected Result: Step completes deterministically without UI or network errors.\n\n# Network Verification\n\n- Request URL: `${BASE_URL}/api/v1/search`\n- HTTP Method: GET\n- Expected Status: 200\n- Payload Presence: Verified response payload\n- Visible UI Result: Interactive controls visible and responsive\n\n# Expected Final Result\n\nAll steps and network status assertions succeed for SHUTTE-001-02.\n\n# Classification\n\n- Read-only\n- Positive\n\n# Restrictions\n\n- Do not include credentials, tokens, cookies, authorization codes, or sensitive payloads.\n- Do not use static environment-specific data.\n\n# Generation Status\n\n- Test script generation: Complete\n- CI/CD execution: Ready\n- Healing: Ready\n",
+      "purpose": "Verify Page Load & Core UI Component Sanity for Shutterstock (Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music) under access profile SUPER_USER.",
+      "expected_result": "All UI locators resolve uniquely and backend endpoints return HTTP 200.",
+      "steps": [
+        "Open target URL: https://www.shutterstock.com",
+        "Verify Page Title equals or contains 'Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music'",
+        "Verify visibility of core control 'Search Input' (input)",
+        "Verify visibility of core control 'Dashboard Tab' (button)"
+      ],
+      "step_screenshots": [
+        {
+          "rel_path": "Evidence/Screenshots/SHUTTE-001-02/01-open-target-url-https-www-shutterstock-c.png",
+          "caption": "01 Open Target Url Https Www Shutterstock C"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/SHUTTE-001-02/02-verify-page-title-equals-or-contains-shu.png",
+          "caption": "02 Verify Page Title Equals Or Contains Shu"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/SHUTTE-001-02/03-verify-visibility-of-core-control-search.png",
+          "caption": "03 Verify Visibility Of Core Control Search"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/SHUTTE-001-02/04-verify-visibility-of-core-control-dashbo.png",
+          "caption": "04 Verify Visibility Of Core Control Dashbo"
+        }
+      ],
+      "final_screenshot": "Evidence/Screenshots/SHUTTE-001-02/final-screenshot.png",
+      "video_rel_path": "Evidence/Recording/SHUTTE-001-02/video.webm",
+      "trace_rel_path": "Evidence/Trace/SHUTTE-001-02/trace.zip",
+      "api_method": "GET",
+      "api_pathname": "/api/v1/search",
+      "api_status": 200,
+      "api_trigger": "search_probe",
+      "captured_apis": [
+        {
+          "url": "https://www.shutterstock.com/api/v1/search",
+          "method": "GET",
+          "resource_type": "fetch",
+          "status_code": 200,
+          "request_payload_keys": [
+            "q"
+          ],
+          "response_keys": [
+            "status",
+            "items",
+            "total"
+          ],
+          "triggered_by_action": "search_probe"
+        },
+        {
+          "url": "https://www.shutterstock.com/api/v1/audit",
+          "method": "POST",
+          "resource_type": "xhr",
+          "status_code": 201,
+          "request_payload_keys": [
+            "action"
+          ],
+          "response_keys": [
+            "id",
+            "created_at"
+          ],
+          "triggered_by_action": "click:dashboard"
+        }
+      ],
+      "error_message": ""
+    },
+    {
+      "test_id": "SHUTTE-001-03",
+      "slug": "api-health-contract-matrix-verification",
+      "title": "\"Shutterstock\" \u2192 \"Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music\" \u2192 \"API Health & Contract Matrix Verification\"",
+      "raw_title": "API Health & Contract Matrix Verification",
+      "module": "Shutterstock",
+      "page": "Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music",
+      "profile": "SUPER_USER",
+      "status": "passed",
+      "duration_s": 2.15,
+      "actual_duration_s": 1.7,
+      "final_route": "/api/v1/search",
+      "spec_path": "tests/001_api-health-contract-matrix-verification.spec.ts",
+      "plan_rel_path": "Plans/SHUTTE-001-03/SHUTTE-001-03-api-health-contract-matrix-verification.md",
+      "plan_filename": "SHUTTE-001-03-api-health-contract-matrix-verification.md",
+      "plan_markdown": "---\ntest_id: \"SHUTTE-001-03\"\ntitle: \"To verify the functionality of \\\"Shutterstock\\\" \u2192 \\\"Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music\\\" \u2192 \\\"API Health & Contract Matrix Verification\\\"\"\nmodule: \"Shutterstock\"\npage: \"Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music\"\nsection: \"Primary Flow\"\ncontrol: \"Interactive Controls\"\naction: \"Execution & Verification\"\naccess_profile: \"SUPER_USER\"\npriority: \"High\"\nclassification: \"Read-only\"\ntest_type: \"Positive\"\nautomation_candidate: true\nplan_status: \"reviewed\"\nscript_status: \"generated\"\nenvironment_variables:\n  - BASE_URL\n  - TEST_ACCESS_PROFILE\ntest_data: {}\nrelated_script: \"tests/api-health-contract-matrix-verification.spec.ts\"\n---\n\n# Purpose\n\nVerify the functionality of \"Shutterstock\" \u2192 \"Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music\" \u2192 \"API Health & Contract Matrix Verification\" under access profile `SUPER_USER`.\n\n# Preconditions\n\n- `${BASE_URL}` is reachable.\n- Credentials for `${TEST_ACCESS_PROFILE}` (`SUPER_USER`) are configured in `.env`.\n\n# Test Data\n\nUse environment variables and runtime fixtures.\n\n# Steps and Expected Results\n\n1. Action: Validate contract for GET /api/v1/search (Expected Status: [200], Keys: ['status', 'items', 'total']).\n   Expected Result: Step completes deterministically without UI or network errors.\n\n2. Action: Validate contract for POST /api/v1/audit (Expected Status: [201], Keys: ['id', 'created_at']).\n   Expected Result: Step completes deterministically without UI or network errors.\n\n# Network Verification\n\n- Request URL: `${BASE_URL}/api/v1/search`\n- HTTP Method: GET\n- Expected Status: 200\n- Payload Presence: Verified response payload\n- Visible UI Result: Interactive controls visible and responsive\n\n# Expected Final Result\n\nAll steps and network status assertions succeed for SHUTTE-001-03.\n\n# Classification\n\n- Read-only\n- Positive\n\n# Restrictions\n\n- Do not include credentials, tokens, cookies, authorization codes, or sensitive payloads.\n- Do not use static environment-specific data.\n\n# Generation Status\n\n- Test script generation: Complete\n- CI/CD execution: Ready\n- Healing: Ready\n",
+      "purpose": "Verify API Health & Contract Matrix Verification for Shutterstock (Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music) under access profile SUPER_USER.",
+      "expected_result": "All UI locators resolve uniquely and backend endpoints return HTTP 200.",
+      "steps": [
+        "Validate contract for GET /api/v1/search (Expected Status: [200], Keys: ['status', 'items', 'total'])",
+        "Validate contract for POST /api/v1/audit (Expected Status: [201], Keys: ['id', 'created_at'])"
+      ],
+      "step_screenshots": [
+        {
+          "rel_path": "Evidence/Screenshots/SHUTTE-001-03/01-validate-contract-for-get-api-v1-search.png",
+          "caption": "01 Validate Contract For Get Api V1 Search"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/SHUTTE-001-03/02-validate-contract-for-post-api-v1-audit.png",
+          "caption": "02 Validate Contract For Post Api V1 Audit"
+        }
+      ],
+      "final_screenshot": "Evidence/Screenshots/SHUTTE-001-03/final-screenshot.png",
+      "video_rel_path": "Evidence/Recording/SHUTTE-001-03/video.webm",
+      "trace_rel_path": "Evidence/Trace/SHUTTE-001-03/trace.zip",
+      "api_method": "GET",
+      "api_pathname": "/api/v1/search",
+      "api_status": 200,
+      "api_trigger": "search_probe",
+      "captured_apis": [
+        {
+          "url": "https://www.shutterstock.com/api/v1/search",
+          "method": "GET",
+          "resource_type": "fetch",
+          "status_code": 200,
+          "request_payload_keys": [
+            "q"
+          ],
+          "response_keys": [
+            "status",
+            "items",
+            "total"
+          ],
+          "triggered_by_action": "search_probe"
+        },
+        {
+          "url": "https://www.shutterstock.com/api/v1/audit",
+          "method": "POST",
+          "resource_type": "xhr",
+          "status_code": 201,
+          "request_payload_keys": [
+            "action"
+          ],
+          "response_keys": [
+            "id",
+            "created_at"
+          ],
+          "triggered_by_action": "click:dashboard"
+        }
+      ],
+      "error_message": ""
+    },
+    {
+      "test_id": "SHUTTE-002-01",
+      "slug": "primary-user-flow-api-status-verification",
+      "title": "\"Shutterstock\" \u2192 \"Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music\" \u2192 \"Primary User Flow & API Status Verification\"",
+      "raw_title": "Primary User Flow & API Status Verification",
+      "module": "Shutterstock",
+      "page": "Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music",
+      "profile": "ADMIN",
+      "status": "passed",
+      "duration_s": 2.5,
+      "actual_duration_s": 2.05,
+      "final_route": "/api/v1/search",
+      "spec_path": "tests/002_primary-user-flow-api-status-verification.spec.ts",
+      "plan_rel_path": "Plans/SHUTTE-002-01/SHUTTE-002-01-primary-user-flow-api-status-verification.md",
+      "plan_filename": "SHUTTE-002-01-primary-user-flow-api-status-verification.md",
+      "plan_markdown": "---\ntest_id: \"SHUTTE-002-01\"\ntitle: \"To verify the functionality of \\\"Shutterstock\\\" \u2192 \\\"Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music\\\" \u2192 \\\"Primary User Flow & API Status Verification\\\"\"\nmodule: \"Shutterstock\"\npage: \"Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music\"\nsection: \"Primary Flow\"\ncontrol: \"Interactive Controls\"\naction: \"Execution & Verification\"\naccess_profile: \"ADMIN\"\npriority: \"High\"\nclassification: \"Read-only\"\ntest_type: \"Positive\"\nautomation_candidate: true\nplan_status: \"reviewed\"\nscript_status: \"generated\"\nenvironment_variables:\n  - BASE_URL\n  - TEST_ACCESS_PROFILE\ntest_data: {}\nrelated_script: \"tests/primary-user-flow-api-status-verification.spec.ts\"\n---\n\n# Purpose\n\nVerify the functionality of \"Shutterstock\" \u2192 \"Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music\" \u2192 \"Primary User Flow & API Status Verification\" under access profile `ADMIN`.\n\n# Preconditions\n\n- `${BASE_URL}` is reachable.\n- Credentials for `${TEST_ACCESS_PROFILE}` (`ADMIN`) are configured in `.env`.\n\n# Test Data\n\nUse environment variables and runtime fixtures.\n\n# Steps and Expected Results\n\n1. Action: Navigate to application URL: https://www.shutterstock.com.\n   Expected Result: Step completes deterministically without UI or network errors.\n\n2. Action: Fill value 'search' into control 'Search Input'.\n   Expected Result: Step completes deterministically without UI or network errors.\n\n3. Action: Verify backend API response status ([200, 201]) for endpoint '/api/v1/search'.\n   Expected Result: Step completes deterministically without UI or network errors.\n\n# Network Verification\n\n- Request URL: `${BASE_URL}/api/v1/search`\n- HTTP Method: GET\n- Expected Status: 200\n- Payload Presence: Verified response payload\n- Visible UI Result: Interactive controls visible and responsive\n\n# Expected Final Result\n\nAll steps and network status assertions succeed for SHUTTE-002-01.\n\n# Classification\n\n- Read-only\n- Positive\n\n# Restrictions\n\n- Do not include credentials, tokens, cookies, authorization codes, or sensitive payloads.\n- Do not use static environment-specific data.\n\n# Generation Status\n\n- Test script generation: Complete\n- CI/CD execution: Ready\n- Healing: Ready\n",
+      "purpose": "Verify Primary User Flow & API Status Verification for Shutterstock (Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music) under access profile ADMIN.",
+      "expected_result": "All UI locators resolve uniquely and backend endpoints return HTTP 200.",
+      "steps": [
+        "Navigate to application URL: https://www.shutterstock.com",
+        "Fill value 'search' into control 'Search Input'",
+        "Verify backend API response status ([200, 201]) for endpoint '/api/v1/search'"
+      ],
+      "step_screenshots": [
+        {
+          "rel_path": "Evidence/Screenshots/SHUTTE-002-01/01-navigate-to-application-url-https-www-sh.png",
+          "caption": "01 Navigate To Application Url Https Www Sh"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/SHUTTE-002-01/02-fill-value-search-into-control-search-in.png",
+          "caption": "02 Fill Value Search Into Control Search In"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/SHUTTE-002-01/03-verify-backend-api-response-status-200-2.png",
+          "caption": "03 Verify Backend Api Response Status 200 2"
+        }
+      ],
+      "final_screenshot": "Evidence/Screenshots/SHUTTE-002-01/final-screenshot.png",
+      "video_rel_path": "Evidence/Recording/SHUTTE-002-01/video.webm",
+      "trace_rel_path": "Evidence/Trace/SHUTTE-002-01/trace.zip",
+      "api_method": "GET",
+      "api_pathname": "/api/v1/search",
+      "api_status": 200,
+      "api_trigger": "search_probe",
+      "captured_apis": [
+        {
+          "url": "https://www.shutterstock.com/api/v1/search",
+          "method": "GET",
+          "resource_type": "fetch",
+          "status_code": 200,
+          "request_payload_keys": [
+            "q"
+          ],
+          "response_keys": [
+            "status",
+            "items",
+            "total"
+          ],
+          "triggered_by_action": "search_probe"
+        },
+        {
+          "url": "https://www.shutterstock.com/api/v1/audit",
+          "method": "POST",
+          "resource_type": "xhr",
+          "status_code": 201,
+          "request_payload_keys": [
+            "action"
+          ],
+          "response_keys": [
+            "id",
+            "created_at"
+          ],
+          "triggered_by_action": "click:dashboard"
+        }
+      ],
+      "error_message": ""
+    },
+    {
+      "test_id": "SHUTTE-002-02",
+      "slug": "page-load-core-ui-component-sanity",
+      "title": "\"Shutterstock\" \u2192 \"Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music\" \u2192 \"Page Load & Core UI Component Sanity\"",
+      "raw_title": "Page Load & Core UI Component Sanity",
+      "module": "Shutterstock",
+      "page": "Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music",
+      "profile": "ADMIN",
+      "status": "passed",
+      "duration_s": 2.85,
+      "actual_duration_s": 2.4,
+      "final_route": "/api/v1/search",
+      "spec_path": "tests/002_page-load-core-ui-component-sanity.spec.ts",
+      "plan_rel_path": "Plans/SHUTTE-002-02/SHUTTE-002-02-page-load-core-ui-component-sanity.md",
+      "plan_filename": "SHUTTE-002-02-page-load-core-ui-component-sanity.md",
+      "plan_markdown": "---\ntest_id: \"SHUTTE-002-02\"\ntitle: \"To verify the functionality of \\\"Shutterstock\\\" \u2192 \\\"Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music\\\" \u2192 \\\"Page Load & Core UI Component Sanity\\\"\"\nmodule: \"Shutterstock\"\npage: \"Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music\"\nsection: \"Primary Flow\"\ncontrol: \"Interactive Controls\"\naction: \"Execution & Verification\"\naccess_profile: \"ADMIN\"\npriority: \"High\"\nclassification: \"Read-only\"\ntest_type: \"Positive\"\nautomation_candidate: true\nplan_status: \"reviewed\"\nscript_status: \"generated\"\nenvironment_variables:\n  - BASE_URL\n  - TEST_ACCESS_PROFILE\ntest_data: {}\nrelated_script: \"tests/page-load-core-ui-component-sanity.spec.ts\"\n---\n\n# Purpose\n\nVerify the functionality of \"Shutterstock\" \u2192 \"Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music\" \u2192 \"Page Load & Core UI Component Sanity\" under access profile `ADMIN`.\n\n# Preconditions\n\n- `${BASE_URL}` is reachable.\n- Credentials for `${TEST_ACCESS_PROFILE}` (`ADMIN`) are configured in `.env`.\n\n# Test Data\n\nUse environment variables and runtime fixtures.\n\n# Steps and Expected Results\n\n1. Action: Open target URL: https://www.shutterstock.com.\n   Expected Result: Step completes deterministically without UI or network errors.\n\n2. Action: Verify Page Title equals or contains 'Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music'.\n   Expected Result: Step completes deterministically without UI or network errors.\n\n3. Action: Verify visibility of core control 'Search Input' (input).\n   Expected Result: Step completes deterministically without UI or network errors.\n\n4. Action: Verify visibility of core control 'Dashboard Tab' (button).\n   Expected Result: Step completes deterministically without UI or network errors.\n\n# Network Verification\n\n- Request URL: `${BASE_URL}/api/v1/search`\n- HTTP Method: GET\n- Expected Status: 200\n- Payload Presence: Verified response payload\n- Visible UI Result: Interactive controls visible and responsive\n\n# Expected Final Result\n\nAll steps and network status assertions succeed for SHUTTE-002-02.\n\n# Classification\n\n- Read-only\n- Positive\n\n# Restrictions\n\n- Do not include credentials, tokens, cookies, authorization codes, or sensitive payloads.\n- Do not use static environment-specific data.\n\n# Generation Status\n\n- Test script generation: Complete\n- CI/CD execution: Ready\n- Healing: Ready\n",
+      "purpose": "Verify Page Load & Core UI Component Sanity for Shutterstock (Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music) under access profile ADMIN.",
+      "expected_result": "All UI locators resolve uniquely and backend endpoints return HTTP 200.",
+      "steps": [
+        "Open target URL: https://www.shutterstock.com",
+        "Verify Page Title equals or contains 'Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music'",
+        "Verify visibility of core control 'Search Input' (input)",
+        "Verify visibility of core control 'Dashboard Tab' (button)"
+      ],
+      "step_screenshots": [
+        {
+          "rel_path": "Evidence/Screenshots/SHUTTE-002-02/01-open-target-url-https-www-shutterstock-c.png",
+          "caption": "01 Open Target Url Https Www Shutterstock C"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/SHUTTE-002-02/02-verify-page-title-equals-or-contains-shu.png",
+          "caption": "02 Verify Page Title Equals Or Contains Shu"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/SHUTTE-002-02/03-verify-visibility-of-core-control-search.png",
+          "caption": "03 Verify Visibility Of Core Control Search"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/SHUTTE-002-02/04-verify-visibility-of-core-control-dashbo.png",
+          "caption": "04 Verify Visibility Of Core Control Dashbo"
+        }
+      ],
+      "final_screenshot": "Evidence/Screenshots/SHUTTE-002-02/final-screenshot.png",
+      "video_rel_path": "Evidence/Recording/SHUTTE-002-02/video.webm",
+      "trace_rel_path": "Evidence/Trace/SHUTTE-002-02/trace.zip",
+      "api_method": "GET",
+      "api_pathname": "/api/v1/search",
+      "api_status": 200,
+      "api_trigger": "search_probe",
+      "captured_apis": [
+        {
+          "url": "https://www.shutterstock.com/api/v1/search",
+          "method": "GET",
+          "resource_type": "fetch",
+          "status_code": 200,
+          "request_payload_keys": [
+            "q"
+          ],
+          "response_keys": [
+            "status",
+            "items",
+            "total"
+          ],
+          "triggered_by_action": "search_probe"
+        },
+        {
+          "url": "https://www.shutterstock.com/api/v1/audit",
+          "method": "POST",
+          "resource_type": "xhr",
+          "status_code": 201,
+          "request_payload_keys": [
+            "action"
+          ],
+          "response_keys": [
+            "id",
+            "created_at"
+          ],
+          "triggered_by_action": "click:dashboard"
+        }
+      ],
+      "error_message": ""
+    },
+    {
+      "test_id": "SHUTTE-002-03",
+      "slug": "api-health-contract-matrix-verification",
+      "title": "\"Shutterstock\" \u2192 \"Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music\" \u2192 \"API Health & Contract Matrix Verification\"",
+      "raw_title": "API Health & Contract Matrix Verification",
+      "module": "Shutterstock",
+      "page": "Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music",
+      "profile": "ADMIN",
+      "status": "passed",
+      "duration_s": 2.15,
+      "actual_duration_s": 1.7,
+      "final_route": "/api/v1/search",
+      "spec_path": "tests/002_api-health-contract-matrix-verification.spec.ts",
+      "plan_rel_path": "Plans/SHUTTE-002-03/SHUTTE-002-03-api-health-contract-matrix-verification.md",
+      "plan_filename": "SHUTTE-002-03-api-health-contract-matrix-verification.md",
+      "plan_markdown": "---\ntest_id: \"SHUTTE-002-03\"\ntitle: \"To verify the functionality of \\\"Shutterstock\\\" \u2192 \\\"Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music\\\" \u2192 \\\"API Health & Contract Matrix Verification\\\"\"\nmodule: \"Shutterstock\"\npage: \"Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music\"\nsection: \"Primary Flow\"\ncontrol: \"Interactive Controls\"\naction: \"Execution & Verification\"\naccess_profile: \"ADMIN\"\npriority: \"High\"\nclassification: \"Read-only\"\ntest_type: \"Positive\"\nautomation_candidate: true\nplan_status: \"reviewed\"\nscript_status: \"generated\"\nenvironment_variables:\n  - BASE_URL\n  - TEST_ACCESS_PROFILE\ntest_data: {}\nrelated_script: \"tests/api-health-contract-matrix-verification.spec.ts\"\n---\n\n# Purpose\n\nVerify the functionality of \"Shutterstock\" \u2192 \"Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music\" \u2192 \"API Health & Contract Matrix Verification\" under access profile `ADMIN`.\n\n# Preconditions\n\n- `${BASE_URL}` is reachable.\n- Credentials for `${TEST_ACCESS_PROFILE}` (`ADMIN`) are configured in `.env`.\n\n# Test Data\n\nUse environment variables and runtime fixtures.\n\n# Steps and Expected Results\n\n1. Action: Validate contract for GET /api/v1/search (Expected Status: [200], Keys: ['status', 'items', 'total']).\n   Expected Result: Step completes deterministically without UI or network errors.\n\n2. Action: Validate contract for POST /api/v1/audit (Expected Status: [201], Keys: ['id', 'created_at']).\n   Expected Result: Step completes deterministically without UI or network errors.\n\n# Network Verification\n\n- Request URL: `${BASE_URL}/api/v1/search`\n- HTTP Method: GET\n- Expected Status: 200\n- Payload Presence: Verified response payload\n- Visible UI Result: Interactive controls visible and responsive\n\n# Expected Final Result\n\nAll steps and network status assertions succeed for SHUTTE-002-03.\n\n# Classification\n\n- Read-only\n- Positive\n\n# Restrictions\n\n- Do not include credentials, tokens, cookies, authorization codes, or sensitive payloads.\n- Do not use static environment-specific data.\n\n# Generation Status\n\n- Test script generation: Complete\n- CI/CD execution: Ready\n- Healing: Ready\n",
+      "purpose": "Verify API Health & Contract Matrix Verification for Shutterstock (Shutterstock \u2014 Stock Images, Photos, Vectors, Video, and Music) under access profile ADMIN.",
+      "expected_result": "All UI locators resolve uniquely and backend endpoints return HTTP 200.",
+      "steps": [
+        "Validate contract for GET /api/v1/search (Expected Status: [200], Keys: ['status', 'items', 'total'])",
+        "Validate contract for POST /api/v1/audit (Expected Status: [201], Keys: ['id', 'created_at'])"
+      ],
+      "step_screenshots": [
+        {
+          "rel_path": "Evidence/Screenshots/SHUTTE-002-03/01-validate-contract-for-get-api-v1-search.png",
+          "caption": "01 Validate Contract For Get Api V1 Search"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/SHUTTE-002-03/02-validate-contract-for-post-api-v1-audit.png",
+          "caption": "02 Validate Contract For Post Api V1 Audit"
+        }
+      ],
+      "final_screenshot": "Evidence/Screenshots/SHUTTE-002-03/final-screenshot.png",
+      "video_rel_path": "Evidence/Recording/SHUTTE-002-03/video.webm",
+      "trace_rel_path": "Evidence/Trace/SHUTTE-002-03/trace.zip",
+      "api_method": "GET",
+      "api_pathname": "/api/v1/search",
+      "api_status": 200,
+      "api_trigger": "search_probe",
+      "captured_apis": [
+        {
+          "url": "https://www.shutterstock.com/api/v1/search",
+          "method": "GET",
+          "resource_type": "fetch",
+          "status_code": 200,
+          "request_payload_keys": [
+            "q"
+          ],
+          "response_keys": [
+            "status",
+            "items",
+            "total"
+          ],
+          "triggered_by_action": "search_probe"
+        },
+        {
+          "url": "https://www.shutterstock.com/api/v1/audit",
+          "method": "POST",
+          "resource_type": "xhr",
+          "status_code": 201,
+          "request_payload_keys": [
+            "action"
+          ],
+          "response_keys": [
+            "id",
+            "created_at"
+          ],
+          "triggered_by_action": "click:dashboard"
+        }
+      ],
+      "error_message": ""
+    }
+  ]
+}

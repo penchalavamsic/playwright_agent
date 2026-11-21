@@ -1,0 +1,34 @@
+[
+  {
+    "url": "https://events.backtrace.io/api/summed-events/submit?universe=UNIVERSE&token=TOKEN",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status_code": 401,
+    "request_payload_keys": [
+      "application",
+      "appversion",
+      "summed_events",
+      "metadata"
+    ],
+    "response_keys": [
+      "error"
+    ],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://events.backtrace.io/api/unique-events/submit?universe=UNIVERSE&token=TOKEN",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status_code": 401,
+    "request_payload_keys": [
+      "application",
+      "appversion",
+      "unique_events",
+      "metadata"
+    ],
+    "response_keys": [
+      "error"
+    ],
+    "triggered_by_action": "page_load"
+  }
+]

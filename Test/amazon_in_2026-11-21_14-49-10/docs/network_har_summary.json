@@ -1,0 +1,199 @@
+[
+  {
+    "url": "https://1c5c1ecf7303.e10058c8.ap-south-1.token.awswaf.com/1c5c1ecf7303/6ab7d267eef9/66125abca348/inputs?client=browser",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [
+      "challenge",
+      "challenge_type",
+      "difficulty"
+    ],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://1c5c1ecf7303.e10058c8.ap-south-1.token.awswaf.com/1c5c1ecf7303/6ab7d267eef9/66125abca348/mp_verify?region=ap-south-1",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [
+      "token",
+      "inputs"
+    ],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://m.media-amazon.com/images/G/01/csm/showads.v2.js?adspot_=1",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://www.amazon.in/dram/renderLazyLoadedStreaming?rshVal=1795252753545",
+    "method": "POST",
+    "resource_type": "xhr",
+    "status_code": 200,
+    "request_payload_keys": [
+      "encryptedLazyLoadRenderRequest",
+      "version"
+    ],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://www.amazon.in/hz/rhf?currentPageType=Gateway&currentSubPageType=desktop&excludeAsin=&fieldKeywords=&k=&keywords=&search=&auditEnabled=&previewCampaigns=&forceWidgets=&searchAlias=&cardJSPresent=true",
+    "method": "GET",
+    "resource_type": "xhr",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [
+      "html",
+      "success"
+    ],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://unagi.amazon.in/1/events/com.amazon.csm.csa.prod",
+    "method": "POST",
+    "resource_type": "xhr",
+    "status_code": 200,
+    "request_payload_keys": [
+      "events"
+    ],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://www.amazon.in/suggestions?limit=11&prefix=&suggestion-type=WIDGET&suggestion-type=KEYWORD&page-type=Gateway&alias=aps&site-variant=desktop&version=3&event=onfocus&wc=&lop=en_IN&last-prefix=%00&avg-ks-time=0&fb=1&predicted_text_accepted=&estoken=&session-id=522-4907289-8637867&request-id=ZTQER9570YZAZHZK41PZ&mid=A21TJRUUN4KGV&plain-mid=44571&client-info=search-ui",
+    "method": "GET",
+    "resource_type": "xhr",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [
+      "alias",
+      "predictiveText",
+      "prefix",
+      "responseId",
+      "shuffled",
+      "suffix",
+      "suggestionTitleId",
+      "suggestions"
+    ],
+    "triggered_by_action": "probe:search -> typed '12gb ram' into searchbox 'Search Amazon.in'"
+  },
+  {
+    "url": "https://www.amazon.in/suggestions?limit=11&prefix=12gb%20ram&suggestion-type=WIDGET&suggestion-type=KEYWORD&page-type=Gateway&alias=aps&site-variant=desktop&version=3&event=onkeypress&wc=&lop=en_IN&last-prefix=%00&avg-ks-time=3&fb=1&predicted_text_accepted=&estoken=&session-id=522-4907289-8637867&request-id=ZTQER9570YZAZHZK41PZ&mid=A21TJRUUN4KGV&plain-mid=44571&client-info=search-ui",
+    "method": "GET",
+    "resource_type": "xhr",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [
+      "alias",
+      "predictiveText",
+      "prefix",
+      "responseId",
+      "shuffled",
+      "suffix",
+      "suggestionTitleId",
+      "suggestions"
+    ],
+    "triggered_by_action": "probe:search -> typed '12gb ram' into searchbox 'Search Amazon.in'"
+  },
+  {
+    "url": "https://unagi.amazon.in/1/events/com.amazon.eel.SearchAutocompleteUIServiceMetrics.nexus",
+    "method": "POST",
+    "resource_type": "xhr",
+    "status_code": 200,
+    "request_payload_keys": [
+      "events"
+    ],
+    "response_keys": [],
+    "triggered_by_action": "probe:search -> typed '12gb ram' into searchbox 'Search Amazon.in'"
+  },
+  {
+    "url": "https://www.amazon.in/dram/renderLazyLoadedStreaming?rshVal=1795252768535",
+    "method": "POST",
+    "resource_type": "xhr",
+    "status_code": 200,
+    "request_payload_keys": [
+      "encryptedLazyLoadRenderRequest",
+      "version"
+    ],
+    "response_keys": [],
+    "triggered_by_action": "restore_navigation"
+  },
+  {
+    "url": "https://www.amazon.in/hz/rhf?currentPageType=Gateway&currentSubPageType=desktop&excludeAsin=&fieldKeywords=&k=&keywords=&search=&auditEnabled=&previewCampaigns=&forceWidgets=&searchAlias=&cardJSPresent=true",
+    "method": "GET",
+    "resource_type": "xhr",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [
+      "html",
+      "success"
+    ],
+    "triggered_by_action": "restore_navigation"
+  },
+  {
+    "url": "https://unagi.amazon.in/1/events/com.amazon.csm.csa.prod",
+    "method": "POST",
+    "resource_type": "xhr",
+    "status_code": 200,
+    "request_payload_keys": [
+      "events"
+    ],
+    "response_keys": [],
+    "triggered_by_action": "probe:click link 'Cart, shift, alt, c'"
+  },
+  {
+    "url": "https://www.amazon.in/cart/enforcement/bannerAlert",
+    "method": "POST",
+    "resource_type": "xhr",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "probe:click link '0 items in cart'"
+  },
+  {
+    "url": "https://www.amazon.in/ax/preauth?policy_handle=Retail-Checkout",
+    "method": "GET",
+    "resource_type": "xhr",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [
+      "icaEligible",
+      "token",
+      "data"
+    ],
+    "triggered_by_action": "probe:click link '0 items in cart'"
+  },
+  {
+    "url": "https://www.amazon.in/hz/rhf?currentPageType=ShoppingCart&currentSubPageType=Cart&excludeAsin=&fieldKeywords=&k=&keywords=&search=&auditEnabled=&previewCampaigns=&forceWidgets=&searchAlias=&cardJSPresent=true",
+    "method": "GET",
+    "resource_type": "xhr",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [
+      "html",
+      "success"
+    ],
+    "triggered_by_action": "probe:click link '0 items in cart'"
+  },
+  {
+    "url": "https://www.amazon.in/dram/renderLazyLoadedStreaming?rshVal=1795252779336",
+    "method": "POST",
+    "resource_type": "xhr",
+    "status_code": 200,
+    "request_payload_keys": [
+      "encryptedLazyLoadRenderRequest",
+      "version"
+    ],
+    "response_keys": [],
+    "triggered_by_action": "restore_navigation"
+  }
+]

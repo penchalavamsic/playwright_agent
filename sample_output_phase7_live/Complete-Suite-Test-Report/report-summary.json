@@ -1,0 +1,189 @@
+{
+  "report_title": "Shutterstock Studio Portal Detailed Test Evidence Report \u2014 127.0.0.1:56844 \u2014 SUPER_USER",
+  "app_display_name": "Shutterstock Studio Portal",
+  "domain_label": "127.0.0.1:56844",
+  "module": "Shutterstock",
+  "profile": "SUPER_USER",
+  "target_url": "${BASE_URL}",
+  "browser": "Msedge",
+  "date": "2026-11-21",
+  "total": 3,
+  "passed": 3,
+  "failed": 0,
+  "flaky": 0,
+  "skipped": 0,
+  "pass_rate_pct": 100.0,
+  "duration_s": 6.8,
+  "test_cases": [
+    {
+      "test_id": "SHUTTE-001-01",
+      "slug": "primary-user-flow-api-status-verification",
+      "title": "\"Shutterstock\" \u2192 \"Shutterstock Studio Portal\" \u2192 \"Primary User Flow & API Status Verification\"",
+      "raw_title": "Primary User Flow & API Status Verification",
+      "module": "Shutterstock",
+      "page": "Shutterstock Studio Portal",
+      "profile": "SUPER_USER",
+      "status": "passed",
+      "duration_s": 2.15,
+      "actual_duration_s": 1.7,
+      "final_route": "/api/search",
+      "spec_path": "tests/001_primary-user-flow-api-status-verification.spec.ts",
+      "plan_rel_path": "Plans/SHUTTE-001-01/SHUTTE-001-01-primary-user-flow-api-status-verification.md",
+      "plan_filename": "SHUTTE-001-01-primary-user-flow-api-status-verification.md",
+      "plan_markdown": "---\ntest_id: \"SHUTTE-001-01\"\ntitle: \"To verify the functionality of \\\"Shutterstock\\\" \u2192 \\\"Shutterstock Studio Portal\\\" \u2192 \\\"Primary User Flow & API Status Verification\\\"\"\nmodule: \"Shutterstock\"\npage: \"Shutterstock Studio Portal\"\nsection: \"Primary Flow\"\ncontrol: \"Interactive Controls\"\naction: \"Execution & Verification\"\naccess_profile: \"SUPER_USER\"\npriority: \"High\"\nclassification: \"Read-only\"\ntest_type: \"Positive\"\nautomation_candidate: true\nplan_status: \"reviewed\"\nscript_status: \"generated\"\nenvironment_variables:\n  - BASE_URL\n  - TEST_ACCESS_PROFILE\ntest_data: {}\nrelated_script: \"tests/primary-user-flow-api-status-verification.spec.ts\"\n---\n\n# Purpose\n\nVerify the functionality of \"Shutterstock\" \u2192 \"Shutterstock Studio Portal\" \u2192 \"Primary User Flow & API Status Verification\" under access profile `SUPER_USER`.\n\n# Preconditions\n\n- `${BASE_URL}` is reachable.\n- Credentials for `${TEST_ACCESS_PROFILE}` (`SUPER_USER`) are configured in `.env`.\n\n# Test Data\n\nUse environment variables and runtime fixtures.\n\n# Steps and Expected Results\n\n1. Action: Navigate to application URL: http://127.0.0.1:56844.\n   Expected Result: Step completes deterministically without UI or network errors.\n\n2. Action: Search value 'vectors' into control 'Search stock images...'.\n   Expected Result: Step completes deterministically without UI or network errors.\n\n# Network Verification\n\n- Request URL: `${BASE_URL}/api/search`\n- HTTP Method: GET\n- Expected Status: 200\n- Payload Presence: Verified response payload\n- Visible UI Result: Interactive controls visible and responsive\n\n# Expected Final Result\n\nAll steps and network status assertions succeed for SHUTTE-001-01.\n\n# Classification\n\n- Read-only\n- Positive\n\n# Restrictions\n\n- Do not include credentials, tokens, cookies, authorization codes, or sensitive payloads.\n- Do not use static environment-specific data.\n\n# Generation Status\n\n- Test script generation: Complete\n- CI/CD execution: Ready\n- Healing: Ready\n",
+      "purpose": "Verify Primary User Flow & API Status Verification for Shutterstock Studio Portal (Shutterstock Studio Portal) under access profile SUPER_USER.",
+      "expected_result": "All UI locators resolve uniquely and backend endpoints return HTTP 200.",
+      "steps": [
+        "Navigate to application URL: http://127.0.0.1:56844",
+        "Search value 'vectors' into control 'Search stock images...'"
+      ],
+      "step_screenshots": [
+        {
+          "rel_path": "Evidence/Screenshots/SHUTTE-001-01/01-navigate-to-application-url-http-127-0-0.png",
+          "caption": "01 Navigate To Application Url Http 127 0 0"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/SHUTTE-001-01/02-search-value-vectors-into-control-search.png",
+          "caption": "02 Search Value Vectors Into Control Search"
+        }
+      ],
+      "final_screenshot": "Evidence/Screenshots/SHUTTE-001-01/final-screenshot.png",
+      "video_rel_path": "Evidence/Recording/SHUTTE-001-01/video.webm",
+      "trace_rel_path": "Evidence/Trace/SHUTTE-001-01/trace.zip",
+      "api_method": "GET",
+      "api_pathname": "/api/search",
+      "api_status": 200,
+      "api_trigger": "probe:click tab 'Explore Gallery'",
+      "captured_apis": [
+        {
+          "url": "http://127.0.0.1:56844/api/search?q=vectors",
+          "method": "GET",
+          "resource_type": "fetch",
+          "status_code": 200,
+          "request_payload_keys": [],
+          "response_keys": [
+            "status",
+            "results"
+          ],
+          "triggered_by_action": "probe:click tab 'Explore Gallery'"
+        }
+      ],
+      "error_message": ""
+    },
+    {
+      "test_id": "SHUTTE-001-02",
+      "slug": "page-load-core-ui-component-sanity",
+      "title": "\"Shutterstock\" \u2192 \"Shutterstock Studio Portal\" \u2192 \"Page Load & Core UI Component Sanity\"",
+      "raw_title": "Page Load & Core UI Component Sanity",
+      "module": "Shutterstock",
+      "page": "Shutterstock Studio Portal",
+      "profile": "SUPER_USER",
+      "status": "passed",
+      "duration_s": 2.85,
+      "actual_duration_s": 2.4,
+      "final_route": "/api/search",
+      "spec_path": "tests/001_page-load-core-ui-component-sanity.spec.ts",
+      "plan_rel_path": "Plans/SHUTTE-001-02/SHUTTE-001-02-page-load-core-ui-component-sanity.md",
+      "plan_filename": "SHUTTE-001-02-page-load-core-ui-component-sanity.md",
+      "plan_markdown": "---\ntest_id: \"SHUTTE-001-02\"\ntitle: \"To verify the functionality of \\\"Shutterstock\\\" \u2192 \\\"Shutterstock Studio Portal\\\" \u2192 \\\"Page Load & Core UI Component Sanity\\\"\"\nmodule: \"Shutterstock\"\npage: \"Shutterstock Studio Portal\"\nsection: \"Primary Flow\"\ncontrol: \"Interactive Controls\"\naction: \"Execution & Verification\"\naccess_profile: \"SUPER_USER\"\npriority: \"High\"\nclassification: \"Read-only\"\ntest_type: \"Positive\"\nautomation_candidate: true\nplan_status: \"reviewed\"\nscript_status: \"generated\"\nenvironment_variables:\n  - BASE_URL\n  - TEST_ACCESS_PROFILE\ntest_data: {}\nrelated_script: \"tests/page-load-core-ui-component-sanity.spec.ts\"\n---\n\n# Purpose\n\nVerify the functionality of \"Shutterstock\" \u2192 \"Shutterstock Studio Portal\" \u2192 \"Page Load & Core UI Component Sanity\" under access profile `SUPER_USER`.\n\n# Preconditions\n\n- `${BASE_URL}` is reachable.\n- Credentials for `${TEST_ACCESS_PROFILE}` (`SUPER_USER`) are configured in `.env`.\n\n# Test Data\n\nUse environment variables and runtime fixtures.\n\n# Steps and Expected Results\n\n1. Action: Open target URL: http://127.0.0.1:56844.\n   Expected Result: Step completes deterministically without UI or network errors.\n\n2. Action: Verify Page Title equals or contains 'Shutterstock Studio Portal'.\n   Expected Result: Step completes deterministically without UI or network errors.\n\n3. Action: Verify visibility of core control 'Search stock images...' (input).\n   Expected Result: Step completes deterministically without UI or network errors.\n\n4. Action: Verify visibility of core control 'Explore Gallery' (button).\n   Expected Result: Step completes deterministically without UI or network errors.\n\n# Network Verification\n\n- Request URL: `${BASE_URL}/api/search`\n- HTTP Method: GET\n- Expected Status: 200\n- Payload Presence: Verified response payload\n- Visible UI Result: Interactive controls visible and responsive\n\n# Expected Final Result\n\nAll steps and network status assertions succeed for SHUTTE-001-02.\n\n# Classification\n\n- Read-only\n- Positive\n\n# Restrictions\n\n- Do not include credentials, tokens, cookies, authorization codes, or sensitive payloads.\n- Do not use static environment-specific data.\n\n# Generation Status\n\n- Test script generation: Complete\n- CI/CD execution: Ready\n- Healing: Ready\n",
+      "purpose": "Verify Page Load & Core UI Component Sanity for Shutterstock Studio Portal (Shutterstock Studio Portal) under access profile SUPER_USER.",
+      "expected_result": "All UI locators resolve uniquely and backend endpoints return HTTP 200.",
+      "steps": [
+        "Open target URL: http://127.0.0.1:56844",
+        "Verify Page Title equals or contains 'Shutterstock Studio Portal'",
+        "Verify visibility of core control 'Search stock images...' (input)",
+        "Verify visibility of core control 'Explore Gallery' (button)"
+      ],
+      "step_screenshots": [
+        {
+          "rel_path": "Evidence/Screenshots/SHUTTE-001-02/01-open-target-url-http-127-0-0-1-56844.png",
+          "caption": "01 Open Target Url Http 127 0 0 1 56844"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/SHUTTE-001-02/02-verify-page-title-equals-or-contains-shu.png",
+          "caption": "02 Verify Page Title Equals Or Contains Shu"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/SHUTTE-001-02/03-verify-visibility-of-core-control-search.png",
+          "caption": "03 Verify Visibility Of Core Control Search"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/SHUTTE-001-02/04-verify-visibility-of-core-control-explor.png",
+          "caption": "04 Verify Visibility Of Core Control Explor"
+        }
+      ],
+      "final_screenshot": "Evidence/Screenshots/SHUTTE-001-02/final-screenshot.png",
+      "video_rel_path": "Evidence/Recording/SHUTTE-001-02/video.webm",
+      "trace_rel_path": "Evidence/Trace/SHUTTE-001-02/trace.zip",
+      "api_method": "GET",
+      "api_pathname": "/api/search",
+      "api_status": 200,
+      "api_trigger": "probe:click tab 'Explore Gallery'",
+      "captured_apis": [
+        {
+          "url": "http://127.0.0.1:56844/api/search?q=vectors",
+          "method": "GET",
+          "resource_type": "fetch",
+          "status_code": 200,
+          "request_payload_keys": [],
+          "response_keys": [
+            "status",
+            "results"
+          ],
+          "triggered_by_action": "probe:click tab 'Explore Gallery'"
+        }
+      ],
+      "error_message": ""
+    },
+    {
+      "test_id": "SHUTTE-001-03",
+      "slug": "api-health-contract-matrix-verification",
+      "title": "\"Shutterstock\" \u2192 \"Shutterstock Studio Portal\" \u2192 \"API Health & Contract Matrix Verification\"",
+      "raw_title": "API Health & Contract Matrix Verification",
+      "module": "Shutterstock",
+      "page": "Shutterstock Studio Portal",
+      "profile": "SUPER_USER",
+      "status": "passed",
+      "duration_s": 1.8,
+      "actual_duration_s": 1.35,
+      "final_route": "/api/search",
+      "spec_path": "tests/001_api-health-contract-matrix-verification.spec.ts",
+      "plan_rel_path": "Plans/SHUTTE-001-03/SHUTTE-001-03-api-health-contract-matrix-verification.md",
+      "plan_filename": "SHUTTE-001-03-api-health-contract-matrix-verification.md",
+      "plan_markdown": "---\ntest_id: \"SHUTTE-001-03\"\ntitle: \"To verify the functionality of \\\"Shutterstock\\\" \u2192 \\\"Shutterstock Studio Portal\\\" \u2192 \\\"API Health & Contract Matrix Verification\\\"\"\nmodule: \"Shutterstock\"\npage: \"Shutterstock Studio Portal\"\nsection: \"Primary Flow\"\ncontrol: \"Interactive Controls\"\naction: \"Execution & Verification\"\naccess_profile: \"SUPER_USER\"\npriority: \"High\"\nclassification: \"Read-only\"\ntest_type: \"Positive\"\nautomation_candidate: true\nplan_status: \"reviewed\"\nscript_status: \"generated\"\nenvironment_variables:\n  - BASE_URL\n  - TEST_ACCESS_PROFILE\ntest_data: {}\nrelated_script: \"tests/api-health-contract-matrix-verification.spec.ts\"\n---\n\n# Purpose\n\nVerify the functionality of \"Shutterstock\" \u2192 \"Shutterstock Studio Portal\" \u2192 \"API Health & Contract Matrix Verification\" under access profile `SUPER_USER`.\n\n# Preconditions\n\n- `${BASE_URL}` is reachable.\n- Credentials for `${TEST_ACCESS_PROFILE}` (`SUPER_USER`) are configured in `.env`.\n\n# Test Data\n\nUse environment variables and runtime fixtures.\n\n# Steps and Expected Results\n\n1. Action: Validate contract for GET /api/search (Expected Status: [200], Keys: ['status', 'results']).\n   Expected Result: Step completes deterministically without UI or network errors.\n\n# Network Verification\n\n- Request URL: `${BASE_URL}/api/search`\n- HTTP Method: GET\n- Expected Status: 200\n- Payload Presence: Verified response payload\n- Visible UI Result: Interactive controls visible and responsive\n\n# Expected Final Result\n\nAll steps and network status assertions succeed for SHUTTE-001-03.\n\n# Classification\n\n- Read-only\n- Positive\n\n# Restrictions\n\n- Do not include credentials, tokens, cookies, authorization codes, or sensitive payloads.\n- Do not use static environment-specific data.\n\n# Generation Status\n\n- Test script generation: Complete\n- CI/CD execution: Ready\n- Healing: Ready\n",
+      "purpose": "Verify API Health & Contract Matrix Verification for Shutterstock Studio Portal (Shutterstock Studio Portal) under access profile SUPER_USER.",
+      "expected_result": "All UI locators resolve uniquely and backend endpoints return HTTP 200.",
+      "steps": [
+        "Validate contract for GET /api/search (Expected Status: [200], Keys: ['status', 'results'])"
+      ],
+      "step_screenshots": [
+        {
+          "rel_path": "Evidence/Screenshots/SHUTTE-001-03/01-validate-contract-for-get-api-search-exp.png",
+          "caption": "01 Validate Contract For Get Api Search Exp"
+        }
+      ],
+      "final_screenshot": "Evidence/Screenshots/SHUTTE-001-03/final-screenshot.png",
+      "video_rel_path": "Evidence/Recording/SHUTTE-001-03/video.webm",
+      "trace_rel_path": "Evidence/Trace/SHUTTE-001-03/trace.zip",
+      "api_method": "GET",
+      "api_pathname": "/api/search",
+      "api_status": 200,
+      "api_trigger": "probe:click tab 'Explore Gallery'",
+      "captured_apis": [
+        {
+          "url": "http://127.0.0.1:56844/api/search?q=vectors",
+          "method": "GET",
+          "resource_type": "fetch",
+          "status_code": 200,
+          "request_payload_keys": [],
+          "response_keys": [
+            "status",
+            "results"
+          ],
+          "triggered_by_action": "probe:click tab 'Explore Gallery'"
+        }
+      ],
+      "error_message": ""
+    }
+  ]
+}

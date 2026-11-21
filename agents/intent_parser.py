@@ -8,9 +8,10 @@ from __future__ import annotations
 
 import inspect
 import re
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from agents.state import AgentState, ParsedFlowStep
+from core.workspace_manager import WorkspaceManager
 
 # Keywords & Regex patterns
 STATUS_CODE_REGEX = re.compile(r"\b([2-5]\d{2})\b")
@@ -44,6 +45,41 @@ def _emit_progress(state: AgentState, node_name: str, percent: float, message: s
         pass
 
 
+def detect_access_profile_from_flow(
+    user_flow_text: str,
+    active_access_profile: str = "",
+    account_credentials: Optional[Dict[str, Any]] = None,
+) -> str:
+    """Resolve active access profile from explicit user flow mentions or fallback to GUI selection."""
+    text = user_flow_text or ""
+    candidates: List[str] = []
+    for k in (account_credentials or {}).keys():
+        norm = WorkspaceManager.normalize_role(k)
+        if norm and norm not in candidates:
+            candidates.append(norm)
+    for default_role in ("SUPER_USER_ADMIN_USER", "SUPER_USER", "ADMIN"):
+        if default_role not in candidates:
+            candidates.append(default_role)
+
+    # Sort longest-first so SUPER_USER_ADMIN_USER matches before SUPER_USER or ADMIN
+    candidates.sort(key=len, reverse=True)
+
+    for role in candidates:
+        parts = [re.escape(p) for p in role.split("_") if p]
+        if not parts:
+            continue
+        role_pat = r"[\s_\-]+".join(parts)
+        contextual_re = re.compile(
+            rf"\b(?:as|with|using|login\s+as|log\s+in\s+as|for|role|profile)\s+(?:a\s+|an\s+|the\s+)?{role_pat}\b",
+            re.IGNORECASE,
+        )
+        exact_token_re = re.compile(rf"\b{re.escape(role)}\b")
+        if contextual_re.search(text) or exact_token_re.search(text):
+            return role
+
+    return active_access_profile or "None (Public URL)"
+
+
 def intent_parser_node(state: AgentState) -> Dict[str, Any]:
     """Parse user_flow_text into deterministic structured ParsedFlowStep items."""
     _emit_progress(
@@ -55,6 +91,17 @@ def intent_parser_node(state: AgentState) -> Dict[str, Any]:
 
     user_flow = state.get("user_flow_text", "")
     target_url = state.get("target_url", "")
+    raw_output_dir = state.get("output_dir", "")
+    resolved_output_dir = (
+        str(WorkspaceManager.resolve_run_output_dir(raw_output_dir, target_url))
+        if raw_output_dir
+        else ""
+    )
+    resolved_profile = detect_access_profile_from_flow(
+        user_flow_text=user_flow,
+        active_access_profile=state.get("active_access_profile", ""),
+        account_credentials=state.get("account_credentials", {}),
+    )
 
     # Extract all explicitly mentioned status codes across the whole text
     global_status_codes = [int(m) for m in STATUS_CODE_REGEX.findall(user_flow)]
@@ -232,5 +279,11 @@ def intent_parser_node(state: AgentState) -> Dict[str, Any]:
             )
         )
 
-    return {"parsed_flow_steps": [s.model_dump() for s in parsed_steps]}
+    result_payload: Dict[str, Any] = {
+        "parsed_flow_steps": [s.model_dump() for s in parsed_steps],
+        "active_access_profile": resolved_profile,
+    }
+    if resolved_output_dir:
+        result_payload["output_dir"] = resolved_output_dir
+    return result_payload
 

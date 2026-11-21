@@ -16,6 +16,8 @@ import itertools
 import json
 import logging
 import re
+import tempfile
+from pathlib import Path
 from typing import Any, Awaitable, Callable, Dict, List, Optional, Sequence, Tuple, Union
 from urllib.parse import urldefrag, urlparse
 
@@ -40,8 +42,8 @@ ProgressCallback = Callable[[str, float, str], Union[None, Awaitable[None]]]
 # Constants
 # ---------------------------------------------------------------------------
 
-#: Browser channels tried in order. ``None`` == Playwright's bundled Chromium.
-DEFAULT_CHANNELS: Tuple[Optional[str], ...] = ("chrome", "msedge", None)
+#: Browser channels tried in order. Prioritize "msedge" then "chrome" then bundled Chromium.
+DEFAULT_CHANNELS: Tuple[Optional[str], ...] = ("msedge", "chrome", None)
 
 INTERACTIVE_SELECTOR = ", ".join(
     [
@@ -163,7 +165,7 @@ EXTRACT_ELEMENTS_JS = r"""
       if (!t) { const img = el.querySelector('img[alt]'); if (img) t = norm(img.getAttribute('alt')); }
       if (t) return t;
     }
-    return norm(el.getAttribute('title')) || norm(el.getAttribute('placeholder'));
+    return norm(el.getAttribute('title')) || norm(el.getAttribute('placeholder')) || norm(el.getAttribute('data-test')) || norm(el.getAttribute('data-testid'));
   };
 
   const cssFor = (el) => {
@@ -322,6 +324,45 @@ def render_locator(strategy: str, value: str, role: str = "") -> Dict[str, str]:
 class BrowserInspector:
     """Inspects a URL: DOM locators, ARIA snapshot and XHR/fetch API telemetry."""
 
+    # Active persistent session handle shared across runs if interactive/headed mode kept open
+    _active_session: Optional[Dict[str, Any]] = None
+
+    @classmethod
+    async def close_persistent_browser(cls) -> None:
+        """Explicitly terminate any persistent browser session kept open."""
+        if cls._active_session:
+            session = cls._active_session
+            cls._active_session = None
+            try:
+                if session.get("context"):
+                    await session["context"].close()
+            except Exception:
+                pass
+            try:
+                if session.get("browser"):
+                    await session["browser"].close()
+            except Exception:
+                pass
+            try:
+                if session.get("pw"):
+                    await session["pw"].stop()
+            except Exception:
+                pass
+            logger.info("Persistent browser session closed successfully.")
+
+    @classmethod
+    def close_persistent_browser_sync(cls) -> None:
+        """Synchronous wrapper to close persistent browser session."""
+        if cls._active_session:
+            try:
+                loop = asyncio.get_event_loop()
+                if loop.is_running():
+                    loop.create_task(cls.close_persistent_browser())
+                else:
+                    loop.run_until_complete(cls.close_persistent_browser())
+            except Exception:
+                asyncio.run(cls.close_persistent_browser())
+
     def __init__(
         self,
         channels: Sequence[Optional[str]] = DEFAULT_CHANNELS,
@@ -349,6 +390,27 @@ class BrowserInspector:
         self._seq = itertools.count()
         self._element_meta: Dict[str, Dict[str, Any]] = {}
         self._progress_cb: Optional[ProgressCallback] = None
+        self._step_screenshots: List[Dict[str, str]] = []
+        self._screenshots_dir: Optional[Path] = None
+
+    async def _capture_step_screenshot(self, page: Page, label: str) -> None:
+        """Capture a real PNG screenshot of `page` for the current inspection step."""
+        if not self._screenshots_dir:
+            return
+        try:
+            idx = len(self._step_screenshots) + 1
+            slug = re.sub(r"[^a-zA-Z0-9]+", "-", label.strip().lower()).strip("-")[:40] or f"step-{idx}"
+            png_path = self._screenshots_dir / f"{idx:02d}-{slug}.png"
+            await page.screenshot(path=str(png_path), full_page=False, timeout=5_000)
+            if png_path.exists() and png_path.stat().st_size > 0:
+                self._step_screenshots.append(
+                    {
+                        "step_name": label,
+                        "file_path": str(png_path.resolve()),
+                    }
+                )
+        except Exception as exc:
+            logger.debug("Step screenshot capture skipped (%s): %s", label, exc)
 
     async def _emit(self, node: str, percent: float, message: str) -> None:
         logger.info("[%5.1f%%] %s: %s", percent, node, message)
@@ -370,6 +432,8 @@ class BrowserInspector:
         progress_callback: Optional[ProgressCallback] = None,
         pause_for_user: bool = False,
         capture_trigger: Optional[Any] = None,
+        active_access_profile: str = "",
+        account_credentials: Optional[Dict[str, Dict[str, str]]] = None,
     ) -> InspectionReport:
         """Inspect ``target_url`` and return a fully populated :class:`InspectionReport`.
 
@@ -383,58 +447,184 @@ class BrowserInspector:
 
         # In interactive manual session, browser must be visible
         actual_headless = False if pause_for_user else headless
+        keep_browser_open = (not actual_headless) or pause_for_user
 
-        async with async_playwright() as pw:
-            await self._emit("launch_browser", 5, "Launching Browser (Interactive Session)" if pause_for_user else "Launching Browser")
-            browser, channel = await self._launch_browser(pw, actual_headless)
+        # If previous persistent session exists, close it first
+        if self._active_session:
+            await self.close_persistent_browser()
+
+        # Point Playwright driver to bundled ms-playwright/ffmpeg when running from frozen .exe
+        import os
+        import sys
+        bundled_pw_dir = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent.parent)) / "ms-playwright"
+        if bundled_pw_dir.exists() and not os.environ.get("PLAYWRIGHT_BROWSERS_PATH"):
+            os.environ["PLAYWRIGHT_BROWSERS_PATH"] = str(bundled_pw_dir)
+
+        pw = await async_playwright().start()
+        await self._emit("launch_browser", 5, "Launching Browser (Interactive Session)" if pause_for_user else "Launching Browser")
+        browser, channel = await self._launch_browser(pw, actual_headless)
+
+        staging_dir = Path(tempfile.mkdtemp(prefix="pw_studio_evidence_"))
+        self._screenshots_dir = staging_dir / "screenshots"
+        video_staging_dir = staging_dir / "video"
+        self._screenshots_dir.mkdir(parents=True, exist_ok=True)
+        video_staging_dir.mkdir(parents=True, exist_ok=True)
+
+        final_screenshot_path = ""
+        video_path = ""
+        trace_path = ""
+        tracing_active = False
+
+        try:
+            video_enabled = True
+            context = await browser.new_context(
+                viewport={"width": 1280, "height": 720},
+                ignore_https_errors=True,  # corporate / internal certificates
+                record_video_dir=str(video_staging_dir),
+                record_video_size={"width": 1280, "height": 720},
+            )
             try:
-                context = await browser.new_context(
-                    viewport={"width": self.viewport[0], "height": self.viewport[1]},
-                    ignore_https_errors=True,  # corporate / internal certificates
-                )
                 page = await context.new_page()
-                page.set_default_timeout(15_000 if pause_for_user else 10_000)
-
-                await self._emit("attach_network", 15, "Attaching Network Listeners")
-                self._attach_listeners(context, page, interactive_mode=pause_for_user)
-
-                await self._emit("navigate", 25, f"Navigating to URL: {target_url}")
-                self._current_action = "page_load"
-                await self._navigate(page, target_url)
-
-                if pause_for_user:
-                    await self._emit(
-                        "interactive_session",
-                        30,
-                        "Interactive Browser open. Perform logins, file uploads, or multi-tab actions. Click 'Capture State' when ready.",
+            except Exception as exc:
+                if "ffmpeg" in str(exc).lower():
+                    logger.warning("Playwright ffmpeg binary unavailable; falling back to screenshots + trace without video recording.")
+                    video_enabled = False
+                    await context.close()
+                    context = await browser.new_context(
+                        viewport={"width": 1280, "height": 720},
+                        ignore_https_errors=True,
                     )
-                    self._current_action = "manual_interaction"
-                    await self._wait_for_user_capture(capture_trigger, context)
-                    await self._emit("interactive_session", 33, "Capture trigger received. Analyzing active page state...")
-
-                # Identify active page (last active or first page)
-                active_page = context.pages[-1] if context.pages else page
-                page_title = await self._safe_title(active_page)
-
-                await self._emit("extract_dom", 35, "Extracting DOM & ARIA Locators")
-                elements, live_locators = await self._extract_elements(active_page)
-                aria_snapshot = await self._capture_aria_snapshot(active_page)
-                await self._emit("extract_dom", 40, f"Extracted {len(elements)} interactive elements from active page")
-
-                probes: List[str] = []
-                if not pause_for_user:
-                    await self._emit("flow_probes", 45, "Executing Safe Flow Probes & Capturing APIs")
-                    probes = await self._run_flow_probes(active_page, target_url, user_flow_text, elements, live_locators)
+                    page = await context.new_page()
                 else:
-                    probes = ["manual:user_session_captured"]
+                    raise
 
-                self._current_action = "background"
-                await self._wait_for_network_quiet(quiet_ms=500, timeout_ms=3_000)
-                if self._pending_tasks:
-                    await asyncio.gather(*self._pending_tasks, return_exceptions=True)
+            try:
+                await context.tracing.start(screenshots=True, snapshots=True, sources=True)
+                tracing_active = True
+            except Exception as exc:
+                logger.debug("Tracing start skipped: %s", exc)
+
+            page.set_default_timeout(15_000 if pause_for_user else 10_000)
+
+            await self._emit("attach_network", 15, "Attaching Network Listeners")
+            self._attach_listeners(context, page, interactive_mode=pause_for_user)
+
+            await self._emit("navigate", 25, f"Navigating to URL: {target_url}")
+            self._current_action = "page_load"
+            await self._navigate(page, target_url)
+            await self._capture_step_screenshot(page, "Navigate to target application")
+
+            login_performed = False
+            login_locators: Dict[str, Dict[str, str]] = {}
+            if (
+                active_access_profile
+                and active_access_profile.strip() not in ("None (Public URL)", "NONE", "PUBLIC")
+                and account_credentials
+            ):
+                await self._emit(
+                    "auto_login",
+                    28,
+                    f"Checking login form for profile '{active_access_profile}'...",
+                )
+                login_performed, login_locators = await self._perform_auto_login(
+                    page, active_access_profile, account_credentials
+                )
+                if login_performed:
+                    await self._capture_step_screenshot(
+                        page, f"Authenticate as {active_access_profile}"
+                    )
+
+            if pause_for_user:
+                await self._emit(
+                    "interactive_session",
+                    30,
+                    "Interactive Browser open. Perform logins, file uploads, or multi-tab actions. Click 'Capture State' when ready.",
+                )
+                self._current_action = "manual_interaction"
+                await self._wait_for_user_capture(capture_trigger, context)
+                await self._emit("interactive_session", 33, "Capture trigger received. Analyzing active page state...")
+
+            # Identify active page (last active or first page)
+            active_page = context.pages[-1] if context.pages else page
+            page_title = await self._safe_title(active_page)
+            if pause_for_user:
+                await self._capture_step_screenshot(active_page, "Capture interactive user session state")
+
+            await self._emit("extract_dom", 35, "Extracting DOM & ARIA Locators")
+            elements, live_locators = await self._extract_elements(active_page)
+            aria_snapshot = await self._capture_aria_snapshot(active_page)
+            await self._capture_step_screenshot(active_page, "Verify interactive DOM components and readiness")
+            await self._emit("extract_dom", 40, f"Extracted {len(elements)} interactive elements from active page")
+
+            probes: List[str] = []
+            if not pause_for_user:
+                await self._emit("flow_probes", 45, "Executing Safe Flow Probes & Capturing APIs")
+                probes = await self._run_flow_probes(active_page, target_url, user_flow_text, elements, live_locators)
+            else:
+                probes = ["manual:user_session_captured"]
+            if login_performed:
+                probes.insert(0, f"login:{active_access_profile}")
+
+            self._current_action = "background"
+            await self._wait_for_network_quiet(quiet_ms=500, timeout_ms=3_000)
+            if self._pending_tasks:
+                await asyncio.gather(*self._pending_tasks, return_exceptions=True)
+
+            # Capture final state screenshot
+            try:
+                final_ss_file = self._screenshots_dir / "final-screenshot.png"
+                await active_page.screenshot(path=str(final_ss_file), full_page=False, timeout=5_000)
+                if final_ss_file.exists() and final_ss_file.stat().st_size > 0:
+                    final_screenshot_path = str(final_ss_file.resolve())
+            except Exception as exc:
+                logger.debug("Final screenshot capture skipped: %s", exc)
+
+            # Stop Playwright tracing and write trace.zip
+            if tracing_active:
+                try:
+                    trace_zip_file = staging_dir / "trace.zip"
+                    await context.tracing.stop(path=str(trace_zip_file))
+                    if trace_zip_file.exists() and trace_zip_file.stat().st_size > 0:
+                        trace_path = str(trace_zip_file.resolve())
+                except Exception as exc:
+                    logger.debug("Tracing stop skipped: %s", exc)
+
+            # Close page & context cleanly to flush and finalize the .webm video file on disk
+            active_video = active_page.video
+            try:
+                await active_page.close()
+            except Exception:
+                pass
+            await context.close()
+            try:
+                if active_video:
+                    v_path = Path(await active_video.path())
+                    if v_path.exists() and v_path.stat().st_size > 0:
+                        video_path = str(v_path.resolve())
+            except Exception:
+                pass
+            if not video_path:
+                webm_files = sorted(video_staging_dir.glob("*.webm"), key=lambda p: p.stat().st_size, reverse=True)
+                if webm_files and webm_files[0].stat().st_size > 0:
+                    video_path = str(webm_files[0].resolve())
+
+            await browser.close()
+            await pw.stop()
+        except Exception:
+            # On unexpected failure, ensure cleanup
+            try:
                 await context.close()
-            finally:
+            except Exception:
+                pass
+            try:
                 await browser.close()
+            except Exception:
+                pass
+            try:
+                await pw.stop()
+            except Exception:
+                pass
+            raise
 
         report = InspectionReport(
             target_url=target_url,
@@ -444,6 +634,12 @@ class BrowserInspector:
             aria_snapshot=aria_snapshot,
             browser_channel=channel,
             probes_executed=probes,
+            login_performed=login_performed,
+            login_locators=login_locators,
+            step_screenshots=list(self._step_screenshots),
+            final_screenshot_path=final_screenshot_path,
+            video_path=video_path,
+            trace_path=trace_path,
         )
         await self._emit(
             "inspection_complete",
@@ -458,7 +654,16 @@ class BrowserInspector:
         for channel in self.channels:
             kwargs: Dict[str, Any] = {
                 "headless": headless,
-                "args": ["--no-first-run", "--no-default-browser-check", "--disable-extensions"],
+                "timeout": 10_000,
+                "args": [
+                    "--no-first-run",
+                    "--no-default-browser-check",
+                    "--disable-extensions",
+                    "--no-sandbox",
+                    "--disable-setuid-sandbox",
+                    "--disable-gpu",
+                    "--disable-dev-shm-usage",
+                ],
             }
             if channel:
                 kwargs["channel"] = channel
@@ -490,6 +695,105 @@ class BrowserInspector:
             # Streaming / long-polling pages never go idle - proceed with what we have.
             logger.info("networkidle not reached within %sms; continuing", self.network_idle_timeout_ms)
             await self._wait_for_network_quiet(quiet_ms=500, timeout_ms=2_000)
+
+    async def _perform_auto_login(
+        self,
+        page: Page,
+        active_access_profile: str,
+        account_credentials: Dict[str, Dict[str, str]],
+    ) -> Tuple[bool, Dict[str, Dict[str, str]]]:
+        """Detect login form and authenticate using the active profile's credentials."""
+        from core.workspace_manager import WorkspaceManager
+
+        norm_role = WorkspaceManager.normalize_role(active_access_profile)
+        creds = account_credentials.get(norm_role) or account_credentials.get(active_access_profile)
+        if not creds:
+            logger.info("No credentials found for profile '%s'; skipping auto-login.", active_access_profile)
+            return False, {}
+
+        username = creds.get("username", "")
+        password = creds.get("password", "")
+        if not password and creds.get("password_b64"):
+            password = WorkspaceManager.decode_password(creds["password_b64"])
+
+        if not username and not password:
+            return False, {}
+
+        pwd_sel = 'input[type="password"]'
+        pwd_loc = page.locator(pwd_sel).first
+        try:
+            await pwd_loc.wait_for(state="visible", timeout=2_000)
+        except Exception:
+            logger.info("No visible password input detected on page; skipping auto-login.")
+            return False, {}
+
+        user_candidates = [
+            'input[type="email"]',
+            'input[name*="user" i]',
+            'input[name*="email" i]',
+            'input[id*="user" i]',
+            'input[id*="email" i]',
+            'input[type="text"]',
+        ]
+        user_sel = 'input[type="text"]'
+        user_loc: Optional[Locator] = None
+        for cand in user_candidates:
+            loc = page.locator(cand).first
+            try:
+                if await loc.is_visible():
+                    user_sel = cand
+                    user_loc = loc
+                    break
+            except Exception:
+                continue
+
+        submit_candidates = [
+            'button[type="submit"]',
+            'input[type="submit"]',
+            'button:has-text("Log in")',
+            'button:has-text("Login")',
+            'button:has-text("Sign in")',
+            'button:has-text("Submit")',
+        ]
+        submit_sel = 'button[type="submit"]'
+        submit_loc: Optional[Locator] = None
+        for cand in submit_candidates:
+            loc = page.locator(cand).first
+            try:
+                if await loc.is_visible():
+                    submit_sel = cand
+                    submit_loc = loc
+                    break
+            except Exception:
+                continue
+
+        login_locators = {
+            "username": render_locator("css", user_sel),
+            "password": render_locator("css", pwd_sel),
+            "submit": render_locator("css", submit_sel),
+        }
+
+        self._current_action = f"login:{norm_role}"
+        try:
+            if user_loc and username:
+                await user_loc.fill(username)
+            if password:
+                await pwd_loc.fill(password)
+            if submit_loc:
+                await submit_loc.click()
+            else:
+                await pwd_loc.press("Enter")
+
+            try:
+                await page.wait_for_load_state("networkidle", timeout=4_000)
+            except Exception:
+                await self._wait_for_network_quiet(quiet_ms=500, timeout_ms=2_000)
+
+            logger.info("Auto-login executed for profile '%s'.", norm_role)
+            return True, login_locators
+        except Exception as exc:
+            logger.warning("Auto-login attempt for '%s' encountered error: %s", norm_role, exc)
+            return False, login_locators
 
     @staticmethod
     async def _safe_title(page: Page) -> str:
@@ -898,6 +1202,9 @@ class BrowserInspector:
             ok = False
             logger.info("Probe failed (%s): %s", label, str(exc).splitlines()[0])
         await self._wait_for_network_quiet(quiet_ms=700, timeout_ms=6_000)
+        if ok:
+            clean_label = label.replace("probe:", "").strip()
+            await self._capture_step_screenshot(page, clean_label)
         self._current_action = "background"
         return ok
 

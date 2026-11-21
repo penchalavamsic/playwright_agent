@@ -50,6 +50,8 @@ async def browser_inspector_node(state: AgentState) -> Dict[str, Any]:
         progress_callback=scaled_progress,
         pause_for_user=interactive_mode,
         capture_trigger=capture_trigger,
+        active_access_profile=state.get("active_access_profile", ""),
+        account_credentials=state.get("account_credentials", {}),
     )
 
     return {"inspection_report": report.model_dump()}

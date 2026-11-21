@@ -1,0 +1,84 @@
+[
+  {
+    "url": "https://1c5c1ecf7303.e10058c8.ap-south-1.token.awswaf.com/1c5c1ecf7303/6ab7d267eef9/66125abca348/inputs?client=browser",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [
+      "challenge",
+      "challenge_type",
+      "difficulty"
+    ],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://1c5c1ecf7303.e10058c8.ap-south-1.token.awswaf.com/1c5c1ecf7303/6ab7d267eef9/66125abca348/mp_verify?region=ap-south-1",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [
+      "token",
+      "inputs"
+    ],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://m.media-amazon.com/images/G/01/csm/showads.v2.js?adspot_=1",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://www.amazon.in/dram/renderLazyLoadedStreaming?rshVal=1795252425142",
+    "method": "POST",
+    "resource_type": "xhr",
+    "status_code": 200,
+    "request_payload_keys": [
+      "encryptedLazyLoadRenderRequest",
+      "version"
+    ],
+    "response_keys": [],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://www.amazon.in/hz/rhf?currentPageType=Gateway&currentSubPageType=desktop&excludeAsin=&fieldKeywords=&k=&keywords=&search=&auditEnabled=&previewCampaigns=&forceWidgets=&searchAlias=&cardJSPresent=true",
+    "method": "GET",
+    "resource_type": "xhr",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [
+      "html",
+      "success"
+    ],
+    "triggered_by_action": "page_load"
+  },
+  {
+    "url": "https://www.amazon.in/dram/renderLazyLoadedStreaming?rshVal=1795252439250",
+    "method": "POST",
+    "resource_type": "xhr",
+    "status_code": 200,
+    "request_payload_keys": [
+      "encryptedLazyLoadRenderRequest",
+      "version"
+    ],
+    "response_keys": [],
+    "triggered_by_action": "restore_navigation"
+  },
+  {
+    "url": "https://www.amazon.in/hz/rhf?currentPageType=Gateway&currentSubPageType=desktop&excludeAsin=&fieldKeywords=&k=&keywords=&search=&auditEnabled=&previewCampaigns=&forceWidgets=&searchAlias=&cardJSPresent=true",
+    "method": "GET",
+    "resource_type": "xhr",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [
+      "html",
+      "success"
+    ],
+    "triggered_by_action": "restore_navigation"
+  }
+]

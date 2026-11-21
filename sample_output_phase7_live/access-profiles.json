@@ -1,0 +1,6 @@
+{
+  "SUPER_USER": {
+    "username_env": "SUPER_USER_USERNAME",
+    "password_env": "SUPER_USER_PASSWORD"
+  }
+}

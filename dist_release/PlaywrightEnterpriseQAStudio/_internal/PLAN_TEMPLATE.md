@@ -24,7 +24,7 @@ Describe the single small behavior being verified.
 
 # Preconditions
 
-- `${LIMAS_BASE_URL}` is reachable.
+- `${BASE_URL}` is reachable.
 - Credentials for `${TEST_ACCESS_PROFILE}` are configured.
 - The required role and test data are available.
 - The starting page is accessible.
@@ -85,7 +85,7 @@ Describe one clear and independently verifiable result.
    - SUPER_USER_ADMIN_USER
 8. Keep every plan shareable between environments and team members.
 9. CI/CD owns test execution.
-10. The Healer may propose test-only changes later but must not change expected LIMAS behavior.
+10. The Healer may propose test-only changes later but must not change expected application behavior.
 11. Plans must use this Jira-style title format:
 
 To verify the functionality of "<Module>" → "<Section>" → "<Control>" → "<Action>"

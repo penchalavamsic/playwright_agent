@@ -72,6 +72,11 @@ class AgentState(TypedDict, total=False):
     capture_trigger_event: Any              # asyncio.Event or threading.Event for capture step
     progress_callback: Any                  # Callable[[str, float, str], None]
 
+    # Phase 6: Multi-Account & Multi-Day Workspace State
+    active_access_profile: str              # e.g. "SUPER_USER", "ADMIN", "None (Public URL)"
+    account_credentials: Dict[str, Dict[str, str]]  # role -> {"username": ..., "password": ...}
+    sequence_number: int                    # 1-based sequential run number (001, 002, ...)
+
     # Node outputs
     parsed_flow_steps: List[Dict[str, Any]]  # Serialized ParsedFlowStep dicts
     inspection_report: Dict[str, Any]       # Serialized InspectionReport dict

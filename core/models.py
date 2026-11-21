@@ -73,6 +73,24 @@ class InspectionReport(BaseModel):
     # --- additional metadata (optional, useful for downstream phases) ---
     browser_channel: str = Field("", description="'chrome', 'msedge' or 'chromium'.")
     probes_executed: List[str] = Field(default_factory=list)
+    login_performed: bool = Field(False, description="True if role-based auto-login executed.")
+    login_locators: Dict[str, Dict[str, str]] = Field(
+        default_factory=dict,
+        description="Discovered login form locators (username, password, submit) per language.",
+    )
+    step_screenshots: List[Dict[str, str]] = Field(
+        default_factory=list,
+        description="Ordered list of {'step_name': str, 'file_path': str} real PNG screenshots captured during inspection.",
+    )
+    final_screenshot_path: str = Field(
+        "", description="Absolute file path to real final-screenshot.png captured on active page."
+    )
+    video_path: str = Field(
+        "", description="Absolute file path to real recorded .webm session video."
+    )
+    trace_path: str = Field(
+        "", description="Absolute file path to real Playwright trace.zip archive."
+    )
     inspected_at: str = Field(
         default_factory=lambda: datetime.now(timezone.utc).isoformat(timespec="seconds")
     )

@@ -1,0 +1,6 @@
+{
+  "STANDARD_USER": {
+    "username_env": "STANDARD_USER_USERNAME",
+    "password_env": "STANDARD_USER_PASSWORD"
+  }
+}

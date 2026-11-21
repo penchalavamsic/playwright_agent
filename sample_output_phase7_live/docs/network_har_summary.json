@@ -1,0 +1,14 @@
+[
+  {
+    "url": "http://127.0.0.1:56844/api/search?q=vectors",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [],
+    "response_keys": [
+      "status",
+      "results"
+    ],
+    "triggered_by_action": "probe:click tab 'Explore Gallery'"
+  }
+]

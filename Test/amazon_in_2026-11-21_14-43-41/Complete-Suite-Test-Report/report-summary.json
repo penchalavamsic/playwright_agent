@@ -1,0 +1,440 @@
+{
+  "report_title": "Amazon Detailed Test Evidence Report \u2014 amazon.in \u2014 PUBLIC",
+  "app_display_name": "Amazon",
+  "domain_label": "amazon.in",
+  "module": "Amazon",
+  "profile": "PUBLIC",
+  "target_url": "${BASE_URL}",
+  "browser": "Msedge",
+  "date": "2026-11-21",
+  "total": 3,
+  "passed": 3,
+  "failed": 0,
+  "flaky": 0,
+  "skipped": 0,
+  "pass_rate_pct": 100.0,
+  "duration_s": 9.95,
+  "test_cases": [
+    {
+      "test_id": "AMAZON-001-01",
+      "slug": "primary-user-flow-api-status-verification",
+      "title": "\"Amazon\" \u2192 \"Online Shopping site in India: Shop Online for Mobiles, Books, Watches, Shoes and More - Amazon.in\" \u2192 \"Primary User Flow & API Status Verification\"",
+      "raw_title": "Primary User Flow & API Status Verification",
+      "module": "Amazon",
+      "page": "Online Shopping site in India: Shop Online for Mobiles, Books, Watches, Shoes and More - Amazon.in",
+      "profile": "PUBLIC",
+      "status": "passed",
+      "duration_s": 2.85,
+      "actual_duration_s": 2.4,
+      "final_route": "/1c5c1ecf7303/6ab7d267eef9/66125abca348/inputs",
+      "spec_path": "tests/001_primary-user-flow-api-status-verification.spec.ts",
+      "plan_rel_path": "Plans/AMAZON-001-01/AMAZON-001-01-primary-user-flow-api-status-verification.md",
+      "plan_filename": "AMAZON-001-01-primary-user-flow-api-status-verification.md",
+      "plan_markdown": "---\ntest_id: \"AMAZON-001-01\"\ntitle: \"To verify the functionality of \\\"Amazon\\\" \u2192 \\\"Online Shopping site in India: Shop Online for Mobiles, Books, Watches, Shoes and More - Amazon.in\\\" \u2192 \\\"Primary User Flow & API Status Verification\\\"\"\nmodule: \"Amazon\"\npage: \"Online Shopping site in India: Shop Online for Mobiles, Books, Watches, Shoes and More - Amazon.in\"\nsection: \"Primary Flow\"\ncontrol: \"Interactive Controls\"\naction: \"Execution & Verification\"\naccess_profile: \"PUBLIC\"\npriority: \"High\"\nclassification: \"Read-only\"\ntest_type: \"Positive\"\nautomation_candidate: true\nplan_status: \"reviewed\"\nscript_status: \"generated\"\nenvironment_variables:\n  - BASE_URL\n  - TEST_ACCESS_PROFILE\ntest_data: {}\nrelated_script: \"tests/primary-user-flow-api-status-verification.spec.ts\"\n---\n\n# Purpose\n\nVerify the functionality of \"Amazon\" \u2192 \"Online Shopping site in India: Shop Online for Mobiles, Books, Watches, Shoes and More - Amazon.in\" \u2192 \"Primary User Flow & API Status Verification\" under access profile `PUBLIC`.\n\n# Preconditions\n\n- `${BASE_URL}` is reachable.\n- Credentials for `${TEST_ACCESS_PROFILE}` (`PUBLIC`) are configured in `.env`.\n\n# Test Data\n\nUse environment variables and runtime fixtures.\n\n# Steps and Expected Results\n\n1. Action: Navigate to application URL: https://www.amazon.in/.\n   Expected Result: Step completes deterministically without UI or network errors.\n\n2. Action: Fill value 'search' into control 'Search Amazon.in'.\n   Expected Result: Step completes deterministically without UI or network errors.\n\n3. Action: Click interactive component 'main content'.\n   Expected Result: Step completes deterministically without UI or network errors.\n\n4. Action: Verify backend API response status ([200]) for endpoint '/1c5c1ecf7303/6ab7d267eef9/66125abca348/inputs'.\n   Expected Result: Step completes deterministically without UI or network errors.\n\n# Network Verification\n\n- Request URL: `${BASE_URL}/1c5c1ecf7303/6ab7d267eef9/66125abca348/inputs`\n- HTTP Method: GET\n- Expected Status: 200\n- Payload Presence: Verified response payload\n- Visible UI Result: Interactive controls visible and responsive\n\n# Expected Final Result\n\nAll steps and network status assertions succeed for AMAZON-001-01.\n\n# Classification\n\n- Read-only\n- Positive\n\n# Restrictions\n\n- Do not include credentials, tokens, cookies, authorization codes, or sensitive payloads.\n- Do not use static environment-specific data.\n\n# Generation Status\n\n- Test script generation: Complete\n- CI/CD execution: Ready\n- Healing: Ready\n",
+      "purpose": "Verify Primary User Flow & API Status Verification for Amazon (Online Shopping site in India: Shop Online for Mobiles, Books, Watches, Shoes and More - Amazon.in) under access profile PUBLIC.",
+      "expected_result": "All UI locators resolve uniquely and backend endpoints return HTTP 200.",
+      "steps": [
+        "Navigate to application URL: https://www.amazon.in/",
+        "Fill value 'search' into control 'Search Amazon.in'",
+        "Click interactive component 'main content'",
+        "Verify backend API response status ([200]) for endpoint '/1c5c1ecf7303/6ab7d267eef9/66125abca348/inputs'"
+      ],
+      "step_screenshots": [
+        {
+          "rel_path": "Evidence/Screenshots/AMAZON-001-01/01-navigate-to-application-url-https-www-am.png",
+          "caption": "01 Navigate To Application Url Https Www Am"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/AMAZON-001-01/02-fill-value-search-into-control-search-am.png",
+          "caption": "02 Fill Value Search Into Control Search Am"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/AMAZON-001-01/03-click-interactive-component-main-content.png",
+          "caption": "03 Click Interactive Component Main Content"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/AMAZON-001-01/04-verify-backend-api-response-status-200-f.png",
+          "caption": "04 Verify Backend Api Response Status 200 F"
+        }
+      ],
+      "final_screenshot": "Evidence/Screenshots/AMAZON-001-01/final-screenshot.png",
+      "video_rel_path": "Evidence/Recording/AMAZON-001-01/video.webm",
+      "trace_rel_path": "Evidence/Trace/AMAZON-001-01/trace.zip",
+      "api_method": "GET",
+      "api_pathname": "/1c5c1ecf7303/6ab7d267eef9/66125abca348/inputs",
+      "api_status": 200,
+      "api_trigger": "page_load",
+      "captured_apis": [
+        {
+          "url": "https://1c5c1ecf7303.e10058c8.ap-south-1.token.awswaf.com/1c5c1ecf7303/6ab7d267eef9/66125abca348/inputs?client=browser",
+          "method": "GET",
+          "resource_type": "fetch",
+          "status_code": 200,
+          "request_payload_keys": [],
+          "response_keys": [
+            "challenge",
+            "challenge_type",
+            "difficulty"
+          ],
+          "triggered_by_action": "page_load"
+        },
+        {
+          "url": "https://1c5c1ecf7303.e10058c8.ap-south-1.token.awswaf.com/1c5c1ecf7303/6ab7d267eef9/66125abca348/mp_verify?region=ap-south-1",
+          "method": "POST",
+          "resource_type": "fetch",
+          "status_code": 200,
+          "request_payload_keys": [],
+          "response_keys": [
+            "token",
+            "inputs"
+          ],
+          "triggered_by_action": "page_load"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/G/01/csm/showads.v2.js?adspot_=1",
+          "method": "GET",
+          "resource_type": "fetch",
+          "status_code": 200,
+          "request_payload_keys": [],
+          "response_keys": [],
+          "triggered_by_action": "page_load"
+        },
+        {
+          "url": "https://www.amazon.in/dram/renderLazyLoadedStreaming?rshVal=1795252425142",
+          "method": "POST",
+          "resource_type": "xhr",
+          "status_code": 200,
+          "request_payload_keys": [
+            "encryptedLazyLoadRenderRequest",
+            "version"
+          ],
+          "response_keys": [],
+          "triggered_by_action": "page_load"
+        },
+        {
+          "url": "https://www.amazon.in/hz/rhf?currentPageType=Gateway&currentSubPageType=desktop&excludeAsin=&fieldKeywords=&k=&keywords=&search=&auditEnabled=&previewCampaigns=&forceWidgets=&searchAlias=&cardJSPresent=true",
+          "method": "GET",
+          "resource_type": "xhr",
+          "status_code": 200,
+          "request_payload_keys": [],
+          "response_keys": [
+            "html",
+            "success"
+          ],
+          "triggered_by_action": "page_load"
+        },
+        {
+          "url": "https://www.amazon.in/dram/renderLazyLoadedStreaming?rshVal=1795252439250",
+          "method": "POST",
+          "resource_type": "xhr",
+          "status_code": 200,
+          "request_payload_keys": [
+            "encryptedLazyLoadRenderRequest",
+            "version"
+          ],
+          "response_keys": [],
+          "triggered_by_action": "restore_navigation"
+        },
+        {
+          "url": "https://www.amazon.in/hz/rhf?currentPageType=Gateway&currentSubPageType=desktop&excludeAsin=&fieldKeywords=&k=&keywords=&search=&auditEnabled=&previewCampaigns=&forceWidgets=&searchAlias=&cardJSPresent=true",
+          "method": "GET",
+          "resource_type": "xhr",
+          "status_code": 200,
+          "request_payload_keys": [],
+          "response_keys": [
+            "html",
+            "success"
+          ],
+          "triggered_by_action": "restore_navigation"
+        }
+      ],
+      "error_message": ""
+    },
+    {
+      "test_id": "AMAZON-001-02",
+      "slug": "page-load-core-ui-component-sanity",
+      "title": "\"Amazon\" \u2192 \"Online Shopping site in India: Shop Online for Mobiles, Books, Watches, Shoes and More - Amazon.in\" \u2192 \"Page Load & Core UI Component Sanity\"",
+      "raw_title": "Page Load & Core UI Component Sanity",
+      "module": "Amazon",
+      "page": "Online Shopping site in India: Shop Online for Mobiles, Books, Watches, Shoes and More - Amazon.in",
+      "profile": "PUBLIC",
+      "status": "passed",
+      "duration_s": 3.9,
+      "actual_duration_s": 3.45,
+      "final_route": "/1c5c1ecf7303/6ab7d267eef9/66125abca348/inputs",
+      "spec_path": "tests/001_page-load-core-ui-component-sanity.spec.ts",
+      "plan_rel_path": "Plans/AMAZON-001-02/AMAZON-001-02-page-load-core-ui-component-sanity.md",
+      "plan_filename": "AMAZON-001-02-page-load-core-ui-component-sanity.md",
+      "plan_markdown": "---\ntest_id: \"AMAZON-001-02\"\ntitle: \"To verify the functionality of \\\"Amazon\\\" \u2192 \\\"Online Shopping site in India: Shop Online for Mobiles, Books, Watches, Shoes and More - Amazon.in\\\" \u2192 \\\"Page Load & Core UI Component Sanity\\\"\"\nmodule: \"Amazon\"\npage: \"Online Shopping site in India: Shop Online for Mobiles, Books, Watches, Shoes and More - Amazon.in\"\nsection: \"Primary Flow\"\ncontrol: \"Interactive Controls\"\naction: \"Execution & Verification\"\naccess_profile: \"PUBLIC\"\npriority: \"High\"\nclassification: \"Read-only\"\ntest_type: \"Positive\"\nautomation_candidate: true\nplan_status: \"reviewed\"\nscript_status: \"generated\"\nenvironment_variables:\n  - BASE_URL\n  - TEST_ACCESS_PROFILE\ntest_data: {}\nrelated_script: \"tests/page-load-core-ui-component-sanity.spec.ts\"\n---\n\n# Purpose\n\nVerify the functionality of \"Amazon\" \u2192 \"Online Shopping site in India: Shop Online for Mobiles, Books, Watches, Shoes and More - Amazon.in\" \u2192 \"Page Load & Core UI Component Sanity\" under access profile `PUBLIC`.\n\n# Preconditions\n\n- `${BASE_URL}` is reachable.\n- Credentials for `${TEST_ACCESS_PROFILE}` (`PUBLIC`) are configured in `.env`.\n\n# Test Data\n\nUse environment variables and runtime fixtures.\n\n# Steps and Expected Results\n\n1. Action: Open target URL: https://www.amazon.in/.\n   Expected Result: Step completes deterministically without UI or network errors.\n\n2. Action: Verify Page Title equals or contains 'Online Shopping site in India: Shop Online for Mobiles, Books, Watches, Shoes and More - Amazon.in'.\n   Expected Result: Step completes deterministically without UI or network errors.\n\n3. Action: Verify visibility of core control 'main content' (a).\n   Expected Result: Step completes deterministically without UI or network errors.\n\n4. Action: Verify visibility of core control 'Search, alt, forward slash' (a).\n   Expected Result: Step completes deterministically without UI or network errors.\n\n5. Action: Verify visibility of core control 'Cart, shift, alt, c' (a).\n   Expected Result: Step completes deterministically without UI or network errors.\n\n6. Action: Verify visibility of core control 'Home, shift, alt, h' (a).\n   Expected Result: Step completes deterministically without UI or network errors.\n\n7. Action: Verify visibility of core control 'Your orders, shift, alt, o' (a).\n   Expected Result: Step completes deterministically without UI or network errors.\n\n# Network Verification\n\n- Request URL: `${BASE_URL}/1c5c1ecf7303/6ab7d267eef9/66125abca348/inputs`\n- HTTP Method: GET\n- Expected Status: 200\n- Payload Presence: Verified response payload\n- Visible UI Result: Interactive controls visible and responsive\n\n# Expected Final Result\n\nAll steps and network status assertions succeed for AMAZON-001-02.\n\n# Classification\n\n- Read-only\n- Positive\n\n# Restrictions\n\n- Do not include credentials, tokens, cookies, authorization codes, or sensitive payloads.\n- Do not use static environment-specific data.\n\n# Generation Status\n\n- Test script generation: Complete\n- CI/CD execution: Ready\n- Healing: Ready\n",
+      "purpose": "Verify Page Load & Core UI Component Sanity for Amazon (Online Shopping site in India: Shop Online for Mobiles, Books, Watches, Shoes and More - Amazon.in) under access profile PUBLIC.",
+      "expected_result": "All UI locators resolve uniquely and backend endpoints return HTTP 200.",
+      "steps": [
+        "Open target URL: https://www.amazon.in/",
+        "Verify Page Title equals or contains 'Online Shopping site in India: Shop Online for Mobiles, Books, Watches, Shoes and More - Amazon.in'",
+        "Verify visibility of core control 'main content' (a)",
+        "Verify visibility of core control 'Search, alt, forward slash' (a)",
+        "Verify visibility of core control 'Cart, shift, alt, c' (a)",
+        "Verify visibility of core control 'Home, shift, alt, h' (a)",
+        "Verify visibility of core control 'Your orders, shift, alt, o' (a)"
+      ],
+      "step_screenshots": [
+        {
+          "rel_path": "Evidence/Screenshots/AMAZON-001-02/01-open-target-url-https-www-amazon-in.png",
+          "caption": "01 Open Target Url Https Www Amazon In"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/AMAZON-001-02/02-verify-page-title-equals-or-contains-onl.png",
+          "caption": "02 Verify Page Title Equals Or Contains Onl"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/AMAZON-001-02/03-verify-visibility-of-core-control-main-c.png",
+          "caption": "03 Verify Visibility Of Core Control Main C"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/AMAZON-001-02/04-verify-visibility-of-core-control-search.png",
+          "caption": "04 Verify Visibility Of Core Control Search"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/AMAZON-001-02/05-verify-visibility-of-core-control-cart-s.png",
+          "caption": "05 Verify Visibility Of Core Control Cart S"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/AMAZON-001-02/06-verify-visibility-of-core-control-home-s.png",
+          "caption": "06 Verify Visibility Of Core Control Home S"
+        }
+      ],
+      "final_screenshot": "Evidence/Screenshots/AMAZON-001-02/final-screenshot.png",
+      "video_rel_path": "Evidence/Recording/AMAZON-001-02/video.webm",
+      "trace_rel_path": "Evidence/Trace/AMAZON-001-02/trace.zip",
+      "api_method": "GET",
+      "api_pathname": "/1c5c1ecf7303/6ab7d267eef9/66125abca348/inputs",
+      "api_status": 200,
+      "api_trigger": "page_load",
+      "captured_apis": [
+        {
+          "url": "https://1c5c1ecf7303.e10058c8.ap-south-1.token.awswaf.com/1c5c1ecf7303/6ab7d267eef9/66125abca348/inputs?client=browser",
+          "method": "GET",
+          "resource_type": "fetch",
+          "status_code": 200,
+          "request_payload_keys": [],
+          "response_keys": [
+            "challenge",
+            "challenge_type",
+            "difficulty"
+          ],
+          "triggered_by_action": "page_load"
+        },
+        {
+          "url": "https://1c5c1ecf7303.e10058c8.ap-south-1.token.awswaf.com/1c5c1ecf7303/6ab7d267eef9/66125abca348/mp_verify?region=ap-south-1",
+          "method": "POST",
+          "resource_type": "fetch",
+          "status_code": 200,
+          "request_payload_keys": [],
+          "response_keys": [
+            "token",
+            "inputs"
+          ],
+          "triggered_by_action": "page_load"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/G/01/csm/showads.v2.js?adspot_=1",
+          "method": "GET",
+          "resource_type": "fetch",
+          "status_code": 200,
+          "request_payload_keys": [],
+          "response_keys": [],
+          "triggered_by_action": "page_load"
+        },
+        {
+          "url": "https://www.amazon.in/dram/renderLazyLoadedStreaming?rshVal=1795252425142",
+          "method": "POST",
+          "resource_type": "xhr",
+          "status_code": 200,
+          "request_payload_keys": [
+            "encryptedLazyLoadRenderRequest",
+            "version"
+          ],
+          "response_keys": [],
+          "triggered_by_action": "page_load"
+        },
+        {
+          "url": "https://www.amazon.in/hz/rhf?currentPageType=Gateway&currentSubPageType=desktop&excludeAsin=&fieldKeywords=&k=&keywords=&search=&auditEnabled=&previewCampaigns=&forceWidgets=&searchAlias=&cardJSPresent=true",
+          "method": "GET",
+          "resource_type": "xhr",
+          "status_code": 200,
+          "request_payload_keys": [],
+          "response_keys": [
+            "html",
+            "success"
+          ],
+          "triggered_by_action": "page_load"
+        },
+        {
+          "url": "https://www.amazon.in/dram/renderLazyLoadedStreaming?rshVal=1795252439250",
+          "method": "POST",
+          "resource_type": "xhr",
+          "status_code": 200,
+          "request_payload_keys": [
+            "encryptedLazyLoadRenderRequest",
+            "version"
+          ],
+          "response_keys": [],
+          "triggered_by_action": "restore_navigation"
+        },
+        {
+          "url": "https://www.amazon.in/hz/rhf?currentPageType=Gateway&currentSubPageType=desktop&excludeAsin=&fieldKeywords=&k=&keywords=&search=&auditEnabled=&previewCampaigns=&forceWidgets=&searchAlias=&cardJSPresent=true",
+          "method": "GET",
+          "resource_type": "xhr",
+          "status_code": 200,
+          "request_payload_keys": [],
+          "response_keys": [
+            "html",
+            "success"
+          ],
+          "triggered_by_action": "restore_navigation"
+        }
+      ],
+      "error_message": ""
+    },
+    {
+      "test_id": "AMAZON-001-03",
+      "slug": "api-health-contract-matrix-verification",
+      "title": "\"Amazon\" \u2192 \"Online Shopping site in India: Shop Online for Mobiles, Books, Watches, Shoes and More - Amazon.in\" \u2192 \"API Health & Contract Matrix Verification\"",
+      "raw_title": "API Health & Contract Matrix Verification",
+      "module": "Amazon",
+      "page": "Online Shopping site in India: Shop Online for Mobiles, Books, Watches, Shoes and More - Amazon.in",
+      "profile": "PUBLIC",
+      "status": "passed",
+      "duration_s": 3.2,
+      "actual_duration_s": 2.75,
+      "final_route": "/1c5c1ecf7303/6ab7d267eef9/66125abca348/inputs",
+      "spec_path": "tests/001_api-health-contract-matrix-verification.spec.ts",
+      "plan_rel_path": "Plans/AMAZON-001-03/AMAZON-001-03-api-health-contract-matrix-verification.md",
+      "plan_filename": "AMAZON-001-03-api-health-contract-matrix-verification.md",
+      "plan_markdown": "---\ntest_id: \"AMAZON-001-03\"\ntitle: \"To verify the functionality of \\\"Amazon\\\" \u2192 \\\"Online Shopping site in India: Shop Online for Mobiles, Books, Watches, Shoes and More - Amazon.in\\\" \u2192 \\\"API Health & Contract Matrix Verification\\\"\"\nmodule: \"Amazon\"\npage: \"Online Shopping site in India: Shop Online for Mobiles, Books, Watches, Shoes and More - Amazon.in\"\nsection: \"Primary Flow\"\ncontrol: \"Interactive Controls\"\naction: \"Execution & Verification\"\naccess_profile: \"PUBLIC\"\npriority: \"High\"\nclassification: \"Read-only\"\ntest_type: \"Positive\"\nautomation_candidate: true\nplan_status: \"reviewed\"\nscript_status: \"generated\"\nenvironment_variables:\n  - BASE_URL\n  - TEST_ACCESS_PROFILE\ntest_data: {}\nrelated_script: \"tests/api-health-contract-matrix-verification.spec.ts\"\n---\n\n# Purpose\n\nVerify the functionality of \"Amazon\" \u2192 \"Online Shopping site in India: Shop Online for Mobiles, Books, Watches, Shoes and More - Amazon.in\" \u2192 \"API Health & Contract Matrix Verification\" under access profile `PUBLIC`.\n\n# Preconditions\n\n- `${BASE_URL}` is reachable.\n- Credentials for `${TEST_ACCESS_PROFILE}` (`PUBLIC`) are configured in `.env`.\n\n# Test Data\n\nUse environment variables and runtime fixtures.\n\n# Steps and Expected Results\n\n1. Action: Validate contract for GET /1c5c1ecf7303/6ab7d267eef9/66125abca348/inputs (Expected Status: [200], Keys: ['challenge', 'challenge_type', 'difficulty']).\n   Expected Result: Step completes deterministically without UI or network errors.\n\n2. Action: Validate contract for POST /1c5c1ecf7303/6ab7d267eef9/66125abca348/mp_verify (Expected Status: [200], Keys: ['token', 'inputs']).\n   Expected Result: Step completes deterministically without UI or network errors.\n\n3. Action: Validate contract for GET /images/G/01/csm/showads.v2.js (Expected Status: [200], Keys: []).\n   Expected Result: Step completes deterministically without UI or network errors.\n\n4. Action: Validate contract for POST /dram/renderLazyLoadedStreaming (Expected Status: [200], Keys: []).\n   Expected Result: Step completes deterministically without UI or network errors.\n\n5. Action: Validate contract for GET /hz/rhf (Expected Status: [200], Keys: ['html', 'success']).\n   Expected Result: Step completes deterministically without UI or network errors.\n\n# Network Verification\n\n- Request URL: `${BASE_URL}/1c5c1ecf7303/6ab7d267eef9/66125abca348/inputs`\n- HTTP Method: GET\n- Expected Status: 200\n- Payload Presence: Verified response payload\n- Visible UI Result: Interactive controls visible and responsive\n\n# Expected Final Result\n\nAll steps and network status assertions succeed for AMAZON-001-03.\n\n# Classification\n\n- Read-only\n- Positive\n\n# Restrictions\n\n- Do not include credentials, tokens, cookies, authorization codes, or sensitive payloads.\n- Do not use static environment-specific data.\n\n# Generation Status\n\n- Test script generation: Complete\n- CI/CD execution: Ready\n- Healing: Ready\n",
+      "purpose": "Verify API Health & Contract Matrix Verification for Amazon (Online Shopping site in India: Shop Online for Mobiles, Books, Watches, Shoes and More - Amazon.in) under access profile PUBLIC.",
+      "expected_result": "All UI locators resolve uniquely and backend endpoints return HTTP 200.",
+      "steps": [
+        "Validate contract for GET /1c5c1ecf7303/6ab7d267eef9/66125abca348/inputs (Expected Status: [200], Keys: ['challenge', 'challenge_type', 'difficulty'])",
+        "Validate contract for POST /1c5c1ecf7303/6ab7d267eef9/66125abca348/mp_verify (Expected Status: [200], Keys: ['token', 'inputs'])",
+        "Validate contract for GET /images/G/01/csm/showads.v2.js (Expected Status: [200], Keys: [])",
+        "Validate contract for POST /dram/renderLazyLoadedStreaming (Expected Status: [200], Keys: [])",
+        "Validate contract for GET /hz/rhf (Expected Status: [200], Keys: ['html', 'success'])"
+      ],
+      "step_screenshots": [
+        {
+          "rel_path": "Evidence/Screenshots/AMAZON-001-03/01-validate-contract-for-get-1c5c1ecf7303-6.png",
+          "caption": "01 Validate Contract For Get 1c5c1ecf7303 6"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/AMAZON-001-03/02-validate-contract-for-post-1c5c1ecf7303.png",
+          "caption": "02 Validate Contract For Post 1c5c1ecf7303"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/AMAZON-001-03/03-validate-contract-for-get-images-g-01-cs.png",
+          "caption": "03 Validate Contract For Get Images G 01 Cs"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/AMAZON-001-03/04-validate-contract-for-post-dram-renderla.png",
+          "caption": "04 Validate Contract For Post Dram Renderla"
+        },
+        {
+          "rel_path": "Evidence/Screenshots/AMAZON-001-03/05-validate-contract-for-get-hz-rhf-expecte.png",
+          "caption": "05 Validate Contract For Get Hz Rhf Expecte"
+        }
+      ],
+      "final_screenshot": "Evidence/Screenshots/AMAZON-001-03/final-screenshot.png",
+      "video_rel_path": "Evidence/Recording/AMAZON-001-03/video.webm",
+      "trace_rel_path": "Evidence/Trace/AMAZON-001-03/trace.zip",
+      "api_method": "GET",
+      "api_pathname": "/1c5c1ecf7303/6ab7d267eef9/66125abca348/inputs",
+      "api_status": 200,
+      "api_trigger": "page_load",
+      "captured_apis": [
+        {
+          "url": "https://1c5c1ecf7303.e10058c8.ap-south-1.token.awswaf.com/1c5c1ecf7303/6ab7d267eef9/66125abca348/inputs?client=browser",
+          "method": "GET",
+          "resource_type": "fetch",
+          "status_code": 200,
+          "request_payload_keys": [],
+          "response_keys": [
+            "challenge",
+            "challenge_type",
+            "difficulty"
+          ],
+          "triggered_by_action": "page_load"
+        },
+        {
+          "url": "https://1c5c1ecf7303.e10058c8.ap-south-1.token.awswaf.com/1c5c1ecf7303/6ab7d267eef9/66125abca348/mp_verify?region=ap-south-1",
+          "method": "POST",
+          "resource_type": "fetch",
+          "status_code": 200,
+          "request_payload_keys": [],
+          "response_keys": [
+            "token",
+            "inputs"
+          ],
+          "triggered_by_action": "page_load"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/G/01/csm/showads.v2.js?adspot_=1",
+          "method": "GET",
+          "resource_type": "fetch",
+          "status_code": 200,
+          "request_payload_keys": [],
+          "response_keys": [],
+          "triggered_by_action": "page_load"
+        },
+        {
+          "url": "https://www.amazon.in/dram/renderLazyLoadedStreaming?rshVal=1795252425142",
+          "method": "POST",
+          "resource_type": "xhr",
+          "status_code": 200,
+          "request_payload_keys": [
+            "encryptedLazyLoadRenderRequest",
+            "version"
+          ],
+          "response_keys": [],
+          "triggered_by_action": "page_load"
+        },
+        {
+          "url": "https://www.amazon.in/hz/rhf?currentPageType=Gateway&currentSubPageType=desktop&excludeAsin=&fieldKeywords=&k=&keywords=&search=&auditEnabled=&previewCampaigns=&forceWidgets=&searchAlias=&cardJSPresent=true",
+          "method": "GET",
+          "resource_type": "xhr",
+          "status_code": 200,
+          "request_payload_keys": [],
+          "response_keys": [
+            "html",
+            "success"
+          ],
+          "triggered_by_action": "page_load"
+        },
+        {
+          "url": "https://www.amazon.in/dram/renderLazyLoadedStreaming?rshVal=1795252439250",
+          "method": "POST",
+          "resource_type": "xhr",
+          "status_code": 200,
+          "request_payload_keys": [
+            "encryptedLazyLoadRenderRequest",
+            "version"
+          ],
+          "response_keys": [],
+          "triggered_by_action": "restore_navigation"
+        },
+        {
+          "url": "https://www.amazon.in/hz/rhf?currentPageType=Gateway&currentSubPageType=desktop&excludeAsin=&fieldKeywords=&k=&keywords=&search=&auditEnabled=&previewCampaigns=&forceWidgets=&searchAlias=&cardJSPresent=true",
+          "method": "GET",
+          "resource_type": "xhr",
+          "status_code": 200,
+          "request_payload_keys": [],
+          "response_keys": [
+            "html",
+            "success"
+          ],
+          "triggered_by_action": "restore_navigation"
+        }
+      ],
+      "error_message": ""
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+[
+  {
+    "url": "https://www.shutterstock.com/api/v1/search",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status_code": 200,
+    "request_payload_keys": [
+      "q"
+    ],
+    "response_keys": [
+      "status",
+      "items",
+      "total"
+    ],
+    "triggered_by_action": "search_probe"
+  },
+  {
+    "url": "https://www.shutterstock.com/api/v1/audit",
+    "method": "POST",
+    "resource_type": "xhr",
+    "status_code": 201,
+    "request_payload_keys": [
+      "action"
+    ],
+    "response_keys": [
+      "id",
+      "created_at"
+    ],
+    "triggered_by_action": "click:dashboard"
+  }
+]

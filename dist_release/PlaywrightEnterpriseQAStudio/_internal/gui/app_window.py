@@ -13,6 +13,7 @@ import os
 import queue
 import sys
 import threading
+import webbrowser
 from pathlib import Path
 from tkinter import filedialog, messagebox
 from typing import Any, Dict, List, Optional
@@ -21,6 +22,8 @@ import customtkinter as ctk
 
 from agents.state import AgentState
 from agents.workflow_graph import run_agent_pipeline
+from core.browser_inspector import BrowserInspector
+from core.workspace_manager import DEFAULT_PROFILE_CHOICES, WorkspaceManager
 
 # Configure CustomTkinter Theme & Styling
 ctk.set_appearance_mode("Dark")
@@ -62,9 +65,22 @@ class EnterpriseQAStudioApp(ctk.CTk):
         self._generated_files_map: Dict[str, str] = {}
         # Interactive Persistent Session state
         self._interactive_trigger_event: Optional[threading.Event] = None
+        # Phase 6: Persistent Multi-Day Workspace & Credential Manager
+        default_ws = Path("./output_workspace").resolve()
+        self.workspace_manager: WorkspaceManager = WorkspaceManager(default_ws)
 
         self._build_ui()
+        self._refresh_workspace_ui()
         self._start_queue_poller()
+        self.protocol("WM_DELETE_WINDOW", self._on_window_close)
+
+    def _on_window_close(self) -> None:
+        """Ensure persistent browser is closed when app window terminates."""
+        try:
+            BrowserInspector.close_persistent_browser_sync()
+        except Exception:
+            pass
+        self.destroy()
 
     def _build_ui(self) -> None:
         # Split layout: 2 Columns (Sidebar 440px wide, Workspace flexible)
@@ -101,6 +117,34 @@ class EnterpriseQAStudioApp(ctk.CTk):
             text_color="#94A3B8",
         )
         sub_lbl.pack(anchor="w")
+
+        # Phase 6: Open Existing Project + Next Test ID Badge
+        ws_bar = ctk.CTkFrame(title_box, fg_color="transparent")
+        ws_bar.pack(fill="x", pady=(8, 0))
+
+        self.open_project_btn = ctk.CTkButton(
+            ws_bar,
+            text="📂 Open Existing Project",
+            width=180,
+            height=28,
+            font=ctk.CTkFont(size=12, weight="bold"),
+            fg_color="#1E3A8A",
+            hover_color="#1D4ED8",
+            command=self._open_existing_project,
+        )
+        self.open_project_btn.pack(side="left")
+
+        self.seq_badge_lbl = ctk.CTkLabel(
+            ws_bar,
+            text="Next Test ID: 001",
+            font=ctk.CTkFont(size=11, weight="bold"),
+            text_color="#38BDF8",
+            fg_color="#1E293B",
+            corner_radius=6,
+            padx=10,
+            pady=3,
+        )
+        self.seq_badge_lbl.pack(side="right")
 
         # Scrollable form container for clean vertical pacing
         form = ctk.CTkScrollableFrame(sidebar, fg_color="transparent")
@@ -149,6 +193,67 @@ class EnterpriseQAStudioApp(ctk.CTk):
             "0.0",
             "Create automation script for the dashboard, search API, click button and verify whether it succeeded with 200 or 201 status code",
         )
+
+        # -------------------------------------------------------------------
+        # SECTION 1B: Role-Based Access Profiles (.env)
+        # -------------------------------------------------------------------
+        auth_header = ctk.CTkFrame(form, fg_color="transparent")
+        auth_header.pack(fill="x", pady=(4, 6))
+        ctk.CTkLabel(
+            auth_header,
+            text="🔑 Role-Based Access Profiles (.env)",
+            font=ctk.CTkFont(size=13, weight="bold"),
+            text_color=COLOR_ACCENT,
+        ).pack(side="left")
+
+        auth_card = ctk.CTkFrame(form, fg_color=COLOR_CARD_BG, corner_radius=8, border_color=COLOR_BORDER, border_width=1)
+        auth_card.pack(fill="x", pady=(0, 14), padx=2, ipady=8)
+
+        ctk.CTkLabel(auth_card, text="Active Run Profile:", font=ctk.CTkFont(size=12, weight="bold")).pack(anchor="w", padx=14, pady=(8, 2))
+        self.profile_dropdown = ctk.CTkOptionMenu(
+            auth_card,
+            values=list(DEFAULT_PROFILE_CHOICES),
+            height=32,
+        )
+        self.profile_dropdown.pack(fill="x", padx=14, pady=(0, 8))
+        self.profile_dropdown.set("None (Public URL)")
+
+        ctk.CTkFrame(auth_card, height=1, fg_color=COLOR_BORDER).pack(fill="x", padx=14, pady=4)
+        ctk.CTkLabel(auth_card, text="Add / Edit Role Account:", font=ctk.CTkFont(size=12, weight="bold")).pack(anchor="w", padx=14, pady=(4, 4))
+
+        self.role_combo = ctk.CTkComboBox(
+            auth_card,
+            values=["SUPER_USER", "ADMIN", "SUPER_USER_ADMIN_USER"],
+            height=30,
+        )
+        self.role_combo.pack(fill="x", padx=14, pady=(0, 6))
+        self.role_combo.set("SUPER_USER")
+
+        self.username_entry = ctk.CTkEntry(auth_card, placeholder_text="Username / Email", height=30)
+        self.username_entry.pack(fill="x", padx=14, pady=(0, 6))
+
+        self.password_entry = ctk.CTkEntry(auth_card, placeholder_text="Password", show="*", height=30)
+        self.password_entry.pack(fill="x", padx=14, pady=(0, 8))
+
+        self.save_account_btn = ctk.CTkButton(
+            auth_card,
+            text="+ Save Role Account",
+            height=30,
+            font=ctk.CTkFont(size=12, weight="bold"),
+            fg_color="#0F766E",
+            hover_color="#115E59",
+            command=self._on_save_role_account,
+        )
+        self.save_account_btn.pack(fill="x", padx=14, pady=(0, 6))
+
+        self.saved_roles_lbl = ctk.CTkLabel(
+            auth_card,
+            text="Saved Roles: None",
+            font=ctk.CTkFont(size=11),
+            text_color="#94A3B8",
+            anchor="w",
+        )
+        self.saved_roles_lbl.pack(fill="x", padx=14, pady=(0, 4))
 
         # -------------------------------------------------------------------
         # SECTION 2: Languages & Scope
@@ -302,7 +407,18 @@ class EnterpriseQAStudioApp(ctk.CTk):
             state="disabled",
             command=self._open_output_folder,
         )
-        self.open_folder_btn.pack(fill="x")
+        self.open_folder_btn.pack(fill="x", pady=(0, 6))
+
+        self.close_browser_btn = ctk.CTkButton(
+            action_box,
+            text="🛑 Close Persistent Browser",
+            height=32,
+            font=ctk.CTkFont(size=12),
+            fg_color="#475569",
+            hover_color="#DC2626",
+            command=self._on_close_browser_clicked,
+        )
+        self.close_browser_btn.pack(fill="x")
 
     # -----------------------------------------------------------------------
     # RIGHT MAIN WORKSPACE: Visual Pipeline Tracker & Multi-Tab Inspector
@@ -408,6 +524,18 @@ class EnterpriseQAStudioApp(ctk.CTk):
             text_color="#94A3B8",
         )
         self.counter_files_lbl.pack(side="left")
+
+        self.open_report_btn = ctk.CTkButton(
+            counter_box,
+            text="📊 Open Test Report",
+            width=165,
+            height=28,
+            font=ctk.CTkFont(size=12, weight="bold"),
+            fg_color="#1E3A8A",
+            hover_color="#1D4ED8",
+            command=self._open_test_report,
+        )
+        self.open_report_btn.pack(side="right", padx=(8, 0))
 
         # BOTTOM PANEL: CTkTabview with 3 Tabs
         self.tabs = ctk.CTkTabview(workspace, corner_radius=8)
@@ -600,6 +728,7 @@ class EnterpriseQAStudioApp(ctk.CTk):
         self.capture_btn.pack_forget()
 
         self.open_folder_btn.configure(state="normal", fg_color=COLOR_COMPLETED, hover_color="#15803D")
+        self.open_report_btn.configure(state="normal", fg_color="#0284C7", hover_color="#0369A1")
 
         # Update Live Counters
         report = final_state.get("inspection_report", {})
@@ -621,6 +750,13 @@ class EnterpriseQAStudioApp(ctk.CTk):
         created_files = final_state.get("generated_files", [])
         if created_files:
             self._populate_file_previewer(created_files)
+
+        # Refresh workspace state & Next Test ID badge after run
+        out_dir = final_state.get("output_dir") or self.out_entry.get().strip()
+        if out_dir:
+            self._last_run_output_dir = out_dir
+            self.workspace_manager = WorkspaceManager.load_project_state(out_dir)
+            self._refresh_workspace_ui()
 
         timestamp = datetime.datetime.now().strftime("%H:%M:%S")
         self.console_textbox.insert(
@@ -726,15 +862,155 @@ class EnterpriseQAStudioApp(ctk.CTk):
     def _browse_output_dir(self) -> None:
         chosen = filedialog.askdirectory(initialdir=self.out_entry.get().strip() or ".")
         if chosen:
+            norm_path = os.path.normpath(chosen)
             self.out_entry.delete(0, "end")
-            self.out_entry.insert(0, os.path.normpath(chosen))
+            self.out_entry.insert(0, norm_path)
+            # Load existing workspace if present, otherwise point workspace_manager to new dir
+            if (Path(norm_path) / WorkspaceManager.PROJECT_FILE).exists():
+                self.load_workspace(norm_path)
+            else:
+                old_accounts = dict(self.workspace_manager.state.get("accounts", {}))
+                self.workspace_manager = WorkspaceManager(norm_path)
+                if old_accounts and not self.workspace_manager.state.get("accounts"):
+                    self.workspace_manager.state["accounts"] = old_accounts
+                self._refresh_workspace_ui()
+
+    def _open_existing_project(self) -> None:
+        chosen = filedialog.askdirectory(initialdir=self.out_entry.get().strip() or ".")
+        if chosen:
+            self.load_workspace(chosen)
+
+    def load_workspace(self, folder_path: str | Path) -> None:
+        """Load an existing multi-day project workspace into the GUI."""
+        norm_path = os.path.normpath(str(folder_path))
+        self._last_run_output_dir = norm_path
+        self.workspace_manager = WorkspaceManager.load_project_state(norm_path)
+
+        self.out_entry.delete(0, "end")
+        self.out_entry.insert(0, norm_path)
+
+        saved_url = self.workspace_manager.state.get("target_url", "")
+        if saved_url:
+            self.url_entry.delete(0, "end")
+            self.url_entry.insert(0, saved_url)
+
+        saved_langs = self.workspace_manager.state.get("target_languages", [])
+        if saved_langs:
+            for chk, lang in [
+                (self.chk_py, "Python"),
+                (self.chk_java, "Java"),
+                (self.chk_ts, "TypeScript"),
+                (self.chk_js, "JavaScript"),
+            ]:
+                if lang in saved_langs:
+                    chk.select()
+                else:
+                    chk.deselect()
+
+        self._refresh_workspace_ui()
+        if hasattr(self, "console_textbox"):
+            self.console_textbox.insert(
+                "end",
+                f"[WORKSPACE LOADED] {norm_path} | Next Test ID: {self.workspace_manager.next_sequence_number():03d}\n",
+            )
+            self.console_textbox.see("end")
+
+    def _on_save_role_account(self) -> None:
+        """Save or update a role account in the local workspace vault & .env."""
+        role = self.role_combo.get().strip()
+        username = self.username_entry.get().strip()
+        password = self.password_entry.get()
+
+        if not role:
+            if not self.is_test_mode:
+                messagebox.showerror("Validation Error", "Please enter or select a Role name.")
+            return
+        if not username or not password:
+            if not self.is_test_mode:
+                messagebox.showerror("Validation Error", "Please provide both Username and Password.")
+            return
+
+        out_dir = self.out_entry.get().strip() or "./output_workspace"
+        if Path(out_dir).resolve() != self.workspace_manager.project_root:
+            old_accounts = dict(self.workspace_manager.state.get("accounts", {}))
+            self.workspace_manager = WorkspaceManager(out_dir)
+            for k, v in old_accounts.items():
+                self.workspace_manager.state.setdefault("accounts", {})[k] = v
+
+        norm_role = self.workspace_manager.add_or_update_account(role, username, password)
+        # Only persist immediately to disk if an existing project workspace is loaded;
+        # new runs create `<output_dir>/<domain>_<timestamp>/` on execution.
+        if self.workspace_manager.exists():
+            self.workspace_manager.write_env_and_profiles(
+                active_role=norm_role,
+                target_url=self.url_entry.get().strip(),
+            )
+            self.workspace_manager.save_project_state()
+
+        self.password_entry.delete(0, "end")
+        self._refresh_workspace_ui()
+        self.profile_dropdown.set(norm_role)
+
+        if hasattr(self, "console_textbox"):
+            self.console_textbox.insert("end", f"[VAULT] Saved role account '{norm_role}' to .env & workspace.\n")
+            self.console_textbox.see("end")
+
+    def _refresh_workspace_ui(self) -> None:
+        """Update Next Test ID badge, saved roles status, and profile dropdown options."""
+        next_seq = self.workspace_manager.next_sequence_number()
+        self.seq_badge_lbl.configure(text=f"Next Test ID: {next_seq:03d}")
+
+        saved_roles = self.workspace_manager.get_saved_roles()
+        if saved_roles:
+            self.saved_roles_lbl.configure(text=f"Saved Roles: {', '.join(saved_roles)}", text_color="#4ADE80")
+        else:
+            self.saved_roles_lbl.configure(text="Saved Roles: None", text_color="#94A3B8")
+
+        options = list(DEFAULT_PROFILE_CHOICES)
+        for r in saved_roles:
+            if r not in options:
+                options.append(r)
+        current = self.profile_dropdown.get()
+        self.profile_dropdown.configure(values=options)
+        if current in options:
+            self.profile_dropdown.set(current)
+        else:
+            self.profile_dropdown.set(options[0])
+
+    def _on_close_browser_clicked(self) -> None:
+        """User clicked close persistent browser."""
+        BrowserInspector.close_persistent_browser_sync()
+        self.console_textbox.insert("end", "[INFO] Persistent browser session closed.\n")
+        self.console_textbox.see("end")
 
     def _open_output_folder(self) -> None:
-        target = self.out_entry.get().strip()
+        target = getattr(self, "_last_run_output_dir", "") or self.out_entry.get().strip()
         if os.path.exists(target):
             os.startfile(target)
         else:
             messagebox.showwarning("Directory Not Found", f"Output folder does not exist yet:\n{target}")
+
+    def _open_test_report(self) -> None:
+        """Launch <project_root>/Complete-Suite-Test-Report/index.html in the default browser."""
+        base_target = getattr(self, "_last_run_output_dir", "") or self.out_entry.get().strip() or "./output_workspace"
+        target = Path(base_target).resolve()
+        report_html = target / "Complete-Suite-Test-Report" / "index.html"
+        if not report_html.exists():
+            # Fallback to workspace root Complete-Suite-Test-Report/index.html if present
+            fallback_html = Path("./Complete-Suite-Test-Report/index.html").resolve()
+            if fallback_html.exists():
+                report_html = fallback_html
+            else:
+                if not self.is_test_mode:
+                    messagebox.showwarning(
+                        "Report Not Found",
+                        f"Enterprise test report has not been generated yet:\n{report_html}",
+                    )
+                return
+        try:
+            os.startfile(str(report_html))
+        except Exception:
+            webbrowser.open(report_html.as_uri())
 
     def _on_start_clicked(self) -> None:
         if self._is_running:
@@ -786,6 +1062,17 @@ class EnterpriseQAStudioApp(ctk.CTk):
         )
         self._reset_pipeline_cards()
 
+        # Sync workspace manager with selected output_dir while preserving unsaved in-memory accounts
+        if Path(output_dir).resolve() != self.workspace_manager.project_root:
+            in_mem_accounts = dict(self.workspace_manager.state.get("accounts", {}))
+            self.workspace_manager = WorkspaceManager(output_dir)
+            for k, v in in_mem_accounts.items():
+                self.workspace_manager.state.setdefault("accounts", {})[k] = v
+
+        active_profile = self.profile_dropdown.get()
+        decrypted_accounts = self.workspace_manager.get_all_decrypted_accounts()
+        next_seq = self.workspace_manager.next_sequence_number()
+
         initial_state: AgentState = {
             "target_url": target_url,
             "user_flow_text": flow_prompt,
@@ -797,6 +1084,9 @@ class EnterpriseQAStudioApp(ctk.CTk):
             "interactive_mode": is_interactive,
             "capture_trigger_event": self._interactive_trigger_event,
             "progress_callback": self._enqueue_progress,
+            "active_access_profile": active_profile,
+            "account_credentials": decrypted_accounts,
+            "sequence_number": next_seq,
             "parsed_flow_steps": [],
             "inspection_report": {},
             "test_plan_markdown": "",

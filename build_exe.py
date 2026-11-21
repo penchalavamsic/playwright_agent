@@ -35,19 +35,16 @@ def clean_build_artifacts() -> None:
 def run_pyinstaller() -> int:
     """Execute PyInstaller build process."""
     print(f"\n[2/4] Executing PyInstaller build with spec: {SPEC_FILE.name}...")
-    pyinstaller_exe = ROOT / ".venv" / "Scripts" / "pyinstaller.exe"
-    if not pyinstaller_exe.exists():
-        pyinstaller_exe = Path(sys.executable).parent / "Scripts" / "pyinstaller.exe"
-    if not pyinstaller_exe.exists():
-        pyinstaller_cmd = [sys.executable, "-m", "PyInstaller"]
-    else:
-        pyinstaller_cmd = [str(pyinstaller_exe)]
+    pyinstaller_cmd = [sys.executable, "-m", "PyInstaller"]
 
     cmd = pyinstaller_cmd + [str(SPEC_FILE), "--noconfirm", "--distpath", str(DIST_RELEASE_DIR)]
     print(f"      Command: {' '.join(cmd)}")
 
+    env = os.environ.copy()
+    env["PYINSTALLER_CONFIG_DIR"] = str(BUILD_DIR / ".pyinstaller_cache")
+
     start_time = time.time()
-    result = subprocess.run(cmd, cwd=str(ROOT))
+    result = subprocess.run(cmd, cwd=str(ROOT), env=env)
     elapsed = time.time() - start_time
 
     if result.returncode != 0:

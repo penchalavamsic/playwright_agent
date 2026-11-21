@@ -18,6 +18,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import urlparse
 
 from agents.state import AgentState, ParsedFlowStep, TestScenarioSpec, TestStepSpec
+from core.workspace_manager import WorkspaceManager
 
 
 def _emit_progress(state: AgentState, node_name: str, percent: float, message: str) -> None:
@@ -117,6 +118,8 @@ def _generate_markdown_test_plan(
     elements: List[Dict[str, Any]],
     apis: List[Dict[str, Any]],
     scenarios: List[TestScenarioSpec],
+    active_access_profile: str = "ADMIN",
+    sequence_number: int = 1,
 ) -> str:
     """Render a fully compliant IEEE 829 Standard Test Plan adhering strictly to PLAN_TEMPLATE.md."""
     clean_page = page_title.strip() if page_title else "Application"
@@ -138,7 +141,12 @@ def _generate_markdown_test_plan(
 
     # Jira-style title format per Rule 11
     jira_title = f'To verify the functionality of "{module_name}" → "{section_name}" → "{control_name}" → "{action_name}"'
-    test_id = f"TP-IEEE829-{int(datetime.datetime.now().timestamp())}"
+    test_id = f"TP-IEEE829-{sequence_number:03d}"
+    profile_val = (
+        WorkspaceManager.normalize_role(active_access_profile)
+        if active_access_profile and active_access_profile not in ("None (Public URL)", "NONE", "PUBLIC")
+        else "PUBLIC"
+    )
 
     # Target API details for Network Verification section
     target_api = None
@@ -149,7 +157,7 @@ def _generate_markdown_test_plan(
     if not target_api and apis:
         target_api = apis[0]
 
-    api_url = target_api.get("url", "${LIMAS_BASE_URL}/api") if target_api else "${LIMAS_BASE_URL}/api"
+    api_url = target_api.get("url", "${BASE_URL}/api") if target_api else "${BASE_URL}/api"
     api_method = target_api.get("method", "GET") if target_api else "GET"
     api_status = target_api.get("status_code", 200) if target_api else 200
     expected_status_str = "200, 201" if api_status in (200, 201) else str(api_status)
@@ -175,7 +183,7 @@ def _generate_markdown_test_plan(
         if step_idx > 12:
             break
     steps_block = "\n\n".join(steps_formatted) if steps_formatted else (
-        "1. Action: Navigate to ${LIMAS_BASE_URL}.\n"
+        "1. Action: Navigate to ${BASE_URL}.\n"
         "   Expected Result: Application loads successfully with HTTP 200.\n\n"
         "2. Action: Verify presence of core controls.\n"
         "   Expected Result: Controls are visible and ready for interaction."
@@ -214,7 +222,7 @@ page: "{clean_page}"
 section: "{section_name}"
 control: "{control_name}"
 action: "{action_name}"
-access_profile: "ADMIN"
+access_profile: "{profile_val}"
 priority: "High"
 classification: "Read-only"
 test_type: "Automated End-to-End & API Contract"
@@ -222,21 +230,21 @@ automation_candidate: true
 plan_status: "approved"
 script_status: "generated"
 environment_variables:
-  - "LIMAS_BASE_URL"
+  - "BASE_URL"
   - "TEST_ACCESS_PROFILE"
 test_data:
-  target_url: "{target_url}"
-  flow_prompt: "{user_flow_text}"
-related_script: "tests/test_automation_suite.py"
+  base_url_env: "BASE_URL"
+  access_profile_env: "TEST_ACCESS_PROFILE"
+related_script: "tests/{sequence_number:03d}_primary_user_flow.py"
 ---
 
 # Purpose
 
-Verify the end-to-end functionality and backend API status code contracts for {module_name} ({clean_page}) when executing the user flow: "{user_flow_text}".
+Verify the end-to-end functionality and backend API status code contracts for {module_name} ({clean_page}) when executing the requested user flow.
 
 # Preconditions
 
-- `${{LIMAS_BASE_URL}}` is reachable (configured for target: `{target_url}`).
+- `${{BASE_URL}}` is reachable.
 - Credentials for `${{TEST_ACCESS_PROFILE}}` are configured.
 - The required role and test data are available.
 - The starting page is accessible without security blockades.
@@ -244,8 +252,8 @@ Verify the end-to-end functionality and backend API status code contracts for {m
 # Test Data
 
 Use environment variables, runtime fixtures, or configuration keys:
-- `${{LIMAS_BASE_URL}}`: `{target_url}`
-- Access Profile: `ADMIN`
+- `${{BASE_URL}}`: Loaded from `.env`
+- `${{TEST_ACCESS_PROFILE}}`: `{profile_val}` (resolved dynamically via `access-profiles.json` and `.env`)
 - Target Locators: Prioritized Playwright locators (`data-testid` &rarr; `id` &rarr; `role+name`).
 
 # Steps and Expected Results
@@ -302,7 +310,7 @@ One clear and independently verifiable result: The automation flow completes det
    - SUPER_USER_ADMIN_USER
 8. Keep every plan shareable between environments and team members.
 9. CI/CD owns test execution.
-10. The Healer may propose test-only changes later but must not change expected LIMAS behavior.
+10. The Healer may propose test-only changes later but must not change expected application behavior.
 11. Plans must use this Jira-style title format:
 
 To verify the functionality of "<Module>" → "<Section>" → "<Control>" → "<Action>"
@@ -525,6 +533,11 @@ def test_planner_node(state: AgentState) -> Dict[str, Any]:
 
     scenarios = [scenario_1, scenario_2, scenario_3]
 
+    active_access_profile = state.get("active_access_profile", "") or "ADMIN"
+    sequence_number = state.get("sequence_number") or (
+        WorkspaceManager(output_dir).next_sequence_number() if output_dir else 1
+    )
+
     # Generate the Markdown Test Plan adhering strictly to PLAN_TEMPLATE.md
     md_content = _generate_markdown_test_plan(
         target_url=target_url,
@@ -534,16 +547,28 @@ def test_planner_node(state: AgentState) -> Dict[str, Any]:
         elements=elements,
         apis=apis,
         scenarios=scenarios,
+        active_access_profile=active_access_profile,
+        sequence_number=sequence_number,
     )
 
     # Save outputs if output_dir specified
     created_files: List[str] = list(state.get("generated_files", []))
     if output_dir:
+        # Save or append unified Master Test Plan at root docs/
         docs_dir = Path(output_dir) / "docs"
         docs_dir.mkdir(parents=True, exist_ok=True)
 
         plan_path = docs_dir / "Test_Plan_IEEE829.md"
-        plan_path.write_text(md_content, encoding="utf-8")
+        if plan_path.exists() and sequence_number > 1:
+            existing_md = plan_path.read_text(encoding="utf-8")
+            combined_md = (
+                existing_md.rstrip()
+                + f"\n\n---\n\n<!-- Run {sequence_number:03d} ({active_access_profile}) -->\n\n"
+                + md_content
+            )
+            plan_path.write_text(combined_md, encoding="utf-8")
+        else:
+            plan_path.write_text(md_content, encoding="utf-8")
         created_files.append(str(plan_path.resolve()))
 
         har_path = docs_dir / "network_har_summary.json"
@@ -561,4 +586,6 @@ def test_planner_node(state: AgentState) -> Dict[str, Any]:
         "test_plan_markdown": md_content,
         "test_scenarios": [sc.model_dump() for sc in scenarios],
         "generated_files": created_files,
+        "sequence_number": sequence_number,
+        "active_access_profile": active_access_profile,
     }

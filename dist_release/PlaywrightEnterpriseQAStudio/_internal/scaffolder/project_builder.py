@@ -11,7 +11,9 @@ import os
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
-from scaffolder.template_registry import TemplateRegistry
+from core.report_generator import EnterpriseReportGenerator, derive_app_display_name
+from core.workspace_manager import WorkspaceManager
+from scaffolder.template_registry import TemplateRegistry, to_pascal_case, to_snake_case
 
 
 class ProjectScaffolder:
@@ -63,9 +65,34 @@ class ProjectScaffolder:
                 "expected_status_codes": [200, 201],
             }
 
+        sequence_number = int(state.get("sequence_number") or 1)
+        seq_str = f"{sequence_number:03d}"
+
+        raw_flow = (state.get("user_flow_text") or "").strip()
+        # Derive a concise, filesystem-safe slug from user_flow_text
+        flow_words = to_snake_case(raw_flow).split("_")
+        # Filter out generic filler words if long
+        concise_words = [w for w in flow_words if w and w not in ("create", "automation", "script", "for", "the", "and", "verify", "whether", "it", "with", "status", "code")]
+        slug_source = "_".join((concise_words or flow_words)[:5]) or "user_flow"
+        flow_slug = slug_source[:40].strip("_") or "user_flow"
+        flow_pascal = to_pascal_case(flow_slug)
+
+        raw_profile = state.get("active_access_profile", "") or ""
+        if raw_profile.strip() in ("", "None (Public URL)", "NONE", "PUBLIC"):
+            active_access_profile = "PUBLIC"
+        else:
+            active_access_profile = WorkspaceManager.normalize_role(raw_profile)
+
+        app_display_name, domain_label = derive_app_display_name(
+            state.get("target_url", ""),
+            report.get("page_title", ""),
+        )
+
         return {
             "target_url": state.get("target_url", ""),
             "page_title": report.get("page_title", ""),
+            "app_display_name": app_display_name,
+            "domain_label": domain_label,
             "target_languages": state.get("target_languages", ["Python", "Java", "TypeScript", "JavaScript"]),
             "elements": elements,
             "search_element": search_element,
@@ -73,24 +100,61 @@ class ProjectScaffolder:
             "target_apis": apis,
             "target_api": target_api,
             "scenarios": scenarios,
+            "sequence_number": sequence_number,
+            "seq_str": seq_str,
+            "flow_slug": flow_slug,
+            "flow_pascal": flow_pascal,
+            "active_access_profile": active_access_profile,
+            "login_locators": report.get("login_locators", {}),
         }
 
     def scaffold_project(self, output_dir: str, state: Dict[str, Any]) -> List[str]:
         """Synthesize and write all selected language project suites to output_dir."""
-        out_path = Path(output_dir).resolve()
+        out_path = WorkspaceManager.resolve_run_output_dir(
+            output_dir, state.get("target_url", "")
+        )
         out_path.mkdir(parents=True, exist_ok=True)
         created_files: List[str] = []
 
+        wm = WorkspaceManager(out_path)
+        for role, creds in (state.get("account_credentials") or {}).items():
+            if isinstance(creds, dict):
+                pw = creds.get("password", "")
+                if not pw and creds.get("password_b64"):
+                    pw = WorkspaceManager.decode_password(creds["password_b64"])
+                wm.add_or_update_account(role, creds.get("username", ""), pw)
+
         context = self.build_context(state)
         target_langs = context.get("target_languages", [])
+        seq_str = context["seq_str"]
+        flow_slug = context["flow_slug"]
+        flow_pascal = context["flow_pascal"]
+        active_profile = context["active_access_profile"]
 
         # -------------------------------------------------------------------
-        # 1. Master README.md
+        # 0. .env, .env.example, access-profiles.json, .gitignore
+        # -------------------------------------------------------------------
+        created_files.extend(
+            wm.write_env_and_profiles(
+                active_role=active_profile,
+                target_url=state.get("target_url", ""),
+            )
+        )
+
+        # -------------------------------------------------------------------
+        # 1. Master README.md & Docs copy
         # -------------------------------------------------------------------
         readme_content = self.registry.render("master_readme", context)
         readme_path = out_path / "README.md"
         readme_path.write_text(readme_content, encoding="utf-8")
         created_files.append(str(readme_path))
+
+        docs_dir = out_path / "docs"
+        docs_dir.mkdir(parents=True, exist_ok=True)
+        test_plan_path = docs_dir / "Test_Plan_IEEE829.md"
+        if not test_plan_path.exists() and state.get("test_plan_markdown"):
+            test_plan_path.write_text(state["test_plan_markdown"], encoding="utf-8")
+            created_files.append(str(test_plan_path))
 
         # -------------------------------------------------------------------
         # 2. Python Playwright Suite
@@ -103,9 +167,13 @@ class ProjectScaffolder:
             files: List[Tuple[Path, str, str]] = [
                 (py_root / "pages" / "__init__.py", "", ""),
                 (py_root / "pages" / "base_page.py", "python_base_page", ""),
+                (py_root / "pages" / "login_page.py", "python_login_page", ""),
                 (py_root / "pages" / "app_page.py", "python_app_page", ""),
                 (py_root / "tests" / "__init__.py", "", ""),
                 (py_root / "tests" / "test_automation_suite.py", "python_test_suite", ""),
+                (py_root / "tests" / f"{seq_str}_{flow_slug}.py", "python_test_scenario_1", ""),
+                (py_root / "tests" / "test_ui_sanity_check.py", "python_test_scenario_2", ""),
+                (py_root / "tests" / "test_api_contract_matrix.py", "python_test_scenario_3", ""),
                 (py_root / "conftest.py", "python_conftest", ""),
                 (py_root / "pytest.ini", "python_pytest_ini", ""),
                 (py_root / "requirements.txt", "python_requirements", ""),
@@ -122,15 +190,23 @@ class ProjectScaffolder:
             java_root = out_path / "Java_Playwright"
             pages_dir = java_root / "src" / "main" / "java" / "com" / "corp" / "qa" / "pages"
             tests_dir = java_root / "src" / "test" / "java" / "com" / "corp" / "qa" / "tests"
+            listeners_dir = java_root / "src" / "test" / "java" / "com" / "corp" / "qa" / "listeners"
             pages_dir.mkdir(parents=True, exist_ok=True)
             tests_dir.mkdir(parents=True, exist_ok=True)
+            listeners_dir.mkdir(parents=True, exist_ok=True)
 
             files = [
                 (java_root / "pom.xml", "java_pom_xml", ""),
                 (java_root / "testng.xml", "java_testng_xml", ""),
+                (listeners_dir / "EnterpriseReportListener.java", "java_report_listener", ""),
                 (pages_dir / "BasePage.java", "java_base_page", ""),
+                (pages_dir / "LoginPage.java", "java_login_page", ""),
                 (pages_dir / "AppPage.java", "java_app_page", ""),
+                (tests_dir / "BaseTest.java", "java_base_test", ""),
                 (tests_dir / "AutomationSuiteTest.java", "java_test_suite", ""),
+                (tests_dir / f"Test{seq_str}{flow_pascal}.java", "java_test_scenario_1", ""),
+                (tests_dir / "TestUiSanityCheck.java", "java_test_scenario_2", ""),
+                (tests_dir / "TestApiContractMatrix.java", "java_test_scenario_3", ""),
             ]
             for file_path, tpl_name, raw_content in files:
                 content = self.registry.render(tpl_name, context) if tpl_name else raw_content
@@ -148,8 +224,13 @@ class ProjectScaffolder:
             files = [
                 (ts_root / "package.json", "ts_package_json", ""),
                 (ts_root / "playwright.config.ts", "ts_playwright_config", ""),
+                (ts_root / "enterprise-reporter.js", "js_enterprise_reporter", ""),
+                (ts_root / "pages" / "LoginPage.ts", "ts_login_page", ""),
                 (ts_root / "pages" / "AppPage.ts", "ts_app_page", ""),
                 (ts_root / "tests" / "automation_suite.spec.ts", "ts_test_suite", ""),
+                (ts_root / "tests" / f"{seq_str}_{flow_slug}.spec.ts", "ts_test_scenario_1", ""),
+                (ts_root / "tests" / "ui_sanity_check.spec.ts", "ts_test_scenario_2", ""),
+                (ts_root / "tests" / "api_contract_matrix.spec.ts", "ts_test_scenario_3", ""),
             ]
             for file_path, tpl_name, raw_content in files:
                 content = self.registry.render(tpl_name, context) if tpl_name else raw_content
@@ -167,13 +248,36 @@ class ProjectScaffolder:
             files = [
                 (js_root / "package.json", "js_package_json", ""),
                 (js_root / "playwright.config.js", "js_playwright_config", ""),
+                (js_root / "enterprise-reporter.js", "js_enterprise_reporter", ""),
+                (js_root / "pages" / "LoginPage.js", "js_login_page", ""),
                 (js_root / "pages" / "AppPage.js", "js_app_page", ""),
                 (js_root / "tests" / "automation_suite.spec.js", "js_test_suite", ""),
+                (js_root / "tests" / f"{seq_str}_{flow_slug}.spec.js", "js_test_scenario_1", ""),
+                (js_root / "tests" / "ui_sanity_check.spec.js", "js_test_scenario_2", ""),
+                (js_root / "tests" / "api_contract_matrix.spec.js", "js_test_scenario_3", ""),
             ]
             for file_path, tpl_name, raw_content in files:
                 content = self.registry.render(tpl_name, context) if tpl_name else raw_content
                 file_path.write_text(content, encoding="utf-8")
                 created_files.append(str(file_path))
+
+        # -------------------------------------------------------------------
+        # 6. Enterprise Complete-Suite-Test-Report Generation (Phase 7)
+        # -------------------------------------------------------------------
+        report_gen = EnterpriseReportGenerator(out_path)
+        created_files.extend(report_gen.generate_from_agent_state(state))
+
+        wm.record_run(
+            sequence_number=context["sequence_number"],
+            test_id=f"TP-IEEE829-{seq_str}",
+            title=f"{seq_str}_{flow_slug}",
+            access_profile=active_profile,
+            target_url=state.get("target_url", ""),
+            target_languages=target_langs,
+            files=created_files,
+        )
+        proj_file = wm.save_project_state()
+        created_files.append(str(proj_file))
 
         return created_files
 
