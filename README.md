@@ -2,6 +2,14 @@
 
 Windows desktop tooling for executing explicit browser flows, capturing real evidence, and generating Python, Java, TypeScript and JavaScript Playwright projects. The Studio does not call an LLM or external AI API. It uses a deterministic flow grammar.
 
+## Demo and complete guide
+
+- [Watch or download the 88-second Full HD demo](demo_media/Playwright_Studio_Demo_Revised.mp4): the labeled application walkthrough with male narration, subtitles, real browser footage, reports, and login-loop diagnosis.
+- [Read the complete application guide](documentation/output/Playwright_Studio_Complete_Guide.pdf): 34 pages covering everyday use and technical architecture, with 32 linked sections and nine diagrams.
+- [Download the demo captions](demo_media/Playwright_Studio_Demo_Revised.srt).
+
+The final media and guide use generic examples without personal or account details. Authoring requirements are in [the demo notes](demo_media/README.txt) and [the guide notes](documentation/README.txt). Raw captures, local credentials, saved browser state, and document-layout intermediates are excluded from version control.
+
 ## Run the corrected application
 
 [Download the latest Windows build from GitHub Releases](https://github.com/penchalavamsic/playwright_agent/releases/latest).
@@ -147,4 +155,4 @@ Build without replacing the older release:
 - `core/demo_portal.py`: self-contained local test application.
 - `gui/app_window.py`: desktop interface and accurate execution outcome display.
 
-See `VALIDATION.md` for findings and verification details. The earlier PDF describes the original design; this README documents the corrected behavior.
+See `VALIDATION.md` for findings and verification details. Use the complete application guide linked above for current procedures and architecture. The earlier architecture PDF describes the original design.
