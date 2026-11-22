@@ -1,0 +1,16 @@
+{
+  "file": "Playwright_Studio_Demo_Revised.mp4",
+  "duration_seconds": 88.0,
+  "resolution": "1920x1080",
+  "fps": 30,
+  "video_codec": "h264",
+  "audio_codec": "aac",
+  "size_bytes": 5597047,
+  "playback_verified": true,
+  "chapters": 13,
+  "visible_capture_timestamps": false,
+  "audio_levels": [
+    "mean_volume: -21.8 dB",
+    "max_volume: -4.9 dB"
+  ]
+}

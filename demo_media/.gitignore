@@ -1,0 +1,10 @@
+assets/
+work/
+project/
+
+# Superseded exports are retained locally; publish the revised edit.
+Playwright_Studio_Demo.mp4
+Playwright_Studio_Demo.srt
+Demo_Preview.png
+Demo_Storyboard.jpg
+Verification.json

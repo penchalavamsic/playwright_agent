@@ -1,0 +1,51 @@
+1
+00:00:00,200 --> 00:00:03,850
+Playwright Studio. Turn your test flows into real evidence.
+
+2
+00:00:04,200 --> 00:00:09,850
+Start with your application URL. Open a project, or choose Try demo.
+
+3
+00:00:10,200 --> 00:00:15,850
+Select a role. Save its credentials with Edit, then choose that profile.
+
+4
+00:00:16,200 --> 00:00:24,850
+Write each action in order. Log in, click, fill, select, and check. Verify text and API results.
+
+5
+00:00:25,200 --> 00:00:32,850
+Open Advanced settings. Choose a fresh or saved session. Set a success marker, or inspect a manual session.
+
+6
+00:00:33,200 --> 00:00:38,850
+Choose your languages and frameworks. Include a test plan, and set the output folder.
+
+7
+00:00:39,200 --> 00:00:46,850
+Click Run test. The browser follows your steps, creates the task, and verifies the response. This is real footage.
+
+8
+00:00:47,200 --> 00:00:52,850
+Review every step. Failures stop dependent actions, so the results reflect what actually happened.
+
+9
+00:00:53,200 --> 00:01:00,850
+Open the full report. Filter results and expand a case. Advisory plans are clearly marked as not run.
+
+10
+00:01:01,200 --> 00:01:08,850
+Inspect screenshots and video. Review API responses, or download the trace. Evidence stays with each report.
+
+11
+00:01:09,200 --> 00:01:15,850
+Review the test plan and generated files. Reopen for another run, or execute the exported suites.
+
+12
+00:01:16,200 --> 00:01:23,850
+Hmm. A login loop? Check redirects and responses. Stop once, and skip dependent steps.
+
+13
+00:01:24,200 --> 00:01:27,850
+Playwright Studio. Ready for your next test.

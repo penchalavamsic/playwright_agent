@@ -1,0 +1,106 @@
+[
+  {
+    "id": "intro",
+    "seconds": 4,
+    "chapter": "PLAYWRIGHT STUDIO",
+    "title": "From flow to evidence",
+    "voice": "Playwright Studio. Turn your test flows into real evidence.",
+    "caption": "A complete QA workflow. No external AI API required."
+  },
+  {
+    "id": "setup",
+    "seconds": 6,
+    "chapter": "01 / START",
+    "title": "Choose your application",
+    "voice": "Start with your application URL. Open a project, or choose Try demo.",
+    "caption": "Application URL  \u2022  Open project  \u2022  Try demo"
+  },
+  {
+    "id": "profile",
+    "seconds": 6,
+    "chapter": "02 / SIGN IN",
+    "title": "Select a login profile",
+    "voice": "Select a role. Save its credentials with Edit, then choose that profile.",
+    "caption": "Role \u2192 Username / email \u2192 Password \u2192 Save profile"
+  },
+  {
+    "id": "flow",
+    "seconds": 9,
+    "chapter": "03 / DESCRIBE",
+    "title": "Write steps in order",
+    "voice": "Write each action in order. Log in, click, fill, select, and check. Verify text and API results.",
+    "caption": "Quote labels and values. Separate actions with semicolons."
+  },
+  {
+    "id": "session",
+    "seconds": 8,
+    "chapter": "04 / CONFIGURE",
+    "title": "Choose the session policy",
+    "voice": "Open Advanced settings. Choose a fresh or saved session. Set a success marker, or inspect a manual session.",
+    "caption": "Fresh = clean context  \u2022  Saved = dedicated profile  \u2022  Manual capture = inspection only"
+  },
+  {
+    "id": "exports",
+    "seconds": 6,
+    "chapter": "05 / OUTPUT",
+    "title": "Select your deliverables",
+    "voice": "Choose your languages and frameworks. Include a test plan, and set the output folder.",
+    "caption": "Four frameworks  \u2022  Optional test plan  \u2022  Your output folder"
+  },
+  {
+    "id": "run",
+    "seconds": 8,
+    "chapter": "06 / EXECUTE",
+    "title": "Run the real workflow",
+    "voice": "Click Run test. The browser follows your steps, creates the task, and verifies the response. This is real footage.",
+    "caption": "Actual browser recording from this demo run"
+  },
+  {
+    "id": "results",
+    "seconds": 6,
+    "chapter": "07 / REVIEW",
+    "title": "Read every step outcome",
+    "voice": "Review every step. Failures stop dependent actions, so the results reflect what actually happened.",
+    "caption": "Passed, failed and skipped outcomes reflect actual execution."
+  },
+  {
+    "id": "report",
+    "seconds": 8,
+    "chapter": "08 / REPORT",
+    "title": "Inspect the full report",
+    "voice": "Open the full report. Filter results and expand a case. Advisory plans are clearly marked as not run.",
+    "caption": "Filter \u2192 Expand a case \u2192 Review the step results"
+  },
+  {
+    "id": "evidence",
+    "seconds": 8,
+    "chapter": "09 / EVIDENCE",
+    "title": "See what actually happened",
+    "voice": "Inspect screenshots and video. Review API responses, or download the trace. Evidence stays with each report.",
+    "caption": "Screenshots  \u2022  Video  \u2022  API status  \u2022  Playwright trace"
+  },
+  {
+    "id": "code",
+    "seconds": 7,
+    "chapter": "10 / REUSE",
+    "title": "Take the project forward",
+    "voice": "Review the test plan and generated files. Reopen for another run, or execute the exported suites.",
+    "caption": "Test plan + source files  \u2022  Numbered runs  \u2022  CLI execution"
+  },
+  {
+    "id": "loop",
+    "seconds": 8,
+    "chapter": "11 / DIAGNOSE",
+    "title": "Stop the login loop",
+    "voice": "Hmm. A login loop? Check redirects and responses. Stop once, and skip dependent steps.",
+    "caption": "Login \u2192 Dashboard \u2192 Login  /  Stop + diagnose  /  No automatic retry"
+  },
+  {
+    "id": "close",
+    "seconds": 4,
+    "chapter": "YOUR NEXT TEST",
+    "title": "Set up. Run. Review. Reuse.",
+    "voice": "Playwright Studio. Ready for your next test.",
+    "caption": "A complete workflow, from setup to reusable tests."
+  }
+]
