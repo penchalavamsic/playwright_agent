@@ -7,7 +7,7 @@ and the downstream deterministic code generators (later phases).
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from typing import Dict, List
+from typing import Any, Dict, List
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -91,6 +91,11 @@ class InspectionReport(BaseModel):
     trace_path: str = Field(
         "", description="Absolute file path to real Playwright trace.zip archive."
     )
+    execution_steps: List[Dict[str, Any]] = Field(default_factory=list)
+    execution_status: str = "not_run"
+    final_url: str = ""
+    duration_s: float = 0.0
+    auth_diagnostics: Dict[str, Any] = Field(default_factory=dict)
     inspected_at: str = Field(
         default_factory=lambda: datetime.now(timezone.utc).isoformat(timespec="seconds")
     )

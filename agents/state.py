@@ -16,7 +16,7 @@ class ParsedFlowStep(BaseModel):
     step_order: int = Field(..., description="1-based sequence order")
     action_type: str = Field(
         ...,
-        description="One of: NAVIGATE, CLICK, FILL, SEARCH, VERIFY_UI, VERIFY_API",
+        description="NAVIGATE, LOGIN, CLICK, FILL, SEARCH, SELECT, CHECK, UNCHECK, PRESS, VERIFY_UI, VERIFY_API or UNSUPPORTED",
     )
     target_keyword: str = Field("", description="Target button, tab, link, or component name")
     input_value: str = Field("", description="Value to type/search if action is FILL/SEARCH")
@@ -71,6 +71,7 @@ class AgentState(TypedDict, total=False):
     interactive_mode: bool                  # Phase 4.1: Manual persistent session mode
     capture_trigger_event: Any              # asyncio.Event or threading.Event for capture step
     progress_callback: Any                  # Callable[[str, float, str], None]
+    browser_settings: Dict[str, Any]
 
     # Phase 6: Multi-Account & Multi-Day Workspace State
     active_access_profile: str              # e.g. "SUPER_USER", "ADMIN", "None (Public URL)"

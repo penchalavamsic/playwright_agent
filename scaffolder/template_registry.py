@@ -154,7 +154,7 @@ from pages.base_page import BasePage
 
 
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
-load_dotenv(_PROJECT_ROOT / ".env", override=True)
+load_dotenv(_PROJECT_ROOT / ".env", override=False)
 
 
 class LoginPage(BasePage):
@@ -180,7 +180,7 @@ class LoginPage(BasePage):
 
     def login_with_profile(self, profile_name: Optional[str] = None) -> None:
         """Authenticate using credentials for `profile_name` from .env & access-profiles.json."""
-        load_dotenv(_PROJECT_ROOT / ".env", override=True)
+        load_dotenv(_PROJECT_ROOT / ".env", override=False)
         role = (profile_name or os.getenv("TEST_ACCESS_PROFILE", "")).strip()
         if not role or role.upper() in ("NONE", "PUBLIC", "NONE (PUBLIC URL)"):
             return
@@ -206,7 +206,7 @@ class LoginPage(BasePage):
             submit_btn.click()
         else:
             pwd_input.press("Enter")
-        self.page.wait_for_load_state("networkidle")
+        # Authentication stability is verified by SessionGuard.
 
     def login_as_profile(self, profile_name: Optional[str] = None) -> None:
         """Alias for login_with_profile."""
@@ -232,7 +232,7 @@ class AppPage(BasePage):
     # -----------------------------------------------------------------------
 {% for el in elements[:40] %}
     @property
-    def {{ el.text_or_label | to_snake_case }}(self) -> Locator:
+    def {{ el.code_name | to_snake_case }}(self) -> Locator:
         """Locator for {{ el.tag }} [{{ el.locator_strategy }}]: {{ el.text_or_label | escape_quotes }}"""
         return self.{{ el.recommended_locator.python }}
 {% endfor %}
@@ -242,7 +242,7 @@ class AppPage(BasePage):
     # -----------------------------------------------------------------------
     def search_and_submit(self, query: str) -> None:
 {% if search_element %}
-        self.{{ search_element.text_or_label | to_snake_case }}.fill(query)
+        self.{{ search_element.code_name | to_snake_case }}.fill(query)
         self.page.keyboard.press("Enter")
 {% else %}
         self.page.keyboard.type(query)
@@ -251,7 +251,7 @@ class AppPage(BasePage):
 
     def click_dashboard_tab(self) -> None:
 {% if dashboard_element %}
-        self.{{ dashboard_element.text_or_label | to_snake_case }}.click()
+        self.{{ dashboard_element.code_name | to_snake_case }}.click()
 {% else %}
         self.page.get_by_role("tab", name="Dashboard").click()
 {% endif %}
@@ -322,7 +322,7 @@ class TestAutomationSuite:
     def test_tc02_core_ui_component_sanity(self):
         """TC-02: Page Load & Core Interactive Controls Visibility Sanity."""
 {% for el in elements[:6] %}
-        expect(self.app.{{ el.text_or_label | to_snake_case }}).to_be_visible()
+        expect(self.app.{{ el.code_name | to_snake_case }}).to_be_visible()
 {% endfor %}
 
     def test_tc03_api_contract_matrix(self):
@@ -421,7 +421,7 @@ class Test002PageLoadAndCoreUiSanity:
     def test_tc02_core_ui_component_sanity(self):
         """Verify visibility of core UI components identified during inspection."""
 {% for el in elements[:6] %}
-        expect(self.app.{{ el.text_or_label | to_snake_case }}).to_be_visible()
+        expect(self.app.{{ el.code_name | to_snake_case }}).to_be_visible()
 {% endfor %}
 '''
 
@@ -468,7 +468,7 @@ from playwright.sync_api import Browser, BrowserContext, Page, Playwright
 
 
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent
-load_dotenv(_PROJECT_ROOT / ".env", override=True)
+load_dotenv(_PROJECT_ROOT / ".env", override=False)
 _COLLECTED_RESULTS: List[Dict[str, Any]] = []
 
 
@@ -629,10 +629,12 @@ body {{ font-family: 'Segoe UI', Tahoma, sans-serif; background: #f5f5f5; color:
 '''
 
 PYTHON_PYTEST_INI_TPL = '''[pytest]
-addopts = -v -s --browser chrome --output=test-results
+addopts = -v -s --browser chromium --output=test-results
 testpaths = tests
-python_files = test_*.py *.py
+python_files = [0-9]*_*.py
 python_classes = Test*
+markers =
+    qa_profile(name): isolate saved browser profiles by role
 python_functions = test_*
 '''
 
@@ -704,7 +706,7 @@ JAVA_TESTNG_XML_TPL = '''<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.d
     </listeners>
     <test name="E2E Automation Tests">
         <classes>
-            <class name="com.corp.qa.tests.AutomationSuiteTest"/>
+            {% for cls in java_test_classes %}<class name="com.corp.qa.tests.{{ cls }}"/>{% endfor %}
         </classes>
     </test>
 </suite>
@@ -876,11 +878,10 @@ public class BaseTest {
         page = context.newPage();
         loginPage = new LoginPage(page, TARGET_URL);
         app = new AppPage(page, TARGET_URL);
-        app.navigate();
-        loginPage.loginWithProfile(LoginPage.getEnv("TEST_ACCESS_PROFILE", "{{ active_access_profile }}"));
+
     }
 
-    @AfterMethod
+    @AfterMethod(alwaysRun = true)
     public void tearDownTest(ITestResult result) {
         Video video = (page != null) ? page.video() : null;
         try {
@@ -908,7 +909,7 @@ public class BaseTest {
         }
     }
 
-    @AfterClass
+    @AfterClass(alwaysRun = true)
     public void tearDownClass() {
         if (browser != null) browser.close();
         if (playwright != null) playwright.close();
@@ -1058,7 +1059,7 @@ public class AppPage extends BasePage {
     // Interactive Element Locators
     // -----------------------------------------------------------------------
 {% for el in elements[:30] %}
-    public Locator get{{ el.text_or_label | to_pascal_case }}() {
+    public Locator get{{ el.code_name | to_pascal_case }}() {
         // Locator for {{ el.tag }} [{{ el.locator_strategy }}]: {{ el.text_or_label | escape_quotes }}
         return this.{{ el.recommended_locator.java }};
     }
@@ -1069,7 +1070,7 @@ public class AppPage extends BasePage {
     // -----------------------------------------------------------------------
     public void searchAndSubmit(String query) {
 {% if search_element %}
-        get{{ search_element.text_or_label | to_pascal_case }}().fill(query);
+        get{{ search_element.code_name | to_pascal_case }}().fill(query);
         page.keyboard().press("Enter");
 {% else %}
         page.keyboard().type(query);
@@ -1079,7 +1080,7 @@ public class AppPage extends BasePage {
 
     public void clickDashboardTab() {
 {% if dashboard_element %}
-        get{{ dashboard_element.text_or_label | to_pascal_case }}().click();
+        get{{ dashboard_element.code_name | to_pascal_case }}().click();
 {% else %}
         page.getByRole(AriaRole.TAB, new Page.GetByRoleOptions().setName("Dashboard").setExact(true)).click();
 {% endif %}
@@ -1167,7 +1168,7 @@ public class AutomationSuiteTest {
     @Test(description = "TC-02: Page Load & Core UI Component Sanity")
     public void testTc02CoreUiComponentSanity() {
 {% for el in elements[:5] %}
-        Assert.assertTrue(app.get{{ el.text_or_label | to_pascal_case }}().isVisible(), "Element {{ el.text_or_label | escape_quotes }} is visible");
+        Assert.assertTrue(app.get{{ el.code_name | to_pascal_case }}().isVisible(), "Element {{ el.text_or_label | escape_quotes }} is visible");
 {% endfor %}
     }
 
@@ -1304,7 +1305,7 @@ public class Test002PageLoadAndCoreUiSanity {
     @Test(description = "TC-02: Page Load & Core UI Component Sanity")
     public void testTc02CoreUiComponentSanity() {
 {% for el in elements[:5] %}
-        Assert.assertTrue(app.get{{ el.text_or_label | to_pascal_case }}().isVisible(), "Element {{ el.text_or_label | escape_quotes }} is visible");
+        Assert.assertTrue(app.get{{ el.code_name | to_pascal_case }}().isVisible(), "Element {{ el.text_or_label | escape_quotes }} is visible");
 {% endfor %}
     }
 }
@@ -1352,23 +1353,26 @@ import * as path from 'path';
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 export default defineConfig({
+  workers: 1,
   testDir: './tests',
-  timeout: 30000,
+  testMatch: /[0-9]+_.*[.]spec[.](ts|js)$/,
+  timeout: 60000,
+  retries: 0,
   expect: {
     timeout: 5000,
   },
   reporter: [
     ['./enterprise-reporter.js'],
-    ['json', { outputFile: '../Complete-Suite-Test-Report/report-summary.json' }],
+    ['json', { outputFile: 'test-results/playwright-results.json' }],
   ],
   use: {
     baseURL: process.env.BASE_URL || '',
     headless: true,
     ignoreHTTPSErrors: true,
-    channel: 'chrome',
-    screenshot: 'on',
-    trace: 'on',
-    video: 'on',
+    channel: process.env.BROWSER_CHANNEL || 'msedge',
+    screenshot: 'off', // attached by the session fixture
+    trace: 'off', // session-fixtures.js records the actual context
+    video: 'off', // session fixture records both fresh and persistent contexts
   },
   projects: [
     {
@@ -1390,11 +1394,12 @@ class EnterpriseSuiteReporter {
   constructor() {
     this.results = [];
     this.startTime = Date.now();
+    this.reportDir = path.resolve(__dirname, 'execution-reports', String(this.startTime));
   }
 
   onTestEnd(test, result) {
     const testId = `PW-${String(this.results.length + 1).padStart(3, '0')}`;
-    const reportDir = path.resolve(__dirname, '../Complete-Suite-Test-Report');
+    const reportDir = this.reportDir;
     const ssDir = path.join(reportDir, 'Evidence', 'Screenshots', testId);
     const recDir = path.join(reportDir, 'Evidence', 'Recording', testId);
     const traceDir = path.join(reportDir, 'Evidence', 'Trace', testId);
@@ -1439,7 +1444,7 @@ class EnterpriseSuiteReporter {
     this.results.push({
       test_id: testId,
       title: test.title,
-      status: result.status === 'timedOut' ? 'failed' : result.status,
+      status: ['timedOut', 'interrupted'].includes(result.status) ? 'failed' : result.status,
       duration_s: Number(((result.duration || 0) / 1000).toFixed(2)),
       profile: process.env.TEST_ACCESS_PROFILE || '{{ active_access_profile }}',
       final_screenshot: finalScreenshotRel,
@@ -1451,7 +1456,7 @@ class EnterpriseSuiteReporter {
   }
 
   onEnd() {
-    const reportDir = path.resolve(__dirname, '../Complete-Suite-Test-Report');
+    const reportDir = this.reportDir;
     for (const sub of ['Plans', 'Screenshots', 'Recording', 'Trace']) {
       fs.mkdirSync(path.join(reportDir, 'Evidence', sub), { recursive: true });
     }
@@ -1463,6 +1468,8 @@ class EnterpriseSuiteReporter {
     const duration = Number(this.results.reduce((acc, r) => acc + r.duration_s, 0).toFixed(2));
     const dateStr = new Date().toISOString().slice(0, 10);
 
+    const esc = value => String(value || '').replace(/[&<>"']/g, c => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[c]));
+    fs.writeFileSync(path.join(reportDir, 'report-summary.json'), JSON.stringify({total, passed, failed, skipped, test_cases: this.results}, null, 2));
     const cards = this.results
       .map(
         (tc, i) => `
@@ -1470,18 +1477,18 @@ class EnterpriseSuiteReporter {
         <div class="test-header" onclick="toggleExpand('test-${i}')">
           <div class="test-card-heading">
             <span class="test-id-col">${tc.test_id}</span>
-            <span class="test-title-col">${tc.title}</span>
+            <span class="test-title-col">${esc(tc.title)}</span>
           </div>
           <span class="test-status ${tc.status}">${tc.status.toUpperCase()}</span>
           <span class="test-duration">${tc.duration_s.toFixed(2)}s</span>
           <span class="expand-icon">▼</span>
         </div>
         <div class="test-body">
-          <div class="test-meta"><span><strong>Profile:</strong> ${profile}</span></div>
+          <div class="test-meta"><span><strong>Profile:</strong> ${esc(profile)}</span></div>
           ${tc.final_screenshot ? `<div class="final-ss"><h4>Final Screenshot</h4><img src="${tc.final_screenshot}" style="max-width:640px"></div>` : ''}
           ${tc.video_rel_path ? `<div class="video-container"><h4>Screen Recording</h4><video controls preload="metadata" style="width:100%;max-width:640px"><source src="${tc.video_rel_path}" type="video/webm"></video></div>` : ''}
           ${tc.trace_rel_path ? `<div class="trace-section"><h4>Trace</h4><p><a href="${tc.trace_rel_path}" download>trace.zip</a></p></div>` : ''}
-          <div class="actual-result"><h4>Actual Result</h4><p><strong>Status:</strong> ${tc.status}</p></div>
+          <pre>${esc(tc.error_message)}</pre><div class="actual-result"><h4>Actual Result</h4><p><strong>Status:</strong> ${tc.status}</p></div>
         </div>
       </div>`
       )
@@ -1491,7 +1498,7 @@ class EnterpriseSuiteReporter {
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>{{ app_display_name }} Detailed Test Evidence Report — {{ domain_label }} — ${profile}</title>
+<title>{{ app_display_name }} Detailed Test Evidence Report — {{ domain_label }} — ${esc(profile)}</title>
 <style>
 body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f5f5f5; color: #333; margin: 0; }
 .report-header { background: #1a1a2e; color: #fff; padding: 24px; }
@@ -1512,7 +1519,7 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f5f5f5; color: 
 </head>
 <body>
 <div class="report-header">
-  <h1>{{ app_display_name }} Detailed Test Evidence Report — {{ domain_label }} — ${profile}</h1>
+  <h1>{{ app_display_name }} Detailed Test Evidence Report — {{ domain_label }} — ${esc(profile)}</h1>
   <div class="summary-grid">
     <div class="summary-card"><div class="summary-value">${total}</div><div class="summary-label">Total</div></div>
     <div class="summary-card passed"><div class="summary-value">${passed}</div><div class="summary-label">Passed</div></div>
@@ -1520,7 +1527,7 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f5f5f5; color: 
     <div class="summary-card"><div class="summary-value">${skipped}</div><div class="summary-label">Skipped</div></div>
     <div class="summary-card"><div class="summary-value">${duration}s</div><div class="summary-label">Duration</div></div>
     <div class="summary-card"><div class="summary-value">${dateStr}</div><div class="summary-label">Date</div></div>
-    <div class="summary-card profile"><div class="summary-value">${profile}</div><div class="summary-label">Profile</div></div>
+    <div class="summary-card profile"><div class="summary-value">${esc(profile)}</div><div class="summary-label">Profile</div></div>
   </div>
 </div>
 <div class="container">${cards}</div>
@@ -1592,7 +1599,7 @@ export class LoginPage {
     } else {
       await pwdInput.press('Enter');
     }
-    await this.page.waitForLoadState('networkidle').catch(() => {});
+    // Authentication stability is verified by SessionGuard.
   }
 }
 '''
@@ -1616,7 +1623,7 @@ export class AppPage {
   // Interactive Element Locators
   // -----------------------------------------------------------------------
 {% for el in elements[:30] %}
-  get {{ el.text_or_label | to_camel_case }}(): Locator {
+  get {{ el.code_name | to_camel_case }}(): Locator {
     // {{ el.tag }} [{{ el.locator_strategy }}]: {{ el.text_or_label | escape_quotes }}
     return this.{{ el.recommended_locator.ts }};
   }
@@ -1627,7 +1634,7 @@ export class AppPage {
   // -----------------------------------------------------------------------
   async searchAndSubmit(query: string): Promise<void> {
 {% if search_element %}
-    await this.{{ search_element.text_or_label | to_camel_case }}.fill(query);
+    await this.{{ search_element.code_name | to_camel_case }}.fill(query);
     await this.page.keyboard.press('Enter');
 {% else %}
     await this.page.keyboard.type(query);
@@ -1637,7 +1644,7 @@ export class AppPage {
 
   async clickDashboardTab(): Promise<void> {
 {% if dashboard_element %}
-    await this.{{ dashboard_element.text_or_label | to_camel_case }}.click();
+    await this.{{ dashboard_element.code_name | to_camel_case }}.click();
 {% else %}
     await this.page.getByRole('tab', { name: 'Dashboard', exact: true }).click();
 {% endif %}
@@ -1690,7 +1697,7 @@ test.describe('Corporate Automation Suite: {{ page_title or "Application" }}', (
 
   test('TC-02: Page Load & Core UI Component Sanity', async () => {
 {% for el in elements[:5] %}
-    await expect(app.{{ el.text_or_label | to_camel_case }}).toBeVisible();
+    await expect(app.{{ el.code_name | to_camel_case }}).toBeVisible();
 {% endfor %}
   });
 
@@ -1767,7 +1774,7 @@ test.describe('Scenario TC-02: Page Load & Core UI Component Sanity', () => {
 
   test('002 - Verify Visibility of Discovered Interactive Controls', async () => {
 {% for el in elements[:5] %}
-    await expect(app.{{ el.text_or_label | to_camel_case }}).toBeVisible();
+    await expect(app.{{ el.code_name | to_camel_case }}).toBeVisible();
 {% endfor %}
   });
 });
@@ -1810,23 +1817,26 @@ const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
 module.exports = defineConfig({
+  workers: 1,
   testDir: './tests',
-  timeout: 30000,
+  testMatch: /[0-9]+_.*[.]spec[.](ts|js)$/,
+  timeout: 60000,
+  retries: 0,
   expect: {
     timeout: 5000,
   },
   reporter: [
     ['./enterprise-reporter.js'],
-    ['json', { outputFile: '../Complete-Suite-Test-Report/report-summary.json' }],
+    ['json', { outputFile: 'test-results/playwright-results.json' }],
   ],
   use: {
     baseURL: process.env.BASE_URL || '',
     headless: true,
     ignoreHTTPSErrors: true,
-    channel: 'chrome',
-    screenshot: 'on',
-    trace: 'on',
-    video: 'on',
+    channel: process.env.BROWSER_CHANNEL || 'msedge',
+    screenshot: 'off', // attached by the session fixture
+    trace: 'off', // session-fixtures.js records the actual context
+    video: 'off', // session fixture records both fresh and persistent contexts
   },
   projects: [
     {
@@ -1894,7 +1904,7 @@ class LoginPage {
     } else {
       await pwdInput.press('Enter');
     }
-    await this.page.waitForLoadState('networkidle').catch(() => {});
+    // Authentication stability is verified by SessionGuard.
   }
 }
 
@@ -1921,7 +1931,7 @@ class AppPage {
   // Interactive Element Locators
   // -----------------------------------------------------------------------
 {% for el in elements[:30] %}
-  get {{ el.text_or_label | to_camel_case }}() {
+  get {{ el.code_name | to_camel_case }}() {
     // {{ el.tag }} [{{ el.locator_strategy }}]: {{ el.text_or_label | escape_quotes }}
     return this.{{ el.recommended_locator.js }};
   }
@@ -1932,7 +1942,7 @@ class AppPage {
   // -----------------------------------------------------------------------
   async searchAndSubmit(query) {
 {% if search_element %}
-    await this.{{ search_element.text_or_label | to_camel_case }}.fill(query);
+    await this.{{ search_element.code_name | to_camel_case }}.fill(query);
     await this.page.keyboard.press('Enter');
 {% else %}
     await this.page.keyboard.type(query);
@@ -1942,7 +1952,7 @@ class AppPage {
 
   async clickDashboardTab() {
 {% if dashboard_element %}
-    await this.{{ dashboard_element.text_or_label | to_camel_case }}.click();
+    await this.{{ dashboard_element.code_name | to_camel_case }}.click();
 {% else %}
     await this.page.getByRole('tab', { name: 'Dashboard', exact: true }).click();
 {% endif %}
@@ -1997,7 +2007,7 @@ test.describe('Corporate Automation Suite: {{ page_title or "Application" }}', (
 
   test('TC-02: Page Load & Core UI Component Sanity', async () => {
 {% for el in elements[:5] %}
-    await expect(app.{{ el.text_or_label | to_camel_case }}).toBeVisible();
+    await expect(app.{{ el.code_name | to_camel_case }}).toBeVisible();
 {% endfor %}
   });
 
@@ -2074,7 +2084,7 @@ test.describe('Scenario TC-02: Page Load & Core UI Component Sanity', () => {
 
   test('002 - Verify Visibility of Discovered Interactive Controls', async () => {
 {% for el in elements[:5] %}
-    await expect(app.{{ el.text_or_label | to_camel_case }}).toBeVisible();
+    await expect(app.{{ el.code_name | to_camel_case }}).toBeVisible();
 {% endfor %}
   });
 });
@@ -2098,70 +2108,32 @@ test.describe('Scenario TC-03: API Health & Contract Matrix Verification', () =>
 # Master Execution README Template
 # ---------------------------------------------------------------------------
 
-MASTER_README_TPL = '''# Corporate Multi-Language Playwright Automation Framework
+MASTER_README_TPL = '''# Generated Playwright flow project
 
-**Generated by**: Offline Zero-API Desktop Automation Agent  
-**Target URL**: `{{ target_url }}`  
-**Page Title**: `{{ page_title }}`  
-**Automation Scope**: Deterministic Page Object Models & API Status Code Verification  
+The numbered tests execute the requested flow in order. Unresolved actions fail explicitly.
+The Studio inspection report is in `Complete-Suite-Test-Report/`. Only the primary flow
+was executed; additional plans are advisory. Framework runs write separate timestamped
+`execution-reports/` folders inside each language folder.
 
----
+Configure `BASE_URL` and role credentials in the project `.env`. Role names are preserved
+per numbered flow. Credentials are not embedded in tests. Keep `.env` and
+`.qa_studio_project.json` private. Base64 password storage is not encryption.
 
-## Generated Frameworks
+## Run
 
-{% if "Python" in target_languages %}
-### 1. Python Playwright (pytest-playwright)
-```bash
-cd Python_Playwright
-pip install -r requirements.txt
-pytest
-```
-- **Pages**: `pages/base_page.py`, `pages/app_page.py`
-- **Tests**: `tests/test_automation_suite.py`
-- **Fixtures**: `conftest.py`, `pytest.ini`
-{% endif %}
+- Python: `python -m pip install -r requirements.txt`, then `python -m pytest`.
+- TypeScript / JavaScript: `npm install`, then `npm test`.
+- Java: JDK 17+, Maven, then `mvn test`.
 
-{% if "Java" in target_languages %}
-### 2. Java Playwright (JUnit 5 / TestNG + Maven)
-```bash
-cd Java_Playwright
-mvn clean test
-```
-- **Pages**: `src/main/java/com/corp/qa/pages/AppPage.java`
-- **Tests**: `src/test/java/com/corp/qa/tests/AutomationSuiteTest.java`
-- **Build**: `pom.xml`, `testng.xml`
-{% endif %}
+Run commands from the corresponding language directory. Set `BROWSER_CHANNEL=chrome`
+if using Chrome instead of Edge. Provision dependencies before using an offline machine.
 
-{% if "TypeScript" in target_languages %}
-### 3. TypeScript Playwright (@playwright/test)
-```bash
-cd TypeScript_Playwright
-npm install
-npx playwright test
-```
-- **Pages**: `pages/AppPage.ts`
-- **Tests**: `tests/automation_suite.spec.ts`
-- **Config**: `playwright.config.ts`, `package.json`
-{% endif %}
+A nonzero test exit means a failed test or environment error; inspect that execution's
+report and runner output. Copy the entire report folder, including evidence, for sharing.
+Missing video/trace/screenshots are not replaced with fabricated media.
 
-{% if "JavaScript" in target_languages %}
-### 4. JavaScript Playwright (@playwright/test)
-```bash
-cd JavaScript_Playwright
-npm install
-npx playwright test
-```
-- **Pages**: `pages/AppPage.js`
-- **Tests**: `tests/automation_suite.spec.js`
-- **Config**: `playwright.config.js`, `package.json`
-{% endif %}
-
----
-
-## IEEE 829 Test Documentation
-The full specification is available in:
-- `docs/Test_Plan_IEEE829.md`
-- `docs/network_har_summary.json`
+Prior numbered flow files remain in the project; aggregate canned tests from older
+Studio versions are excluded from the new test configuration.
 '''
 
 

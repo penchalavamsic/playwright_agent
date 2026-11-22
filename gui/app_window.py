@@ -1,9 +1,4 @@
-"""Enterprise QA Agent Studio Desktop GUI Window (Phase 4).
-
-100% Offline, Zero-API CustomTkinter Desktop Interface with thread-safe queue polling,
-5-Node visual pipeline state badges, live telemetry counters, clean non-overlapping layout,
-and multi-tab output inspector.
-"""
+"""Desktop test setup and results, with optional session settings and diagnostics."""
 
 from __future__ import annotations
 
@@ -47,13 +42,13 @@ COLOR_ACCENT = "#38BDF8"        # Sky 400
 
 
 class EnterpriseQAStudioApp(ctk.CTk):
-    """Playwright Enterprise QA Agent Studio (Zero-API Offline Edition)."""
+    """Playwright Studio."""
 
     def __init__(self, is_test_mode: bool = False) -> None:
         super().__init__()
 
         self.is_test_mode = is_test_mode
-        self.title("Playwright Enterprise QA Agent Studio (Zero-API Offline Edition)")
+        self.title("Playwright Studio")
         self.geometry("1320x860")
         self.minsize(1100, 720)
 
@@ -80,6 +75,9 @@ class EnterpriseQAStudioApp(ctk.CTk):
             BrowserInspector.close_persistent_browser_sync()
         except Exception:
             pass
+        if getattr(self, '_demo_server', None):
+            self._demo_server.shutdown()
+            self._demo_server.server_close()
         self.destroy()
 
     def _build_ui(self) -> None:
@@ -95,506 +93,180 @@ class EnterpriseQAStudioApp(ctk.CTk):
     # LEFT SIDEBAR: User Inputs & Controls
     # -----------------------------------------------------------------------
     def _build_left_sidebar(self) -> None:
-        sidebar = ctk.CTkFrame(self, width=440, corner_radius=12)
-        sidebar.grid(row=0, column=0, padx=(15, 8), pady=15, sticky="nsew")
+        sidebar = ctk.CTkFrame(self, width=440, corner_radius=16, fg_color="#111C30")
+        sidebar.grid(row=0, column=0, padx=(18, 8), pady=18, sticky="nsew")
         sidebar.grid_propagate(False)
-
-        # Header Title
-        title_box = ctk.CTkFrame(sidebar, fg_color="transparent")
-        title_box.pack(fill="x", padx=16, pady=(16, 8))
-
-        title_lbl = ctk.CTkLabel(
-            title_box,
-            text="Autonomous QA Studio",
-            font=ctk.CTkFont(size=20, weight="bold"),
-        )
-        title_lbl.pack(anchor="w")
-
-        sub_lbl = ctk.CTkLabel(
-            title_box,
-            text="100% Offline Zero-API Playwright Synthesizer",
-            font=ctk.CTkFont(size=12),
-            text_color="#94A3B8",
-        )
-        sub_lbl.pack(anchor="w")
-
-        # Phase 6: Open Existing Project + Next Test ID Badge
-        ws_bar = ctk.CTkFrame(title_box, fg_color="transparent")
-        ws_bar.pack(fill="x", pady=(8, 0))
-
-        self.open_project_btn = ctk.CTkButton(
-            ws_bar,
-            text="📂 Open Existing Project",
-            width=180,
-            height=28,
-            font=ctk.CTkFont(size=12, weight="bold"),
-            fg_color="#1E3A8A",
-            hover_color="#1D4ED8",
-            command=self._open_existing_project,
-        )
+        header = ctk.CTkFrame(sidebar, fg_color="transparent")
+        header.pack(fill="x", padx=22, pady=(20, 12))
+        ctk.CTkLabel(header, text="Playwright Studio", font=ctk.CTkFont(size=24, weight="bold")).pack(anchor="w")
+        ctk.CTkLabel(header, text="Set up a flow. Run it. Review the result.", text_color="#94A3B8").pack(anchor="w")
+        links = ctk.CTkFrame(header, fg_color="transparent")
+        links.pack(fill="x", pady=(12, 0))
+        self.open_project_btn = ctk.CTkButton(links, text="Open project", width=130, height=30,
+            fg_color="#26364F", command=self._open_existing_project)
         self.open_project_btn.pack(side="left")
-
-        self.seq_badge_lbl = ctk.CTkLabel(
-            ws_bar,
-            text="Next Test ID: 001",
-            font=ctk.CTkFont(size=11, weight="bold"),
-            text_color="#38BDF8",
-            fg_color="#1E293B",
-            corner_radius=6,
-            padx=10,
-            pady=3,
-        )
-        self.seq_badge_lbl.pack(side="right")
-
-        # Scrollable form container for clean vertical pacing
+        ctk.CTkButton(links, text="Try demo", width=110, height=30, fg_color="#26364F",
+            command=self._load_demo_portal).pack(side="right")
+        # Kept for workspace state; the internal sequence is not a main-screen input.
+        self.seq_badge_lbl = ctk.CTkLabel(header, text="")
         form = ctk.CTkScrollableFrame(sidebar, fg_color="transparent")
-        form.pack(fill="both", expand=True, padx=8, pady=(0, 6))
+        form.pack(fill="both", expand=True, padx=16, pady=0)
 
-        # -------------------------------------------------------------------
-        # SECTION 1: Target & Flow
-        # -------------------------------------------------------------------
-        sec1_header = ctk.CTkFrame(form, fg_color="transparent")
-        sec1_header.pack(fill="x", pady=(4, 6))
-        ctk.CTkLabel(
-            sec1_header,
-            text="1. Target Application & Flow",
-            font=ctk.CTkFont(size=13, weight="bold"),
-            text_color=COLOR_ACCENT,
-        ).pack(side="left")
+        def label(parent, text):
+            ctk.CTkLabel(parent, text=text, font=ctk.CTkFont(size=13, weight="bold")).pack(anchor="w", pady=(12, 4))
 
-        demo_btn = ctk.CTkButton(
-            sec1_header,
-            text="⚡ Load Demo Portal",
-            width=135,
-            height=24,
-            font=ctk.CTkFont(size=11, weight="bold"),
-            fg_color="#334155",
-            hover_color="#475569",
-            command=self._load_demo_portal,
-        )
-        demo_btn.pack(side="right")
-
-        sec1_card = ctk.CTkFrame(form, fg_color=COLOR_CARD_BG, corner_radius=8, border_color=COLOR_BORDER, border_width=1)
-        sec1_card.pack(fill="x", pady=(0, 14), padx=2, ipady=8)
-
-        ctk.CTkLabel(sec1_card, text="Target URL:", font=ctk.CTkFont(size=12, weight="bold")).pack(anchor="w", padx=14, pady=(8, 2))
-        self.url_entry = ctk.CTkEntry(
-            sec1_card,
-            placeholder_text="http://localhost:3000 or https://example.com",
-            height=34,
-        )
-        self.url_entry.pack(fill="x", padx=14, pady=(0, 10))
-        self.url_entry.insert(0, "http://localhost:3000")
-
-        ctk.CTkLabel(sec1_card, text="Flow / Scenario Description:", font=ctk.CTkFont(size=12, weight="bold")).pack(anchor="w", padx=14, pady=(0, 2))
-        self.flow_text = ctk.CTkTextbox(sec1_card, height=100, font=ctk.CTkFont(size=12))
-        self.flow_text.pack(fill="x", padx=14, pady=(0, 6))
-        self.flow_text.insert(
-            "0.0",
-            "Create automation script for the dashboard, search API, click button and verify whether it succeeded with 200 or 201 status code",
-        )
-
-        # -------------------------------------------------------------------
-        # SECTION 1B: Role-Based Access Profiles (.env)
-        # -------------------------------------------------------------------
-        auth_header = ctk.CTkFrame(form, fg_color="transparent")
-        auth_header.pack(fill="x", pady=(4, 6))
-        ctk.CTkLabel(
-            auth_header,
-            text="🔑 Role-Based Access Profiles (.env)",
-            font=ctk.CTkFont(size=13, weight="bold"),
-            text_color=COLOR_ACCENT,
-        ).pack(side="left")
-
-        auth_card = ctk.CTkFrame(form, fg_color=COLOR_CARD_BG, corner_radius=8, border_color=COLOR_BORDER, border_width=1)
-        auth_card.pack(fill="x", pady=(0, 14), padx=2, ipady=8)
-
-        ctk.CTkLabel(auth_card, text="Active Run Profile:", font=ctk.CTkFont(size=12, weight="bold")).pack(anchor="w", padx=14, pady=(8, 2))
-        self.profile_dropdown = ctk.CTkOptionMenu(
-            auth_card,
-            values=list(DEFAULT_PROFILE_CHOICES),
-            height=32,
-        )
-        self.profile_dropdown.pack(fill="x", padx=14, pady=(0, 8))
+        label(form, "Application URL")
+        self.url_entry = ctk.CTkEntry(form, height=38, placeholder_text="https://your-application.com")
+        self.url_entry.pack(fill="x")
+        label(form, "Login profile")
+        profile_row = ctk.CTkFrame(form, fg_color="transparent")
+        profile_row.pack(fill="x")
+        self.profile_dropdown = ctk.CTkOptionMenu(profile_row, values=list(DEFAULT_PROFILE_CHOICES), height=34)
+        self.profile_dropdown.pack(side="left", fill="x", expand=True, padx=(0, 8))
         self.profile_dropdown.set("None (Public URL)")
-
-        ctk.CTkFrame(auth_card, height=1, fg_color=COLOR_BORDER).pack(fill="x", padx=14, pady=4)
-        ctk.CTkLabel(auth_card, text="Add / Edit Role Account:", font=ctk.CTkFont(size=12, weight="bold")).pack(anchor="w", padx=14, pady=(4, 4))
-
-        self.role_combo = ctk.CTkComboBox(
-            auth_card,
-            values=["SUPER_USER", "ADMIN", "SUPER_USER_ADMIN_USER"],
-            height=30,
-        )
-        self.role_combo.pack(fill="x", padx=14, pady=(0, 6))
-        self.role_combo.set("SUPER_USER")
-
-        self.username_entry = ctk.CTkEntry(auth_card, placeholder_text="Username / Email", height=30)
-        self.username_entry.pack(fill="x", padx=14, pady=(0, 6))
-
-        self.password_entry = ctk.CTkEntry(auth_card, placeholder_text="Password", show="*", height=30)
-        self.password_entry.pack(fill="x", padx=14, pady=(0, 8))
-
-        self.save_account_btn = ctk.CTkButton(
-            auth_card,
-            text="+ Save Role Account",
-            height=30,
-            font=ctk.CTkFont(size=12, weight="bold"),
-            fg_color="#0F766E",
-            hover_color="#115E59",
-            command=self._on_save_role_account,
-        )
-        self.save_account_btn.pack(fill="x", padx=14, pady=(0, 6))
-
-        self.saved_roles_lbl = ctk.CTkLabel(
-            auth_card,
-            text="Saved Roles: None",
-            font=ctk.CTkFont(size=11),
-            text_color="#94A3B8",
-            anchor="w",
-        )
-        self.saved_roles_lbl.pack(fill="x", padx=14, pady=(0, 4))
-
-        # -------------------------------------------------------------------
-        # SECTION 2: Languages & Scope
-        # -------------------------------------------------------------------
-        sec2_header = ctk.CTkFrame(form, fg_color="transparent")
-        sec2_header.pack(fill="x", pady=(4, 6))
-        ctk.CTkLabel(
-            sec2_header,
-            text="2. Languages & Deliverables Scope",
-            font=ctk.CTkFont(size=13, weight="bold"),
-            text_color=COLOR_ACCENT,
-        ).pack(side="left")
-
-        toggle_all_btn = ctk.CTkButton(
-            sec2_header,
-            text="Toggle All",
-            width=80,
-            height=24,
-            font=ctk.CTkFont(size=11),
-            fg_color="#334155",
-            hover_color="#475569",
-            command=self._toggle_all_languages,
-        )
-        toggle_all_btn.pack(side="right")
-
-        sec2_card = ctk.CTkFrame(form, fg_color=COLOR_CARD_BG, corner_radius=8, border_color=COLOR_BORDER, border_width=1)
-        sec2_card.pack(fill="x", pady=(0, 14), padx=2, ipady=8)
-
-        ctk.CTkLabel(sec2_card, text="Target Playwright Frameworks:", font=ctk.CTkFont(size=12, weight="bold")).pack(anchor="w", padx=14, pady=(8, 4))
-
-        # Well-spaced 2-column grid container for language checkboxes
-        lang_grid = ctk.CTkFrame(sec2_card, fg_color="transparent")
-        lang_grid.pack(fill="x", padx=14, pady=(0, 8))
-        lang_grid.grid_columnconfigure(0, weight=1, uniform="languages")
-        lang_grid.grid_columnconfigure(1, weight=1, uniform="languages")
-
-        self.chk_py = ctk.CTkCheckBox(lang_grid, text="Python (pytest)", font=ctk.CTkFont(size=12))
-        self.chk_py.grid(row=0, column=0, padx=(0, 6), pady=6, sticky="w")
-        self.chk_py.select()
-
-        self.chk_java = ctk.CTkCheckBox(lang_grid, text="Java (TestNG)", font=ctk.CTkFont(size=12))
-        self.chk_java.grid(row=0, column=1, padx=(6, 0), pady=6, sticky="w")
-        self.chk_java.select()
-
-        self.chk_ts = ctk.CTkCheckBox(lang_grid, text="TypeScript (@playwright)", font=ctk.CTkFont(size=12))
-        self.chk_ts.grid(row=1, column=0, padx=(0, 6), pady=6, sticky="w")
-        self.chk_ts.select()
-
-        self.chk_js = ctk.CTkCheckBox(lang_grid, text="JavaScript (@playwright)", font=ctk.CTkFont(size=12))
-        self.chk_js.grid(row=1, column=1, padx=(6, 0), pady=6, sticky="w")
-        self.chk_js.select()
-
-        ctk.CTkFrame(sec2_card, height=1, fg_color=COLOR_BORDER).pack(fill="x", padx=14, pady=6)
-
-        ctk.CTkLabel(sec2_card, text="Automation Artifact Scope:", font=ctk.CTkFont(size=12, weight="bold")).pack(anchor="w", padx=14, pady=(4, 4))
-
-        scope_box = ctk.CTkFrame(sec2_card, fg_color="transparent")
-        scope_box.pack(fill="x", padx=14, pady=(0, 6))
-
-        self.chk_plan = ctk.CTkCheckBox(scope_box, text="Generate IEEE 829 Test Plan (PLAN_TEMPLATE.md)", font=ctk.CTkFont(size=12))
-        self.chk_plan.pack(anchor="w", pady=4)
-        self.chk_plan.select()
-
-        self.chk_scripts = ctk.CTkCheckBox(scope_box, text="Synthesize Multi-Language POM Frameworks", font=ctk.CTkFont(size=12))
-        self.chk_scripts.pack(anchor="w", pady=4)
-        self.chk_scripts.select()
-
-        self.switch_headless = ctk.CTkSwitch(scope_box, text="Headless Browser Inspection", font=ctk.CTkFont(size=12))
-        self.switch_headless.pack(anchor="w", pady=6)
+        self.account_toggle = ctk.CTkButton(profile_row, text="Edit", width=60, height=34,
+            fg_color="#26364F", command=self._toggle_account_editor)
+        self.account_toggle.pack(side="right")
+        account_slot = ctk.CTkFrame(form, fg_color="transparent", height=1)
+        account_slot.pack(fill="x")
+        self.account_editor = ctk.CTkFrame(account_slot, fg_color=COLOR_CARD_BG)
+        label(self.account_editor, "Save a login profile")
+        self.role_combo = ctk.CTkComboBox(self.account_editor, values=["QA", "ADMIN", "SUPER_USER"], height=32)
+        self.role_combo.pack(fill="x", padx=10, pady=5)
+        self.role_combo.set("QA")
+        self.username_entry = ctk.CTkEntry(self.account_editor, placeholder_text="Username or email", height=32)
+        self.username_entry.pack(fill="x", padx=10, pady=5)
+        self.password_entry = ctk.CTkEntry(self.account_editor, placeholder_text="Password", show="*", height=32)
+        self.password_entry.pack(fill="x", padx=10, pady=5)
+        self.save_account_btn = ctk.CTkButton(self.account_editor, text="Save profile", command=self._on_save_role_account)
+        self.save_account_btn.pack(fill="x", padx=10, pady=8)
+        self.saved_roles_lbl = ctk.CTkLabel(self.account_editor, text="", wraplength=320)
+        self.saved_roles_lbl.pack(fill="x", padx=10, pady=(0, 8))
+        label(form, "Test flow")
+        self.flow_text = ctk.CTkTextbox(form, height=132, font=ctk.CTkFont(size=13), wrap="word")
+        self.flow_text.pack(fill="x")
+        self.flow_text.insert("0.0", 'click "Reports"; verify "Reports"')
+        ctk.CTkLabel(form, text='Use steps such as click "Save"; verify "Saved".', text_color="#94A3B8", font=ctk.CTkFont(size=11)).pack(anchor="w", pady=(4, 12))
+        self.advanced_toggle = ctk.CTkButton(form, text="Advanced settings  +", anchor="w", height=34,
+            fg_color="#26364F", command=self._toggle_advanced_settings)
+        self.advanced_toggle.pack(fill="x", pady=(0, 8))
+        self.advanced_panel = ctk.CTkFrame(form, fg_color="transparent")
+        advanced = self.advanced_panel
+        label(advanced, "Browser session")
+        self.session_mode = ctk.CTkOptionMenu(advanced, values=['Fresh (incognito-like)', 'Saved profile (normal)'])
+        self.session_mode.pack(fill="x", pady=4)
+        ctk.CTkLabel(advanced, text="Fresh starts clean. Saved keeps this project's login.", text_color="#94A3B8", wraplength=340, justify="left").pack(anchor="w")
+        label(advanced, "Confirm login with (optional)")
+        self.auth_success_path = ctk.CTkEntry(advanced, placeholder_text="Authenticated path, e.g. /dashboard")
+        self.auth_success_path.pack(fill="x", pady=4)
+        self.auth_success_selector = ctk.CTkEntry(advanced, placeholder_text="Logged-in CSS selector")
+        self.auth_success_selector.pack(fill="x", pady=4)
+        self.switch_headless = ctk.CTkSwitch(advanced, text="Run browser in background")
+        self.switch_headless.pack(anchor="w", pady=10)
         self.switch_headless.select()
+        self.switch_interactive = ctk.CTkSwitch(advanced, text="Manual browser session", command=self._on_interactive_toggled)
+        self.switch_interactive.pack(anchor="w", pady=6)
+        label(advanced, "Generate scripts")
+        languages = ctk.CTkFrame(advanced, fg_color="transparent")
+        languages.pack(fill="x")
+        for i, (attr, title) in enumerate((("chk_py", "Python"), ("chk_java", "Java"), ("chk_ts", "TypeScript"), ("chk_js", "JavaScript"))):
+            checkbox = ctk.CTkCheckBox(languages, text=title, width=160)
+            checkbox.grid(row=i//2, column=i%2, sticky="w", pady=7)
+            setattr(self, attr, checkbox)
+        self.chk_py.select()
+        self.chk_scripts = ctk.CTkCheckBox(advanced, text="Include automation scripts")
+        self.chk_scripts.pack(anchor="w", pady=(10, 6))
+        self.chk_scripts.select()
+        self.chk_plan = ctk.CTkCheckBox(advanced, text="Include test plan")
+        self.chk_plan.pack(anchor="w", pady=6)
+        self.chk_plan.select()
+        label(advanced, "Save results to")
+        self.out_entry = ctk.CTkEntry(advanced, height=32)
+        self.out_entry.pack(fill="x", pady=4)
+        self.out_entry.insert(0, str(Path("./output_workspace").resolve()))
+        ctk.CTkButton(advanced, text="Choose folder", fg_color="#26364F", command=self._browse_output_dir).pack(anchor="w", pady=(4, 12))
 
-        self.switch_interactive = ctk.CTkSwitch(
-            scope_box,
-            text="Interactive Session (Keep Browser Open)",
-            font=ctk.CTkFont(size=12, weight="bold"),
-            text_color="#F59E0B",
-            command=self._on_interactive_toggled,
-        )
-        self.switch_interactive.pack(anchor="w", pady=(2, 6))
-
-        # -------------------------------------------------------------------
-        # SECTION 3: Output Workspace Directory
-        # -------------------------------------------------------------------
-        sec3_header = ctk.CTkFrame(form, fg_color="transparent")
-        sec3_header.pack(fill="x", pady=(4, 6))
-        ctk.CTkLabel(
-            sec3_header,
-            text="3. Output Workspace Directory",
-            font=ctk.CTkFont(size=13, weight="bold"),
-            text_color=COLOR_ACCENT,
-        ).pack(side="left")
-
-        sec3_card = ctk.CTkFrame(form, fg_color=COLOR_CARD_BG, corner_radius=8, border_color=COLOR_BORDER, border_width=1)
-        sec3_card.pack(fill="x", pady=(0, 10), padx=2, ipady=8)
-
-        out_box = ctk.CTkFrame(sec3_card, fg_color="transparent")
-        out_box.pack(fill="x", padx=14, pady=(8, 6))
-        out_box.grid_columnconfigure(0, weight=1)
-
-        default_out = str(Path("./output_workspace").resolve())
-        self.out_entry = ctk.CTkEntry(out_box, height=34, font=ctk.CTkFont(size=11))
-        self.out_entry.grid(row=0, column=0, sticky="ew", padx=(0, 8))
-        self.out_entry.insert(0, default_out)
-
-        browse_btn = ctk.CTkButton(
-            out_box,
-            text="Browse...",
-            width=85,
-            height=34,
-            command=self._browse_output_dir,
-        )
-        browse_btn.grid(row=0, column=1)
-
-        # -------------------------------------------------------------------
-        # SECTION 4: Action Buttons
-        # -------------------------------------------------------------------
-        action_box = ctk.CTkFrame(sidebar, fg_color="transparent")
-        action_box.pack(fill="x", padx=16, pady=(4, 16))
-
-        self.run_btn = ctk.CTkButton(
-            action_box,
-            text="🚀 Generate Test Plan & Automation Suite",
-            height=46,
-            font=ctk.CTkFont(size=14, weight="bold"),
-            fg_color="#2563EB",
-            hover_color="#1D4ED8",
-            command=self._on_start_clicked,
-        )
+        actions = ctk.CTkFrame(sidebar, fg_color="transparent")
+        actions.pack(fill="x", padx=22, pady=(12, 20))
+        self.run_btn = ctk.CTkButton(actions, text="Run test", height=44, font=ctk.CTkFont(size=15, weight="bold"), command=self._on_start_clicked)
         self.run_btn.pack(fill="x", pady=(0, 8))
+        self.capture_btn = ctk.CTkButton(actions, text="Capture and generate", height=38, command=self._on_capture_clicked)
+        self.close_browser_btn = ctk.CTkButton(actions, text="Close browser", fg_color="#26364F", command=self._on_close_browser_clicked)
+        self.open_folder_btn = ctk.CTkButton(actions, text="Open results folder", height=32, fg_color="#26364F", state="disabled", command=self._open_output_folder)
+        self.open_folder_btn.pack(fill="x")
 
-        # Interactive Step B Button (Revealed during Interactive Session Mode)
-        self.capture_btn = ctk.CTkButton(
-            action_box,
-            text="📸 Capture State & Generate Suite",
-            height=42,
-            font=ctk.CTkFont(size=13, weight="bold"),
-            fg_color="#059669",
-            hover_color="#047857",
-            command=self._on_capture_clicked,
-        )
-        # Hidden by default until Step A is running
-        self.capture_btn.pack_forget()
+    def _toggle_advanced_settings(self) -> None:
+        if self.advanced_panel.winfo_manager():
+            self.advanced_panel.pack_forget()
+            self.advanced_toggle.configure(text="Advanced settings  +")
+        else:
+            self.advanced_panel.pack(fill="x", pady=(0, 12))
+            self.advanced_toggle.configure(text="Advanced settings  −")
 
-        self.open_folder_btn = ctk.CTkButton(
-            action_box,
-            text="📂 Open Output Folder",
-            height=36,
-            font=ctk.CTkFont(size=13),
-            fg_color="#334155",
-            hover_color="#475569",
-            state="disabled",
-            command=self._open_output_folder,
-        )
-        self.open_folder_btn.pack(fill="x", pady=(0, 6))
+    def _toggle_account_editor(self) -> None:
+        if self.account_editor.winfo_manager():
+            self.account_editor.pack_forget()
+            self.account_editor.master.configure(height=1)
+            self.account_toggle.configure(text="Edit")
+        else:
+            self.account_editor.pack(fill="x", pady=(8, 0))
+            self.account_toggle.configure(text="Done")
 
-        self.close_browser_btn = ctk.CTkButton(
-            action_box,
-            text="🛑 Close Persistent Browser",
-            height=32,
-            font=ctk.CTkFont(size=12),
-            fg_color="#475569",
-            hover_color="#DC2626",
-            command=self._on_close_browser_clicked,
-        )
-        self.close_browser_btn.pack(fill="x")
-
-    # -----------------------------------------------------------------------
-    # RIGHT MAIN WORKSPACE: Visual Pipeline Tracker & Multi-Tab Inspector
-    # -----------------------------------------------------------------------
     def _build_right_workspace(self) -> None:
-        workspace = ctk.CTkFrame(self, corner_radius=12)
-        workspace.grid(row=0, column=1, padx=(8, 15), pady=15, sticky="nsew")
+        workspace = ctk.CTkFrame(self, corner_radius=16, fg_color="#111C30")
+        workspace.grid(row=0, column=1, padx=(8, 18), pady=18, sticky="nsew")
         workspace.grid_columnconfigure(0, weight=1)
         workspace.grid_rowconfigure(2, weight=1)
+        heading = ctk.CTkFrame(workspace, fg_color="transparent")
+        heading.grid(row=0, column=0, sticky="ew", padx=24, pady=(22, 12))
+        ctk.CTkLabel(heading, text="Test results", font=ctk.CTkFont(size=23, weight="bold")).pack(side="left")
+        self.open_report_btn = ctk.CTkButton(heading, text="Open full report", width=140, height=32,
+            state="disabled", command=self._open_test_report)
+        self.open_report_btn.pack(side="right")
+        progress = ctk.CTkFrame(workspace, fg_color="transparent")
+        progress.grid(row=1, column=0, sticky="ew", padx=24, pady=(0, 12))
+        progress.grid_columnconfigure(0, weight=1)
+        self.status_banner_lbl = ctk.CTkLabel(progress, text="Ready to run", anchor="w", font=ctk.CTkFont(size=14, weight="bold"))
+        self.status_banner_lbl.grid(row=0, column=0, sticky="ew", pady=(0, 8))
+        self.pct_display_lbl = ctk.CTkLabel(progress, text="0%", width=44, text_color=COLOR_ACCENT)
+        self.pct_display_lbl.grid(row=0, column=1)
+        self.progress_bar = ctk.CTkProgressBar(progress, height=6)
+        self.progress_bar.grid(row=1, column=0, columnspan=2, sticky="ew")
+        self.progress_bar.set(0)
+        self.tabs = ctk.CTkTabview(workspace, corner_radius=10)
+        self.tabs.grid(row=2, column=0, sticky="nsew", padx=20, pady=(0, 20))
+        result_tab = self.tabs.add("Results")
+        tab_console = self.tabs.add("Details")
+        tab_plan = self.tabs.add("Test plan")
+        tab_files = self.tabs.add("Files")
+        for tab in (result_tab, tab_console, tab_plan, tab_files):
+            tab.grid_columnconfigure(0, weight=1)
+            tab.grid_rowconfigure(1, weight=1)
+        self.results_textbox = ctk.CTkTextbox(result_tab, wrap="word", font=ctk.CTkFont(size=15), fg_color=COLOR_CARD_BG)
+        self.results_textbox.grid(row=1, column=0, sticky="nsew", padx=6, pady=6)
+        self._show_result_text("Your next test starts here.\n\nEnter the application URL, choose a login profile if needed, and describe the steps to check.\n\nAfter the run, you'll see which steps passed and where the flow stopped.")
+        counters = ctk.CTkFrame(tab_console, fg_color="transparent")
+        counters.grid(row=0, column=0, sticky="ew", padx=6, pady=6)
+        for attr, text in (("counter_dom_lbl", "Locators: 0"), ("counter_api_lbl", "APIs: 0"), ("counter_files_lbl", "Files: 0")):
+            widget = ctk.CTkLabel(counters, text=text, font=ctk.CTkFont(size=11), text_color="#94A3B8")
+            widget.pack(side="left", padx=(0, 20))
+            setattr(self, attr, widget)
+        self.node_cards = {}
+        self.console_textbox = ctk.CTkTextbox(tab_console, wrap="word", font=ctk.CTkFont(family="Consolas", size=12))
+        self.console_textbox.grid(row=1, column=0, sticky="nsew", padx=6, pady=6)
+        self.plan_textbox = ctk.CTkTextbox(tab_plan, wrap="word", font=ctk.CTkFont(size=13))
+        self.plan_textbox.grid(row=1, column=0, sticky="nsew", padx=6, pady=6)
+        self.plan_textbox.insert("0.0", "Your test plan will appear after the run.")
+        self.file_selector = ctk.CTkOptionMenu(tab_files, values=["No files generated yet"], command=self._on_file_selected)
+        self.file_selector.grid(row=0, column=0, sticky="ew", padx=6, pady=6)
+        self.code_preview_textbox = ctk.CTkTextbox(tab_files, wrap="none", font=ctk.CTkFont(family="Consolas", size=12))
+        self.code_preview_textbox.grid(row=1, column=0, sticky="nsew", padx=6, pady=6)
 
-        # TOP PANEL: 5-Node Visual Pipeline Step Cards
-        top_tracker_box = ctk.CTkFrame(workspace, fg_color="transparent")
-        top_tracker_box.grid(row=0, column=0, sticky="ew", padx=16, pady=(16, 8))
-        top_tracker_box.grid_columnconfigure((0, 1, 2, 3, 4), weight=1)
-
-        self.node_cards: Dict[str, Dict[str, Any]] = {}
-        nodes_config = [
-            ("intent_parser", "1. Intent Parser", "IntentParserNode"),
-            ("browser_inspector", "2. UI & API Inspector", "BrowserInspector"),
-            ("test_planner", "3. IEEE 829 Planner", "TestPlannerNode"),
-            ("code_synthesizer", "4. Code Synthesizer", "CodeSynthesizerNode"),
-            ("project_scaffolder", "5. Project Scaffolder", "ProjectScaffolderNode"),
-        ]
-
-        for idx, (node_id, title, subtitle) in enumerate(nodes_config):
-            card = ctk.CTkFrame(
-                top_tracker_box,
-                fg_color=COLOR_PENDING,
-                border_color=COLOR_BORDER,
-                border_width=1,
-                corner_radius=8,
-                height=68,
-            )
-            card.grid(row=0, column=idx, padx=4, sticky="nsew")
-            card.grid_propagate(False)
-
-            title_l = ctk.CTkLabel(card, text=title, font=ctk.CTkFont(size=12, weight="bold"))
-            title_l.pack(anchor="w", padx=10, pady=(8, 2))
-
-            status_l = ctk.CTkLabel(card, text="○ Pending", font=ctk.CTkFont(size=10), text_color="#94A3B8")
-            status_l.pack(anchor="w", padx=10, pady=(0, 6))
-
-            self.node_cards[node_id] = {
-                "card": card,
-                "title_label": title_l,
-                "status_label": status_l,
-                "state": "pending",
-            }
-
-        # Progress Bar & Telemetry Banner
-        telemetry_box = ctk.CTkFrame(workspace, fg_color="#0F172A", corner_radius=8)
-        telemetry_box.grid(row=1, column=0, sticky="ew", padx=16, pady=(0, 10))
-        telemetry_box.grid_columnconfigure(0, weight=1)
-
-        # Header with Status + Percent
-        t_header = ctk.CTkFrame(telemetry_box, fg_color="transparent")
-        t_header.pack(fill="x", padx=12, pady=(10, 4))
-
-        self.status_banner_lbl = ctk.CTkLabel(
-            t_header,
-            text="Ready. Enter a URL and click Generate to start the pipeline.",
-            font=ctk.CTkFont(size=13, weight="bold"),
-        )
-        self.status_banner_lbl.pack(side="left")
-
-        self.pct_display_lbl = ctk.CTkLabel(
-            t_header,
-            text="0%",
-            font=ctk.CTkFont(size=14, weight="bold"),
-            text_color="#38BDF8",
-        )
-        self.pct_display_lbl.pack(side="right")
-
-        # Smooth Progress Bar
-        self.progress_bar = ctk.CTkProgressBar(telemetry_box, height=12)
-        self.progress_bar.pack(fill="x", padx=12, pady=(0, 8))
-        self.progress_bar.set(0.0)
-
-        # Live Counter Badges
-        counter_box = ctk.CTkFrame(telemetry_box, fg_color="transparent")
-        counter_box.pack(fill="x", padx=12, pady=(0, 10))
-
-        self.counter_dom_lbl = ctk.CTkLabel(
-            counter_box,
-            text="DOM Locators: 0",
-            font=ctk.CTkFont(size=11, weight="bold"),
-            text_color="#94A3B8",
-        )
-        self.counter_dom_lbl.pack(side="left", padx=(0, 16))
-
-        self.counter_api_lbl = ctk.CTkLabel(
-            counter_box,
-            text="APIs Intercepted: 0",
-            font=ctk.CTkFont(size=11, weight="bold"),
-            text_color="#94A3B8",
-        )
-        self.counter_api_lbl.pack(side="left", padx=(0, 16))
-
-        self.counter_files_lbl = ctk.CTkLabel(
-            counter_box,
-            text="Files Generated: 0",
-            font=ctk.CTkFont(size=11, weight="bold"),
-            text_color="#94A3B8",
-        )
-        self.counter_files_lbl.pack(side="left")
-
-        self.open_report_btn = ctk.CTkButton(
-            counter_box,
-            text="📊 Open Test Report",
-            width=165,
-            height=28,
-            font=ctk.CTkFont(size=12, weight="bold"),
-            fg_color="#1E3A8A",
-            hover_color="#1D4ED8",
-            command=self._open_test_report,
-        )
-        self.open_report_btn.pack(side="right", padx=(8, 0))
-
-        # BOTTOM PANEL: CTkTabview with 3 Tabs
-        self.tabs = ctk.CTkTabview(workspace, corner_radius=8)
-        self.tabs.grid(row=2, column=0, sticky="nsew", padx=16, pady=(0, 16))
-
-        tab_console = self.tabs.add("🖥 Live Execution Console")
-        tab_plan = self.tabs.add("📋 Corporate Test Plan (IEEE 829)")
-        tab_files = self.tabs.add("🗂 Generated Project Files")
-
-        # --- TAB 1: Live Execution Console ---
-        tab_console.grid_columnconfigure(0, weight=1)
-        tab_console.grid_rowconfigure(0, weight=1)
-
-        self.console_textbox = ctk.CTkTextbox(
-            tab_console,
-            wrap="word",
-            font=ctk.CTkFont(family="Consolas", size=12),
-        )
-        self.console_textbox.grid(row=0, column=0, sticky="nsew", padx=4, pady=4)
-
-        # --- TAB 2: Corporate Test Plan Markdown ---
-        tab_plan.grid_columnconfigure(0, weight=1)
-        tab_plan.grid_rowconfigure(0, weight=1)
-
-        self.plan_textbox = ctk.CTkTextbox(
-            tab_plan,
-            wrap="word",
-            font=ctk.CTkFont(family="Consolas", size=12),
-        )
-        self.plan_textbox.grid(row=0, column=0, sticky="nsew", padx=4, pady=4)
-        self.plan_textbox.insert(
-            "0.0",
-            "IEEE 829 Corporate Test Plan (PLAN_TEMPLATE.md format) will be generated here automatically after TestPlannerNode completes.\n",
-        )
-
-        # --- TAB 3: Generated Project Files Previewer ---
-        tab_files.grid_columnconfigure(0, weight=1)
-        tab_files.grid_rowconfigure(1, weight=1)
-
-        file_nav_bar = ctk.CTkFrame(tab_files, fg_color="transparent")
-        file_nav_bar.grid(row=0, column=0, sticky="ew", padx=4, pady=(4, 6))
-
-        ctk.CTkLabel(file_nav_bar, text="Select File to Inspect:", font=ctk.CTkFont(size=12, weight="bold")).pack(side="left", padx=(0, 8))
-
-        self.file_selector = ctk.CTkOptionMenu(
-            file_nav_bar,
-            values=["(No files generated yet)"],
-            width=380,
-            command=self._on_file_selected,
-        )
-        self.file_selector.pack(side="left")
-
-        self.code_preview_textbox = ctk.CTkTextbox(
-            tab_files,
-            wrap="none",
-            font=ctk.CTkFont(family="Consolas", size=12),
-        )
-        self.code_preview_textbox.grid(row=1, column=0, sticky="nsew", padx=4, pady=4)
-        self.code_preview_textbox.insert("0.0", "// Select a generated file above to preview its synthesized source code.\n")
+    def _show_result_text(self, text: str) -> None:
+        self.results_textbox.configure(state="normal")
+        self.results_textbox.delete("0.0", "end")
+        self.results_textbox.insert("0.0", text)
+        self.results_textbox.configure(state="disabled")
 
     # -----------------------------------------------------------------------
     # Interactive Session Mode Helpers
@@ -603,19 +275,21 @@ class EnterpriseQAStudioApp(ctk.CTk):
         """Adjust UI button labels when interactive mode is switched."""
         is_interactive = bool(self.switch_interactive.get())
         if is_interactive:
+            self.close_browser_btn.pack(fill="x", pady=6)
             self.switch_headless.deselect()  # Browser must be visible
             if not self._is_running:
-                self.run_btn.configure(text="🌐 Step A: Launch & Keep Browser Open", fg_color="#D97706", hover_color="#B45309")
+                self.run_btn.configure(text="Open browser", fg_color="#D97706", hover_color="#B45309")
         else:
+            self.close_browser_btn.pack_forget()
             if not self._is_running:
-                self.run_btn.configure(text="🚀 Generate Test Plan & Automation Suite", fg_color="#2563EB", hover_color="#1D4ED8")
+                self.run_btn.configure(text="Run test", fg_color="#2563EB", hover_color="#1D4ED8")
             self.capture_btn.pack_forget()
 
     def _on_capture_clicked(self) -> None:
         """Triggered by user in Step B to capture live state and generate suites."""
         if self._interactive_trigger_event:
             self._interactive_trigger_event.set()
-            self.capture_btn.configure(state="disabled", text="⏳ Analyzing & Generating Suites...")
+            self.capture_btn.configure(state="disabled", text="Capturing…")
             self.status_banner_lbl.configure(text="Capture trigger received. Capturing active page DOM and generating suite...")
     def _set_node_state(self, node_id: str, state: str) -> None:
         """Update visual badge state: pending | running | completed | error."""
@@ -682,7 +356,8 @@ class EnterpriseQAStudioApp(ctk.CTk):
 
         self.progress_bar.set(norm_val)
         self.pct_display_lbl.configure(text=f"{pct_int}%")
-        self.status_banner_lbl.configure(text=f"[{node_name}] {message}")
+        stage = {"intentparser": "Preparing the flow", "browserinspector": "Running your flow", "testplanner": "Preparing the test plan", "codesynthesizer": "Generating scripts", "projectscaffolder": "Saving results"}
+        self.status_banner_lbl.configure(text=next((value for key, value in stage.items() if key in node_name.lower()), "Working…"))
 
         # Stream into Console Log
         log_entry = f"[{timestamp}] [{pct_int:3d}%] [{node_name:<24}] {message}\n"
@@ -717,14 +392,29 @@ class EnterpriseQAStudioApp(ctk.CTk):
 
         self.progress_bar.set(1.0)
         self.pct_display_lbl.configure(text="100%")
-        self.status_banner_lbl.configure(text="Pipeline Complete! Multi-Language Suites & Test Plan Ready.")
+        execution_status = final_state.get('inspection_report', {}).get('execution_status', 'not_run')
+        self.status_banner_lbl.configure(text=f"Flow {execution_status.upper().replace('_', ' ')}", text_color="#F87171" if execution_status == "failed" else "#E2E8F0")
+        report = final_state.get("inspection_report", {})
+        lines = [f"Flow {execution_status.upper().replace('_', ' ')}", ""]
+        for index, step in enumerate(report.get("execution_steps", []), 1):
+            label = step.get('description') or f"{step.get('action_type', 'Step').replace('_', ' ').title()} {step.get('target_keyword', '')}"
+            lines.append(f"{index}. {label.strip()}  —  {step.get('status', 'not_run').upper()}")
+            if step.get("error"):
+                lines.append(f"   {step['error']}")
+            lines.append("")
+        if not report.get("execution_steps"):
+            lines.append("No automated steps were executed.")
+        self._show_result_text("\n".join(lines))
+        self.tabs.set("Results")
+        if execution_status == 'failed':
+            self._set_node_state('browser_inspector', 'error')
         
         # Reset Action Buttons
         is_interactive = bool(self.switch_interactive.get())
         if is_interactive:
-            self.run_btn.configure(state="normal", text="🌐 Step A: Launch & Keep Browser Open", fg_color="#D97706", hover_color="#B45309")
+            self.run_btn.configure(state="normal", text="Open browser", fg_color="#D97706", hover_color="#B45309")
         else:
-            self.run_btn.configure(state="normal", text="🚀 Generate Test Plan & Automation Suite", fg_color="#2563EB", hover_color="#1D4ED8")
+            self.run_btn.configure(state="normal", text="Run test", fg_color="#2563EB", hover_color="#1D4ED8")
         self.capture_btn.pack_forget()
 
         self.open_folder_btn.configure(state="normal", fg_color=COLOR_COMPLETED, hover_color="#15803D")
@@ -755,24 +445,18 @@ class EnterpriseQAStudioApp(ctk.CTk):
         out_dir = final_state.get("output_dir") or self.out_entry.get().strip()
         if out_dir:
             self._last_run_output_dir = out_dir
+            self.out_entry.delete(0, 'end')
+            self.out_entry.insert(0, out_dir)
             self.workspace_manager = WorkspaceManager.load_project_state(out_dir)
             self._refresh_workspace_ui()
 
         timestamp = datetime.datetime.now().strftime("%H:%M:%S")
         self.console_textbox.insert(
             "end",
-            f"\n[{timestamp}] [100%] [PIPELINE SUCCESS] Successfully generated {file_count} assets.\n",
+            f"\n[{timestamp}] [100%] Generated {file_count} assets. Flow: {execution_status.upper()}.\n" + '\n'.join(final_state.get('errors', [])) + '\n',
         )
         self.console_textbox.see("end")
 
-        if not self.is_test_mode:
-            messagebox.showinfo(
-                "Framework Generation Complete",
-                f"Successfully synthesized {file_count} automation assets!\n\n"
-                f"- DOM Locators Cataloged: {dom_count}\n"
-                f"- API Contracts Intercepted: {api_count}\n\n"
-                f"Output Folder: {self.out_entry.get().strip()}",
-            )
 
     def _handle_error_event(self, msg: Dict[str, Any]) -> None:
         err = msg.get("error", "Unknown error")
@@ -785,11 +469,13 @@ class EnterpriseQAStudioApp(ctk.CTk):
 
         is_interactive = bool(self.switch_interactive.get())
         if is_interactive:
-            self.run_btn.configure(state="normal", text="🌐 Step A: Launch & Keep Browser Open", fg_color="#D97706", hover_color="#B45309")
+            self.run_btn.configure(state="normal", text="Open browser", fg_color="#D97706", hover_color="#B45309")
         else:
-            self.run_btn.configure(state="normal", text="🚀 Generate Test Plan & Automation Suite", fg_color="#2563EB", hover_color="#1D4ED8")
+            self.run_btn.configure(state="normal", text="Run test", fg_color="#2563EB", hover_color="#1D4ED8")
         self.capture_btn.pack_forget()
-        self.status_banner_lbl.configure(text=f"Pipeline Error: {err[:60]}")
+        self.status_banner_lbl.configure(text="Run failed", text_color="#F87171")
+        self._show_result_text("Run failed\n\n" + err)
+        self.tabs.set("Results")
         timestamp = datetime.datetime.now().strftime("%H:%M:%S")
         self.console_textbox.insert("end", f"\n[{timestamp}] [ERROR] Pipeline failed: {err}\n")
         self.console_textbox.see("end")
@@ -837,9 +523,21 @@ class EnterpriseQAStudioApp(ctk.CTk):
     # UI Control Callbacks
     # -----------------------------------------------------------------------
     def _load_demo_portal(self) -> None:
-        """Autofills offline fixture demo portal URL."""
+        """Start a real disposable localhost portal and configure a reproducible flow."""
+        from core.demo_portal import make_server, DEMO_FLOW
+        if not getattr(self, '_demo_server', None):
+            self._demo_server = make_server()
+            threading.Thread(target=self._demo_server.serve_forever, daemon=True).start()
         self.url_entry.delete(0, "end")
-        self.url_entry.insert(0, "http://127.0.0.1:49790/")
+        self.url_entry.insert(0, f"http://127.0.0.1:{self._demo_server.server_port}")
+        self.flow_text.delete('0.0', 'end')
+        self.flow_text.insert('0.0', DEMO_FLOW)
+        self.workspace_manager.add_or_update_account('QA', 'qa@example.test', 'local-demo-only')
+        self._refresh_workspace_ui()
+        self.profile_dropdown.set('QA')
+        self.session_mode.set('Fresh (incognito-like)')
+        self.auth_success_path.delete(0, 'end')
+        self.auth_success_selector.delete(0, 'end')
 
     def _toggle_all_languages(self) -> None:
         all_selected = (
@@ -890,6 +588,12 @@ class EnterpriseQAStudioApp(ctk.CTk):
         self.out_entry.insert(0, norm_path)
 
         saved_url = self.workspace_manager.state.get("target_url", "")
+        settings = self.workspace_manager.state.get('browser_settings', {})
+        self.session_mode.set('Saved profile (normal)' if settings.get('session_mode') == 'persistent' else 'Fresh (incognito-like)')
+        for field in ('auth_success_path', 'auth_success_selector'):
+            widget = getattr(self, field)
+            widget.delete(0, 'end')
+            widget.insert(0, settings.get(field, ''))
         if saved_url:
             self.url_entry.delete(0, "end")
             self.url_entry.insert(0, saved_url)
@@ -996,17 +700,9 @@ class EnterpriseQAStudioApp(ctk.CTk):
         target = Path(base_target).resolve()
         report_html = target / "Complete-Suite-Test-Report" / "index.html"
         if not report_html.exists():
-            # Fallback to workspace root Complete-Suite-Test-Report/index.html if present
-            fallback_html = Path("./Complete-Suite-Test-Report/index.html").resolve()
-            if fallback_html.exists():
-                report_html = fallback_html
-            else:
-                if not self.is_test_mode:
-                    messagebox.showwarning(
-                        "Report Not Found",
-                        f"Enterprise test report has not been generated yet:\n{report_html}",
-                    )
-                return
+            if not self.is_test_mode:
+                messagebox.showwarning("Report Not Found", f"No report for this project yet:\n{report_html}")
+            return
         try:
             os.startfile(str(report_html))
         except Exception:
@@ -1024,6 +720,10 @@ class EnterpriseQAStudioApp(ctk.CTk):
             messagebox.showerror("Validation Error", "Please provide a valid Target URL.")
             return
 
+        if not flow_prompt:
+            messagebox.showerror("Test flow required", "Enter the steps you want to check.")
+            return
+
         selected_langs: List[str] = []
         if self.chk_py.get():
             selected_langs.append("Python")
@@ -1034,7 +734,7 @@ class EnterpriseQAStudioApp(ctk.CTk):
         if self.chk_js.get():
             selected_langs.append("JavaScript")
 
-        if not selected_langs:
+        if not selected_langs and self.chk_scripts.get():
             messagebox.showerror("Validation Error", "Please select at least one Target Language.")
             return
 
@@ -1044,21 +744,25 @@ class EnterpriseQAStudioApp(ctk.CTk):
 
         if is_interactive:
             self._interactive_trigger_event = threading.Event()
-            self.run_btn.configure(state="disabled", text="🌐 Browser Running (Interactive Mode)...")
+            self.run_btn.configure(state="disabled", text="Browser is open…")
             # Reveal Step B capture button prominently
             self.capture_btn.pack(fill="x", pady=(0, 8), before=self.open_folder_btn)
-            self.capture_btn.configure(state="normal", text="📸 Step B: Capture State & Generate Suite")
+            self.capture_btn.configure(state="normal", text="Capture and generate")
         else:
             self._interactive_trigger_event = None
-            self.run_btn.configure(state="disabled", text="⏳ Synthesizing Automation Suites...")
+            self.run_btn.configure(state="disabled", text="Running test…")
             self.capture_btn.pack_forget()
 
         self.open_folder_btn.configure(state="disabled", fg_color="#334155")
+        self.open_report_btn.configure(state="disabled")
         self.console_textbox.delete("0.0", "end")
         self.progress_bar.set(0.0)
         self.pct_display_lbl.configure(text="0%")
+        self.status_banner_lbl.configure(text_color="#E2E8F0")
+        self._show_result_text("Running your flow…\n\nStep results will appear here when the run finishes.")
+        self.tabs.set("Results")
         self.status_banner_lbl.configure(
-            text="Launching Interactive Browser Session..." if is_interactive else "Launching 5-Node Zero-API LangGraph Pipeline..."
+            text="Opening browser…" if is_interactive else "Starting test…"
         )
         self._reset_pipeline_cards()
 
@@ -1082,6 +786,10 @@ class EnterpriseQAStudioApp(ctk.CTk):
             "generate_test_plan": bool(self.chk_plan.get()),
             "generate_scripts": bool(self.chk_scripts.get()),
             "interactive_mode": is_interactive,
+            "browser_settings": dict(self.workspace_manager.state.get('browser_settings', {}),
+                                     session_mode='persistent' if self.session_mode.get().startswith('Saved') else 'fresh',
+                                     auth_success_path=self.auth_success_path.get().strip(),
+                                     auth_success_selector=self.auth_success_selector.get().strip()),
             "capture_trigger_event": self._interactive_trigger_event,
             "progress_callback": self._enqueue_progress,
             "active_access_profile": active_profile,

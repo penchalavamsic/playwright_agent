@@ -440,6 +440,18 @@ def test_planner_node(state: AgentState) -> Dict[str, Any]:
             )
             step_num += 1
 
+    # Execution-time locators belong to the page where the step actually ran.
+    execution = report_dict.get("execution_steps", [])
+    if execution:
+        s1_steps = [TestStepSpec(
+            step_number=r["step_order"], action=r["action_type"],
+            description=f"{r['action_type']} {r['target_keyword']}",
+            element_name=r["target_keyword"], locators=r.get("locators", {}),
+            input_data=r.get("input_value", ""),
+            api_url_pattern=r['target_keyword'] if r['action_type'] == 'VERIFY_API' else '',
+            expected_status_codes=r.get("expected_status_codes", []),
+        ) for r in execution]
+
     scenario_1 = TestScenarioSpec(
         scenario_id="TC-01",
         title="Primary User Flow & API Status Verification",

@@ -4,5 +4,22 @@ __pycache__/
 build/
 dist/
 *.spec
+!PlaywrightEnterpriseQAStudio.spec
 phase1_output.json
+tmp/
+verification_output/
+dist_verified/
+.pytest_cache/
+.browser_profiles/
+
+# Local credentials and generated website captures
+.env
+.env.*
+!.env.example
+.qa_studio_project.json
+node_modules/
+/Test/
+/output_workspace/
+/sample_output*/
+/Complete-Suite-Test-Report/
 

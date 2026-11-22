@@ -354,6 +354,10 @@ class BrowserInspector:
     def close_persistent_browser_sync(cls) -> None:
         """Synchronous wrapper to close persistent browser session."""
         if cls._active_session:
+            owner_loop = cls._active_session.get('loop')
+            if owner_loop and owner_loop.is_running():
+                asyncio.run_coroutine_threadsafe(cls.close_persistent_browser(), owner_loop)
+                return
             try:
                 loop = asyncio.get_event_loop()
                 if loop.is_running():
@@ -434,6 +438,9 @@ class BrowserInspector:
         capture_trigger: Optional[Any] = None,
         active_access_profile: str = "",
         account_credentials: Optional[Dict[str, Dict[str, str]]] = None,
+        parsed_flow_steps: Optional[List[Dict[str, Any]]] = None,
+        browser_settings: Optional[Dict[str, Any]] = None,
+        session_root: str = '',
     ) -> InspectionReport:
         """Inspect ``target_url`` and return a fully populated :class:`InspectionReport`.
 
@@ -444,6 +451,9 @@ class BrowserInspector:
         self._reset_state()
         self._progress_cb = progress_callback
         target_url = self._normalize_url(target_url)
+        settings = dict(browser_settings or {})
+        if settings.get('session_mode', 'fresh') not in ('fresh', 'persistent'):
+            raise ValueError('Session mode must be fresh or persistent.')
 
         # In interactive manual session, browser must be visible
         actual_headless = False if pause_for_user else headless
@@ -462,7 +472,7 @@ class BrowserInspector:
 
         pw = await async_playwright().start()
         await self._emit("launch_browser", 5, "Launching Browser (Interactive Session)" if pause_for_user else "Launching Browser")
-        browser, channel = await self._launch_browser(pw, actual_headless)
+        browser = None
 
         staging_dir = Path(tempfile.mkdtemp(prefix="pw_studio_evidence_"))
         self._screenshots_dir = staging_dir / "screenshots"
@@ -477,23 +487,26 @@ class BrowserInspector:
 
         try:
             video_enabled = True
-            context = await browser.new_context(
-                viewport={"width": 1280, "height": 720},
-                ignore_https_errors=True,  # corporate / internal certificates
-                record_video_dir=str(video_staging_dir),
-                record_video_size={"width": 1280, "height": 720},
-            )
+            context_options = dict(viewport={"width": 1280, "height": 720}, ignore_https_errors=True,
+                                   record_video_dir=str(video_staging_dir), record_video_size={"width": 1280, "height": 720})
+            if settings.get('session_mode') == 'persistent':
+                context, channel = await self._launch_saved_context(pw, actual_headless, session_root, target_url, active_access_profile, context_options)
+            else:
+                browser, channel = await self._launch_browser(pw, actual_headless)
+                context = await browser.new_context(**context_options)
             try:
-                page = await context.new_page()
+                page = context.pages[0] if context.pages else await context.new_page()
             except Exception as exc:
                 if "ffmpeg" in str(exc).lower():
                     logger.warning("Playwright ffmpeg binary unavailable; falling back to screenshots + trace without video recording.")
                     video_enabled = False
                     await context.close()
-                    context = await browser.new_context(
-                        viewport={"width": 1280, "height": 720},
-                        ignore_https_errors=True,
-                    )
+                    context_options.pop('record_video_dir', None)
+                    context_options.pop('record_video_size', None)
+                    if settings.get('session_mode') == 'persistent':
+                        context, channel = await self._launch_saved_context(pw, actual_headless, session_root, target_url, active_access_profile, context_options)
+                    else:
+                        context = await browser.new_context(**context_options)
                     page = await context.new_page()
                 else:
                     raise
@@ -504,35 +517,27 @@ class BrowserInspector:
             except Exception as exc:
                 logger.debug("Tracing start skipped: %s", exc)
 
+            if pause_for_user:
+                type(self)._active_session = dict(context=context, browser=browser, pw=pw, loop=asyncio.get_running_loop())
             page.set_default_timeout(15_000 if pause_for_user else 10_000)
 
             await self._emit("attach_network", 15, "Attaching Network Listeners")
             self._attach_listeners(context, page, interactive_mode=pause_for_user)
+            from core.browser_session import AuthenticationGuard
+            self.auth_guard = AuthenticationGuard(page, settings)
 
-            await self._emit("navigate", 25, f"Navigating to URL: {target_url}")
-            self._current_action = "page_load"
-            await self._navigate(page, target_url)
-            await self._capture_step_screenshot(page, "Navigate to target application")
-
-            login_performed = False
-            login_locators: Dict[str, Dict[str, str]] = {}
-            if (
-                active_access_profile
-                and active_access_profile.strip() not in ("None (Public URL)", "NONE", "PUBLIC")
-                and account_credentials
-            ):
-                await self._emit(
-                    "auto_login",
-                    28,
-                    f"Checking login form for profile '{active_access_profile}'...",
-                )
-                login_performed, login_locators = await self._perform_auto_login(
-                    page, active_access_profile, account_credentials
-                )
-                if login_performed:
-                    await self._capture_step_screenshot(
-                        page, f"Authenticate as {active_access_profile}"
-                    )
+            from core.flow_parser import parse_flow
+            from core.flow_executor import execute_flow
+            steps = parsed_flow_steps or parse_flow(user_flow_text, target_url, active_access_profile)
+            login_performed, login_locators = False, {}
+            execution_steps = []
+            if not pause_for_user:
+                execution_steps, login_performed, login_locators = await execute_flow(
+                    self, page, target_url, steps, active_access_profile, account_credentials)
+            else:
+                await self._navigate(page, target_url)
+                if active_access_profile and account_credentials:
+                    login_performed, login_locators = await self._perform_auto_login(page, active_access_profile, account_credentials)
 
             if pause_for_user:
                 await self._emit(
@@ -556,14 +561,10 @@ class BrowserInspector:
             await self._capture_step_screenshot(active_page, "Verify interactive DOM components and readiness")
             await self._emit("extract_dom", 40, f"Extracted {len(elements)} interactive elements from active page")
 
-            probes: List[str] = []
-            if not pause_for_user:
-                await self._emit("flow_probes", 45, "Executing Safe Flow Probes & Capturing APIs")
-                probes = await self._run_flow_probes(active_page, target_url, user_flow_text, elements, live_locators)
-            else:
+            probes = [f"step:{r['step_order']}:{r['action_type']}" for r in execution_steps if r['status'] == 'passed']
+            if pause_for_user:
                 probes = ["manual:user_session_captured"]
-            if login_performed:
-                probes.insert(0, f"login:{active_access_profile}")
+            final_url = active_page.url
 
             self._current_action = "background"
             await self._wait_for_network_quiet(quiet_ms=500, timeout_ms=3_000)
@@ -608,9 +609,14 @@ class BrowserInspector:
                 if webm_files and webm_files[0].stat().st_size > 0:
                     video_path = str(webm_files[0].resolve())
 
-            await browser.close()
+            if browser:
+                await browser.close()
             await pw.stop()
+            if pause_for_user:
+                type(self)._active_session = None
         except Exception:
+            if pause_for_user:
+                type(self)._active_session = None
             # On unexpected failure, ensure cleanup
             try:
                 await context.close()
@@ -640,6 +646,11 @@ class BrowserInspector:
             final_screenshot_path=final_screenshot_path,
             video_path=video_path,
             trace_path=trace_path,
+            execution_steps=execution_steps,
+            execution_status=("failed" if any(r['status'] == 'failed' for r in execution_steps) else "passed") if execution_steps else "not_run",
+            duration_s=sum(r['duration_s'] for r in execution_steps),
+            final_url=final_url,
+            auth_diagnostics=self.auth_guard.diagnostics(),
         )
         await self._emit(
             "inspection_complete",
@@ -649,6 +660,25 @@ class BrowserInspector:
         return report
 
     # --------------------------------------------------------------- browser
+    async def _launch_saved_context(self, pw, headless, root, url, role, options):
+        from core.browser_session import profile_directory
+        errors = []
+        for channel in self.channels:
+            directory = profile_directory(root or Path.cwd(), url, role, channel or 'chromium')
+            directory.mkdir(parents=True, exist_ok=True)
+            try:
+                context = await pw.chromium.launch_persistent_context(str(directory), channel=channel, headless=headless, timeout=15000, **options)
+                return context, channel or 'chromium'
+            except Exception as exc:
+                if 'ffmpeg' in str(exc).lower() and 'record_video_dir' in options:
+                    options = {k:v for k,v in options.items() if k not in ('record_video_dir', 'record_video_size')}
+                    context = await pw.chromium.launch_persistent_context(str(directory), channel=channel, headless=headless, timeout=15000, **options)
+                    return context, channel or 'chromium'
+                if any(word in str(exc).lower() for word in ('singletonlock', 'already in use', 'processsingleton')):
+                    raise RuntimeError('The dedicated browser profile is in use. Close its other Studio run and try again.') from exc
+                errors.append(str(exc).splitlines()[0])
+        raise RuntimeError('Could not open a dedicated browser profile: ' + '; '.join(errors))
+
     async def _launch_browser(self, pw: Playwright, headless: bool) -> Tuple[Browser, str]:
         errors: List[str] = []
         for channel in self.channels:
@@ -704,6 +734,15 @@ class BrowserInspector:
     ) -> Tuple[bool, Dict[str, Dict[str, str]]]:
         """Detect login form and authenticate using the active profile's credentials."""
         from core.workspace_manager import WorkspaceManager
+
+        await self.auth_guard.wait_for_entry()
+        # Reuse is allowed only after verifying an explicit logged-in marker.
+        if not await self.auth_guard.password_visible():
+            try:
+                await self.auth_guard.wait_for_login(reused=True)
+                return True, {}
+            except AssertionError:
+                return False, {}
 
         norm_role = WorkspaceManager.normalize_role(active_access_profile)
         creds = account_credentials.get(norm_role) or account_credentials.get(active_access_profile)
@@ -784,11 +823,7 @@ class BrowserInspector:
             else:
                 await pwd_loc.press("Enter")
 
-            try:
-                await page.wait_for_load_state("networkidle", timeout=4_000)
-            except Exception:
-                await self._wait_for_network_quiet(quiet_ms=500, timeout_ms=2_000)
-
+            await self.auth_guard.wait_for_login()
             logger.info("Auto-login executed for profile '%s'.", norm_role)
             return True, login_locators
         except Exception as exc:

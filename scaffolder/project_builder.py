@@ -11,6 +11,7 @@ import os
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
+from scaffolder.flow_codegen import build_flow_test
 from core.report_generator import EnterpriseReportGenerator, derive_app_display_name
 from core.workspace_manager import WorkspaceManager
 from scaffolder.template_registry import TemplateRegistry, to_pascal_case, to_snake_case
@@ -22,10 +23,21 @@ class ProjectScaffolder:
     def __init__(self, registry: TemplateRegistry = None) -> None:
         self.registry = registry or TemplateRegistry()
 
+    def _render_file(self, template, context, raw_content=''):
+        if template.endswith('_test_scenario_1'):
+            return build_flow_test(context, template.split('_')[0])
+        if template == 'python_conftest':
+            return (Path(__file__).parent / 'runtime_pytest.py').read_text(encoding='utf-8')
+        if template in ('java_base_test', 'java_report_listener'):
+            filename = 'BaseTest.java' if template == 'java_base_test' else 'EnterpriseReportListener.java'
+            return (Path(__file__).parent / 'java_runtime' / filename).read_text(encoding='utf-8')
+        return self.registry.render(template, context) if template else raw_content
+
     def build_context(self, state: Dict[str, Any]) -> Dict[str, Any]:
         """Prepare template rendering context from AgentState."""
         report = state.get("inspection_report", {})
-        elements = report.get("elements", [])
+        elements = [dict(element, code_name=f"{element.get('text_or_label') or 'element'}_{index}")
+                    for index, element in enumerate(report.get("elements", []), 1)]
         apis = report.get("captured_apis", [])
         scenarios = state.get("test_scenarios", [])
 
@@ -105,7 +117,8 @@ class ProjectScaffolder:
             "flow_slug": flow_slug,
             "flow_pascal": flow_pascal,
             "active_access_profile": active_access_profile,
-            "login_locators": report.get("login_locators", {}),
+            "login_locators": {field: {lang: code.removeprefix('page.') for lang, code in locators.items()}
+                               for field, locators in report.get("login_locators", {}).items()},
         }
 
     def scaffold_project(self, output_dir: str, state: Dict[str, Any]) -> List[str]:
@@ -117,6 +130,7 @@ class ProjectScaffolder:
         created_files: List[str] = []
 
         wm = WorkspaceManager(out_path)
+        wm.state['browser_settings'] = state.get('browser_settings', {})
         for role, creds in (state.get("account_credentials") or {}).items():
             if isinstance(creds, dict):
                 pw = creds.get("password", "")
@@ -130,6 +144,8 @@ class ProjectScaffolder:
         flow_slug = context["flow_slug"]
         flow_pascal = context["flow_pascal"]
         active_profile = context["active_access_profile"]
+        existing_java = out_path / 'Java_Playwright/src/test/java/com/corp/qa/tests'
+        context['java_test_classes'] = sorted({p.stem for p in existing_java.glob('Test[0-9]*.java')} | {f'Test{seq_str}{flow_pascal}'})
 
         # -------------------------------------------------------------------
         # 0. .env, .env.example, access-profiles.json, .gitignore
@@ -170,18 +186,21 @@ class ProjectScaffolder:
                 (py_root / "pages" / "login_page.py", "python_login_page", ""),
                 (py_root / "pages" / "app_page.py", "python_app_page", ""),
                 (py_root / "tests" / "__init__.py", "", ""),
-                (py_root / "tests" / "test_automation_suite.py", "python_test_suite", ""),
                 (py_root / "tests" / f"{seq_str}_{flow_slug}.py", "python_test_scenario_1", ""),
-                (py_root / "tests" / "test_ui_sanity_check.py", "python_test_scenario_2", ""),
-                (py_root / "tests" / "test_api_contract_matrix.py", "python_test_scenario_3", ""),
                 (py_root / "conftest.py", "python_conftest", ""),
                 (py_root / "pytest.ini", "python_pytest_ini", ""),
                 (py_root / "requirements.txt", "python_requirements", ""),
             ]
             for file_path, tpl_name, raw_content in files:
-                content = self.registry.render(tpl_name, context) if tpl_name else raw_content
+                content = self._render_file(tpl_name, context, raw_content)
                 file_path.write_text(content, encoding="utf-8")
                 created_files.append(str(file_path))
+
+        if "Python" in target_langs:
+            import core.report_generator as renderer
+            renderer_path = py_root / "report_renderer.py"
+            renderer_path.write_text(Path(renderer.__file__).read_text(encoding='utf-8'), encoding='utf-8')
+            created_files.append(str(renderer_path))
 
         # -------------------------------------------------------------------
         # 3. Java Playwright Suite (Maven + TestNG)
@@ -203,13 +222,10 @@ class ProjectScaffolder:
                 (pages_dir / "LoginPage.java", "java_login_page", ""),
                 (pages_dir / "AppPage.java", "java_app_page", ""),
                 (tests_dir / "BaseTest.java", "java_base_test", ""),
-                (tests_dir / "AutomationSuiteTest.java", "java_test_suite", ""),
                 (tests_dir / f"Test{seq_str}{flow_pascal}.java", "java_test_scenario_1", ""),
-                (tests_dir / "TestUiSanityCheck.java", "java_test_scenario_2", ""),
-                (tests_dir / "TestApiContractMatrix.java", "java_test_scenario_3", ""),
             ]
             for file_path, tpl_name, raw_content in files:
-                content = self.registry.render(tpl_name, context) if tpl_name else raw_content
+                content = self._render_file(tpl_name, context, raw_content)
                 file_path.write_text(content, encoding="utf-8")
                 created_files.append(str(file_path))
 
@@ -227,13 +243,10 @@ class ProjectScaffolder:
                 (ts_root / "enterprise-reporter.js", "js_enterprise_reporter", ""),
                 (ts_root / "pages" / "LoginPage.ts", "ts_login_page", ""),
                 (ts_root / "pages" / "AppPage.ts", "ts_app_page", ""),
-                (ts_root / "tests" / "automation_suite.spec.ts", "ts_test_suite", ""),
                 (ts_root / "tests" / f"{seq_str}_{flow_slug}.spec.ts", "ts_test_scenario_1", ""),
-                (ts_root / "tests" / "ui_sanity_check.spec.ts", "ts_test_scenario_2", ""),
-                (ts_root / "tests" / "api_contract_matrix.spec.ts", "ts_test_scenario_3", ""),
             ]
             for file_path, tpl_name, raw_content in files:
-                content = self.registry.render(tpl_name, context) if tpl_name else raw_content
+                content = self._render_file(tpl_name, context, raw_content)
                 file_path.write_text(content, encoding="utf-8")
                 created_files.append(str(file_path))
 
@@ -251,19 +264,30 @@ class ProjectScaffolder:
                 (js_root / "enterprise-reporter.js", "js_enterprise_reporter", ""),
                 (js_root / "pages" / "LoginPage.js", "js_login_page", ""),
                 (js_root / "pages" / "AppPage.js", "js_app_page", ""),
-                (js_root / "tests" / "automation_suite.spec.js", "js_test_suite", ""),
                 (js_root / "tests" / f"{seq_str}_{flow_slug}.spec.js", "js_test_scenario_1", ""),
-                (js_root / "tests" / "ui_sanity_check.spec.js", "js_test_scenario_2", ""),
-                (js_root / "tests" / "api_contract_matrix.spec.js", "js_test_scenario_3", ""),
             ]
             for file_path, tpl_name, raw_content in files:
-                content = self.registry.render(tpl_name, context) if tpl_name else raw_content
+                content = self._render_file(tpl_name, context, raw_content)
                 file_path.write_text(content, encoding="utf-8")
                 created_files.append(str(file_path))
 
         # -------------------------------------------------------------------
         # 6. Enterprise Complete-Suite-Test-Report Generation (Phase 7)
         # -------------------------------------------------------------------
+        for language in target_langs:
+            folder = out_path / (language + '_Playwright')
+            if language == 'Python':
+                assets = [('runtime_auth.py', folder / 'auth_session.py')]
+            elif language in ('TypeScript', 'JavaScript'):
+                assets = [('runtime_session.js', folder / 'session-fixtures.js')]
+            elif language == 'Java':
+                assets = [('java_runtime/SessionGuard.java', folder / 'src/test/java/com/corp/qa/tests/SessionGuard.java')]
+            else:
+                assets = []
+            for source, destination in assets:
+                destination.write_text((Path(__file__).parent / source).read_text(encoding='utf-8'), encoding='utf-8')
+                created_files.append(str(destination))
+
         report_gen = EnterpriseReportGenerator(out_path)
         created_files.extend(report_gen.generate_from_agent_state(state))
 

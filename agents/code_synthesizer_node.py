@@ -73,6 +73,7 @@ def project_scaffolder_node(state: AgentState) -> Dict[str, Any]:
     else:
         from core.workspace_manager import WorkspaceManager
         wm = WorkspaceManager(output_dir)
+        wm.state['browser_settings'] = state.get('browser_settings', {})
         for role, creds in (state.get("account_credentials") or {}).items():
             if isinstance(creds, dict):
                 pw = creds.get("password", "")

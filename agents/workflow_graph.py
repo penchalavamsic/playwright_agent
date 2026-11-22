@@ -43,18 +43,29 @@ async def browser_inspector_node(state: AgentState) -> Dict[str, Any]:
             pass
 
     inspector = BrowserInspector()
-    report = await inspector.inspect_url(
-        target_url=target_url,
-        user_flow_text=user_flow_text,
-        headless=headless,
-        progress_callback=scaled_progress,
-        pause_for_user=interactive_mode,
-        capture_trigger=capture_trigger,
-        active_access_profile=state.get("active_access_profile", ""),
-        account_credentials=state.get("account_credentials", {}),
-    )
+    try:
+        report = await inspector.inspect_url(
+            target_url=target_url,
+            user_flow_text=user_flow_text,
+            headless=headless,
+            progress_callback=scaled_progress,
+            pause_for_user=interactive_mode,
+            capture_trigger=capture_trigger,
+            active_access_profile=state.get("active_access_profile", ""),
+            account_credentials=state.get("account_credentials", {}),
+            parsed_flow_steps=state.get("parsed_flow_steps"),
+            browser_settings=state.get('browser_settings', {}),
+            session_root=state.get('output_dir', ''),
+        )
+    except Exception as exc:
+        from core.models import InspectionReport
+        steps = [dict(step, status='failed' if i == 0 else 'skipped',
+                      duration_s=0.0, error=str(exc) if i == 0 else 'Browser inspection could not complete.', locators={})
+                 for i, step in enumerate(state.get('parsed_flow_steps') or [dict(step_order=1, action_type='NAVIGATE', target_keyword=target_url, input_value=target_url)])]
+        report = InspectionReport(target_url=target_url, execution_status='failed', execution_steps=steps)
 
-    return {"inspection_report": report.model_dump()}
+    return {"inspection_report": report.model_dump(),
+            "errors": list(state.get("errors", [])) + [r["error"] for r in report.execution_steps if r["status"] == "failed"]}
 
 
 def build_workflow_graph() -> Any:

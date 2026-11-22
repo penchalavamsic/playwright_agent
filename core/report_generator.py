@@ -149,8 +149,8 @@ class EnterpriseReportGenerator:
         primary_api = apis[0] if apis else {
             "method": "GET",
             "url": target_url or "/api",
-            "status_code": 200,
-            "triggered_by_action": "Page navigation",
+            "status_code": "Not observed",
+            "triggered_by_action": "No API response captured",
         }
         parsed_path = urlparse(primary_api.get("url", "")).path or "/"
 
@@ -172,7 +172,15 @@ class EnterpriseReportGenerator:
                     "Verify core interactive components and API contract",
                 ]
 
-            duration_s = round(1.45 + 0.35 * len(step_descriptions), 2)
+            executed = idx == 1 and bool(report.get("execution_steps"))
+            status = report.get("execution_status", "not_run") if executed else "not_run"
+            duration_s = report.get("duration_s", 0.0) if executed else 0.0
+            execution_steps = report.get("execution_steps", []) if executed else []
+            if executed:
+                step_descriptions = [f"{r['action_type']} {r['target_keyword']} - {r['status'].upper()}" for r in execution_steps]
+            error = "\n".join(r.get("error", "") for r in execution_steps if r.get("status") == "failed")
+            if not executed:
+                error = "Planned scenario only; not executed. Inspection evidence is not proof that this scenario passed."
             jira_heading = f'"{module_name}" → "{clean_page}" → "{sc_title}"'
 
             # Write per-test Evidence files (copying real Playwright screenshots, video.webm, trace.zip)
@@ -186,10 +194,10 @@ class EnterpriseReportGenerator:
                 steps=step_descriptions,
                 primary_api=primary_api,
                 all_apis=apis,
-                real_step_screenshots=real_step_screenshots,
-                real_final_screenshot=real_final_screenshot,
-                real_video_path=real_video_path,
-                real_trace_path=real_trace_path,
+                real_step_screenshots=real_step_screenshots if executed else [],
+                real_final_screenshot=real_final_screenshot if executed else "",
+                real_video_path=real_video_path if executed else "",
+                real_trace_path=real_trace_path if executed else "",
                 created_files=created_files,
             )
 
@@ -202,16 +210,18 @@ class EnterpriseReportGenerator:
                     "module": module_name,
                     "page": clean_page,
                     "profile": profile,
-                    "status": "passed",
+                    "status": status,
                     "duration_s": duration_s,
-                    "actual_duration_s": round(max(0.8, duration_s - 0.45), 2),
-                    "final_route": parsed_path,
-                    "spec_path": f"tests/{seq_num:03d}_{slug}.spec.ts",
+                    "actual_duration_s": duration_s,
+                    "execution_steps": execution_steps,
+                    "auth_diagnostics": report.get('auth_diagnostics', {}) if executed else {},
+                    "final_route": report.get("final_url", "") if executed else "",
+                    "spec_path": "See numbered flow test in the selected language folder" if idx == 1 else "Not generated (advisory plan)",
                     "plan_rel_path": case_evidence["plan_rel_path"],
                     "plan_filename": case_evidence["plan_filename"],
                     "plan_markdown": case_evidence["plan_markdown"],
                     "purpose": f"Verify {sc_title} for {app_display_name} ({clean_page}) under access profile {profile}.",
-                    "expected_result": f"All UI locators resolve uniquely and backend endpoints return HTTP {primary_api.get('status_code', 200)}.",
+                    "expected_result": "All explicitly requested actions and assertions complete in order.",
                     "steps": step_descriptions,
                     "step_screenshots": case_evidence["step_screenshots"],
                     "final_screenshot": case_evidence["final_screenshot"],
@@ -221,8 +231,8 @@ class EnterpriseReportGenerator:
                     "api_pathname": parsed_path,
                     "api_status": primary_api.get("status_code", 200),
                     "api_trigger": primary_api.get("triggered_by_action", "Page navigation"),
-                    "captured_apis": apis[:10],
-                    "error_message": "",
+                    "captured_apis": apis if executed else [],
+                    "error_message": error,
                 }
             )
 
@@ -233,6 +243,16 @@ class EnterpriseReportGenerator:
             try:
                 old_data = json.loads(summary_json_path.read_text(encoding="utf-8"))
                 existing_cases = list(old_data.get("test_cases", []))
+                if old_data.get('schema_version', 0) < 2:
+                    for case in existing_cases:
+                        case['legacy_reported_status'] = case.get('status', 'unknown')
+                        case['status'] = 'not_run'
+                        case['duration_s'] = 0.0
+                        case['actual_duration_s'] = 0.0
+                        case['error_message'] = 'Legacy report: execution provenance unavailable. Regenerate this flow to verify its result.'
+                        case['step_screenshots'] = []
+                        for key in ('final_screenshot', 'video_rel_path', 'trace_rel_path'):
+                            case[key] = ''
             except Exception:
                 existing_cases = []
 
@@ -245,12 +265,14 @@ class EnterpriseReportGenerator:
         passed_count = sum(1 for c in all_cases if c.get("status") == "passed")
         failed_count = sum(1 for c in all_cases if c.get("status") == "failed")
         flaky_count = sum(1 for c in all_cases if c.get("status") == "flaky")
-        skipped_count = sum(1 for c in all_cases if c.get("status") == "skipped")
+        skipped_count = sum(1 for c in all_cases if c.get("status") in ("skipped", "not_run"))
         total_duration = round(sum(float(c.get("duration_s", 0.0)) for c in all_cases), 2)
-        pass_rate = round((passed_count / total_count) * 100.0, 1) if total_count else 100.0
+        executed_count = passed_count + failed_count
+        pass_rate = round((passed_count / executed_count) * 100.0, 1) if executed_count else 0.0
         date_str = datetime.datetime.now().strftime("%Y-%m-%d")
 
         summary_payload = {
+            "schema_version": 2,
             "report_title": f"{app_display_name} Detailed Test Evidence Report — {domain_label} — {profile}",
             "app_display_name": app_display_name,
             "domain_label": domain_label,
@@ -331,7 +353,7 @@ priority: "High"
 classification: "Read-only"
 test_type: "Positive"
 automation_candidate: true
-plan_status: "reviewed"
+plan_status: "generated"
 script_status: "generated"
 environment_variables:
   - BASE_URL
@@ -362,7 +384,7 @@ Use environment variables and runtime fixtures.
 - Request URL: `${{BASE_URL}}{api_path}`
 - HTTP Method: {api_method}
 - Expected Status: {api_status}
-- Payload Presence: Verified response payload
+- Payload Presence: See observed telemetry; not independently asserted
 - Visible UI Result: Interactive controls visible and responsive
 
 # Expected Final Result
@@ -381,9 +403,7 @@ All steps and network status assertions succeed for {test_id}.
 
 # Generation Status
 
-- Test script generation: Complete
-- CI/CD execution: Ready
-- Healing: Ready
+- Generated plan; execution status is recorded separately in the report.
 """
         plan_path.write_text(plan_md, encoding="utf-8")
         created_files.append(str(plan_path))
@@ -402,75 +422,27 @@ All steps and network status assertions succeed for {test_id}.
             if real_final_screenshot and Path(real_final_screenshot).exists() and Path(real_final_screenshot).stat().st_size > 0
             else (Path(valid_real_steps[-1]["file_path"]) if valid_real_steps else None)
         )
-        fallback_png_bytes: Optional[bytes] = None
+        # Preserve capture labels and order; never relabel one image as several steps.
+        for i, shot in enumerate(valid_real_steps, start=1):
+            name = f"{i:02d}-step.png"
+            dest = case_ss_dir / name
+            shutil.copy2(shot['file_path'], dest)
+            created_files.append(str(dest))
+            step_screenshots.append({"rel_path": f"Evidence/Screenshots/{test_id}/{name}",
+                                     "caption": shot.get('step_name', f'Step {i}')})
 
-        for i, st in enumerate(steps[:6], start=1):
-            st_slug = _slugify(st, max_len=40)
-            ss_name = f"{i:02d}-{st_slug}.png"
-            ss_path = case_ss_dir / ss_name
-            if valid_real_steps:
-                src_png = Path(valid_real_steps[min(i - 1, len(valid_real_steps) - 1)]["file_path"])
-                shutil.copy2(src_png, ss_path)
-            elif valid_real_final:
-                shutil.copy2(valid_real_final, ss_path)
-            else:
-                if fallback_png_bytes is None:
-                    fallback_png_bytes = generate_offline_png()
-                ss_path.write_bytes(fallback_png_bytes)
-            created_files.append(str(ss_path))
-            step_screenshots.append(
-                {
-                    "rel_path": f"Evidence/Screenshots/{test_id}/{ss_name}",
-                    "caption": f"{i:02d} {_title_case_slug(st_slug)}",
-                }
-            )
+        def copy_real(source, folder, filename):
+            if not source or not Path(source).is_file() or Path(source).stat().st_size == 0:
+                return ""
+            dest = self.report_dir / "Evidence" / folder / test_id / filename
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, dest)
+            created_files.append(str(dest))
+            return dest.relative_to(self.report_dir).as_posix()
 
-        final_ss_path = case_ss_dir / "final-screenshot.png"
-        if valid_real_final:
-            shutil.copy2(valid_real_final, final_ss_path)
-        else:
-            if fallback_png_bytes is None:
-                fallback_png_bytes = generate_offline_png()
-            final_ss_path.write_bytes(fallback_png_bytes)
-        created_files.append(str(final_ss_path))
-        final_ss_rel = f"Evidence/Screenshots/{test_id}/final-screenshot.png"
-
-        # 3. Screen Recording (Copy real recorded Playwright .webm file when available)
-        case_rec_dir = self.recording_dir / test_id
-        case_rec_dir.mkdir(parents=True, exist_ok=True)
-        video_path = case_rec_dir / "video.webm"
-        if real_video_path and Path(real_video_path).exists() and Path(real_video_path).stat().st_size > 0:
-            shutil.copy2(Path(real_video_path), video_path)
-        elif not video_path.exists():
-            video_path.write_bytes(
-                b"\x1a\x45\xdf\xa3\x01\x00\x00\x00\x00\x00\x00\x1f\x42\x82\x84webm\x42\x87\x81\x02\x42\x85\x81\x02"
-            )
-        created_files.append(str(video_path))
-        video_rel = f"Evidence/Recording/{test_id}/video.webm"
-
-        # 4. Trace zip archive (Copy real Playwright trace.zip when available)
-        case_trace_dir = self.trace_dir / test_id
-        case_trace_dir.mkdir(parents=True, exist_ok=True)
-        trace_path = case_trace_dir / "trace.zip"
-        if real_trace_path and Path(real_trace_path).exists() and Path(real_trace_path).stat().st_size > 0:
-            shutil.copy2(Path(real_trace_path), trace_path)
-        elif not trace_path.exists():
-            with zipfile.ZipFile(trace_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
-                zf.writestr(
-                    "trace.json",
-                    json.dumps(
-                        {
-                            "test_id": test_id,
-                            "title": title,
-                            "profile": profile,
-                            "steps": steps,
-                            "captured_apis": all_apis[:10],
-                        },
-                        indent=2,
-                    ),
-                )
-        created_files.append(str(trace_path))
-        trace_rel = f"Evidence/Trace/{test_id}/trace.zip"
+        final_ss_rel = copy_real(str(valid_real_final) if valid_real_final else '', 'Screenshots', 'final-screenshot.png')
+        video_rel = copy_real(real_video_path, 'Recording', 'video.webm')
+        trace_rel = copy_real(real_trace_path, 'Trace', 'trace.zip')
 
         return {
             "plan_rel_path": plan_rel_path,
@@ -501,8 +473,8 @@ All steps and network status assertions succeed for {test_id}.
         cards_html: List[str] = []
         for idx, tc in enumerate(test_cases):
             card_id = f"test-{idx}"
-            status = (tc.get("status") or "passed").lower()
-            status_cls = "failed" if status == "failed" else "passed"
+            status = (tc.get("status") or "not_run").lower()
+            status_cls = status if status in ("passed", "failed", "skipped", "not_run", "flaky") else "not_run"
             status_badge = status.upper()
             tc_id = html.escape(str(tc.get("test_id", f"TC-{idx+1:03d}")))
             tc_title = html.escape(str(tc.get("title", "")))
@@ -593,6 +565,8 @@ All steps and network status assertions succeed for {test_id}.
             final_route = html.escape(str(tc.get("final_route", "/")))
             err_msg = str(tc.get("error_message", "")).strip()
             err_block = f'<div class="errors"><h4>Failure Details</h4><pre>{html.escape(err_msg)}</pre></div>' if err_msg else ""
+            auth = tc.get('auth_diagnostics', {})
+            auth_block = ('<div class="auth-diagnostics"><h4>Authentication and session diagnostics</h4><pre>' + html.escape(json.dumps(auth, indent=2)) + '</pre></div>') if auth else ''
 
             cards_html.append(
                 f"""  <div class="test-card {status_cls}" id="{card_id}" data-status="{status_cls}">
@@ -617,13 +591,14 @@ All steps and network status assertions succeed for {test_id}.
         <h4>Test Plan</h4>
         <p>{plan_html_lines}</p>
       </div>
-      {ss_grid_block}
+      {ss_grid_block or "<p>No step screenshots captured for this scenario.</p>"}
       {final_ss_block}
-      {video_block}
+      {video_block or "<p>No recording available for this scenario.</p>"}
       <div class="api-summary"><h4>API / Navigation Summary</h4><h2>API / Navigation Summary</h2><p><strong>Method:</strong> {api_method}<br><strong>Pathname:</strong> {api_pathname}<br><strong>Status:</strong> {api_status}<br><strong>Trigger:</strong> {api_trigger}</p>{api_table_html}</div>
-      {trace_block}
-      <div class="actual-result"><h4>Actual Result</h4><h2>Actual Result</h2><p><strong>Status:</strong> {status}<br><strong>Duration:</strong> {actual_dur}<br><strong>Final Route:</strong> {final_route}</p><p>{"All assertions completed successfully." if status == "passed" else "One or more assertions failed."}</p></div>
+      {trace_block or "<p>No trace captured for this scenario.</p>"}
+      <div class="actual-result"><h4>Actual Result</h4><h2>Actual Result</h2><p><strong>Status:</strong> {status}<br><strong>Duration:</strong> {actual_dur}<br><strong>Final Route:</strong> {final_route}</p><p>{"All assertions completed successfully." if status == "passed" else ("One or more steps failed; remaining steps were skipped." if status == "failed" else "This scenario has not been executed.")}</p></div>
       {err_block}
+      {auth_block}
     </div>
   </div>"""
             )
@@ -672,6 +647,7 @@ body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background
 .test-header:hover {{ background: #f0f0f0; }}
 .test-status {{ padding: 2px 10px; border-radius: 12px; font-size: 0.75em; font-weight: bold; white-space: nowrap; }}
 .test-status.passed {{ background: #e8f5e9; color: #2e7d32; }}
+.test-status.not_run, .test-status.skipped {{ background: #fff3cd; color: #856404; }}
 .test-status.failed {{ background: #ffebee; color: #c62828; }}
 .test-duration {{ color: #666; font-size: 0.85em; min-width: 60px; text-align: right; white-space: nowrap; }}
 .expand-icon {{ transition: transform 0.2s; }}
@@ -719,7 +695,7 @@ a {{ color: #1976d2; }}
     <div class="summary-card passed"><div class="summary-value">{passed}</div><div class="summary-label">Passed</div></div>
     <div class="summary-card failed"><div class="summary-value">{failed}</div><div class="summary-label">Failed</div></div>
     <div class="summary-card"><div class="summary-value">{flaky}</div><div class="summary-label">Flaky</div></div>
-    <div class="summary-card"><div class="summary-value">{skipped}</div><div class="summary-label">Skipped</div></div>
+    <div class="summary-card"><div class="summary-value">{skipped}</div><div class="summary-label">Not run / Skipped</div></div>
     <div class="summary-card passed"><div class="summary-value">{pass_rate}%</div><div class="summary-label">Pass Rate</div></div>
     <div class="summary-card"><div class="summary-value">{duration_s:.2f}s</div><div class="summary-label">Duration</div></div>
     <div class="summary-card"><div class="summary-value">{date_str}</div><div class="summary-label">Date</div></div>
@@ -733,6 +709,7 @@ a {{ color: #1976d2; }}
       <button class="filter-btn active" onclick="filterCards('all', this)">All ({total})</button>
       <button class="filter-btn" onclick="filterCards('passed', this)">Passed ({passed})</button>
       <button class="filter-btn" onclick="filterCards('failed', this)">Failed ({failed})</button>
+      <button class="filter-btn" onclick="filterCards('not_run', this)">Not run</button>
     </div>
     <input type="text" id="card-search" class="search-input" placeholder="Filter by Test ID or Title..." oninput="searchCards(this.value)">
   </div>
@@ -744,21 +721,17 @@ function toggleExpand(id) {{
   document.getElementById(id).classList.toggle('expanded');
 }}
 function filterCards(status, btn) {{
+  window.reportStatus = status;
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
-  document.querySelectorAll('.test-card').forEach(card => {{
-    if (status === 'all' || card.getAttribute('data-status') === status) {{
-      card.style.display = '';
-    }} else {{
-      card.style.display = 'none';
-    }}
-  }});
+  searchCards(document.getElementById('card-search').value);
 }}
 function searchCards(query) {{
   const q = (query || '').toLowerCase();
   document.querySelectorAll('.test-card').forEach(card => {{
     const text = card.innerText.toLowerCase();
-    card.style.display = text.includes(q) ? '' : 'none';
+    const status = window.reportStatus || 'all';
+    card.style.display = text.includes(q) && (status === 'all' || card.dataset.status === status) ? '' : 'none';
   }});
 }}
 </script>

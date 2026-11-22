@@ -43,6 +43,7 @@ class WorkspaceManager:
             "last_sequence_number": 0,
             "history": [],
             "accounts": {},
+            "browser_settings": {},
         }
         self._load_if_exists()
 
@@ -124,6 +125,7 @@ class WorkspaceManager:
                 self.state["last_sequence_number"] = int(data.get("last_sequence_number", 0))
                 self.state["history"] = list(data.get("history", []))
                 self.state["accounts"] = dict(data.get("accounts", {}))
+                self.state["browser_settings"] = dict(data.get("browser_settings", {}))
                 return True
         except Exception:
             pass
@@ -234,6 +236,9 @@ class WorkspaceManager:
         """Generate/update `.env`, `.env.example`, `access-profiles.json`, and `.gitignore`."""
         self.project_root.mkdir(parents=True, exist_ok=True)
         written: List[str] = []
+        settings_path = self.project_root / 'browser-settings.json'
+        settings_path.write_text(json.dumps(self.state.get('browser_settings', {}), indent=2), encoding='utf-8')
+        written.append(str(settings_path))
 
         url = (target_url or self.state.get("target_url", "")).strip()
         if url:
@@ -303,6 +308,7 @@ class WorkspaceManager:
         # 3. Write / update .gitignore
         gitignore_path = self.project_root / self.GITIGNORE_FILE
         required_ignores = [
+            ".browser_profiles/",
             ".env",
             ".qa_studio_project.json",
             "__pycache__/",

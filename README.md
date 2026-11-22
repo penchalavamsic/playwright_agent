@@ -1,179 +1,150 @@
-# Offline Playwright Enterprise QA Agent Studio
+# Playwright Enterprise QA Agent Studio
 
-A **100% Offline, Zero-API Windows Desktop Agent** that deterministically inspects live web applications, captures real screenshots, screen recordings (`.webm`), and Playwright traces (`trace.zip`), and synthesizes complete corporate Page Object Model (POM) automation suites in **Python**, **Java**, **TypeScript**, and **JavaScript** alongside **IEEE 829 Standard Test Plans** and **Self-Contained Enterprise Test Evidence Reports**.
+Windows desktop tooling for executing explicit browser flows, capturing real evidence, and generating Python, Java, TypeScript and JavaScript Playwright projects. The Studio does not call an LLM or external AI API. It uses a deterministic flow grammar.
 
----
+## Run the corrected application
 
-## 🌟 Key Corporate Architectural Features
+[Download the latest Windows build from GitHub Releases](https://github.com/penchalavamsic/playwright_agent/releases/latest).
 
-- **100% Offline & Zero-API**: Zero external LLM API calls, zero cloud dependencies, zero external CDN links in generated reports, and zero local model weights. Everything runs locally on the Windows workstation via deterministic rule-based parsing and Jinja2 synthesis.
-- **Enterprise Browser Re-use & Bundled Media Runtime**: Connects directly to pre-installed Microsoft Edge (`channel="msedge"`) or Google Chrome (`channel="chrome"`), with Playwright's driver and `ffmpeg` bundled into the `.exe` for offline `.webm` video recording.
-- **Multi-Account `.env` & Role-Based Profile Switching (Phase 6)**:
-  - Local credential vault stored in `<project_root>/.qa_studio_project.json` (Base64-encoded passwords) and written to `.env`, `.env.example`, `access-profiles.json`, and `.gitignore`.
-  - Dynamic profile selection via GUI dropdown (`None (Public URL)`, `SUPER_USER`, `ADMIN`, `SUPER_USER_ADMIN_USER`, or any custom role) **or** automatic detection from user flow prompts (e.g., `"as super user..."`, `"login as admin..."`).
-  - Automated login execution during live browser inspection and zero hardcoded usernames, passwords, tokens, or URLs in any generated script or test plan (`BASE_URL` and `TEST_ACCESS_PROFILE` resolved dynamically at runtime).
-- **Timestamped & Multi-Day Persistent Workspaces**:
-  - New runs automatically create `<Output_Folder>/<sanitized_domain>_<YYYY-MM-DD_HH-MM-SS>/` (e.g., `saucedemo_com_2026-11-21_14-32-42/`).
-  - **📂 Open Existing Project** reloads an existing project's URL, saved role accounts, target languages, and sequential test counter (`001`, `002`, `003`, ...), appending new tests and IEEE 829 plan sections across multi-day runs without overwriting prior files.
-- **Interactive Persistent Session Mode**: Supports manual two-step workflows (Step A: keep visible browser open for SSO/MFA/OTP/multi-page navigation &rarr; Step B: capture active DOM state, screenshots, video, trace, and generate suites).
-- **Self-Contained Enterprise Test Evidence Reporting (Phase 7)**:
-  - Generates `Complete-Suite-Test-Report/index.html` with inline CSS/JS (zero external CDNs), executive KPI cards, filter/search controls, step-by-step screenshots, playable `video.webm` screen recordings, downloadable `trace.zip`, captured API status matrices, and per-test IEEE 829 plans.
-  - Dynamically resolves the target application name and domain (zero hardcoded app names).
-  - Embeds native screenshot, video, and report generation into all 4 generated Playwright frameworks (`conftest.py` for Python, `BaseTest.java` + `EnterpriseReportListener.java` for Java/TestNG, and `enterprise-reporter.js` for TypeScript/JavaScript).
-- **5-Node LangGraph State Machine**:
-  `START` &rarr; `IntentParser` &rarr; `BrowserInspector` &rarr; `TestPlanner` &rarr; `CodeSynthesizer` &rarr; `ProjectScaffolder` &rarr; `END`.
-- **CustomTkinter Desktop GUI**: Dark-themed desktop interface with thread-safe `queue.Queue` streaming, 5-node visual pipeline cards, live telemetry counters, **📂 Open Existing Project**, **🔑 Role-Based Access Profiles (.env)** vault, **📊 Open Test Report** launcher, and multi-tab output previewer.
-- **Standalone Windows Executable**: Packaged into `dist_release/PlaywrightEnterpriseQAStudio/PlaywrightEnterpriseQAStudio.exe` via PyInstaller.
+Source: `.\.venv\Scripts\python main.py`
 
----
+The verified Windows package is built separately under `dist_verified/PlaywrightEnterpriseQAStudio/`. Start `PlaywrightEnterpriseQAStudio.exe` there. Copy the **entire folder**, including `_internal`, to another machine. The older `dist_release` folder is not automatically updated.
 
-## 🏗️ Architecture & Module Organization
+The updated portable archive is `dist_verified/PlaywrightEnterpriseQAStudio-deployed-ready.zip`. It includes the simplified UI and deployed-site session controls. Extract it completely before starting the executable.
 
-```
-playwright_agent/
-│
-├── core/                                # Core Telemetry, Persistence & Reporting
-│   ├── models.py                        # Pydantic models (DOMElement, CapturedAPI, InspectionReport)
-│   ├── browser_inspector.py             # Playwright DOM inspector, auto-login, screenshots, video & trace capture
-│   ├── workspace_manager.py             # Phase 6: Multi-day .qa_studio_project.json, .env, access-profiles.json, domain+timestamp folders
-│   └── report_generator.py              # Phase 7: Self-contained offline Complete-Suite-Test-Report generator
-│
-├── agents/                              # LangGraph Deterministic Pipeline Nodes
-│   ├── state.py                         # AgentState TypedDict, ParsedFlowStep, TestScenarioSpec
-│   ├── intent_parser.py                 # IntentParserNode (Flow NLP tokenizer, role detector & output dir resolver)
-│   ├── planner_node.py                  # TestPlannerNode (Append-safe IEEE 829 Test Plan generator)
-│   ├── code_synthesizer_node.py         # CodeSynthesizerNode & ProjectScaffolderNode
-│   └── workflow_graph.py                # 5-node StateGraph pipeline definition
-│
-├── scaffolder/                          # Multi-Language Code Scaffolder
-│   ├── template_registry.py             # Jinja2 templates for Python, Java, TS, JS (LoginPage, BaseTest, reporters)
-│   └── project_builder.py               # Multi-language corporate repository & evidence builder
-│
-├── gui/                                 # Desktop Studio GUI
-│   └── app_window.py                    # CustomTkinter Studio (Project Loader, Role Vault, Interactive Mode, Report Launcher)
-│
-├── PLAN_TEMPLATE.md                     # Corporate IEEE 829 Test Plan template rules
-├── main.py                              # Desktop Application & CLI Entry Point
-├── build_exe.py                         # Automated PyInstaller packaging script (outputs to dist_release/)
-├── PlaywrightEnterpriseQAStudio.spec    # PyInstaller spec (bundles Playwright driver & ffmpeg)
-├── requirements.txt                     # Python dependencies
-│
-├── test_phase1.py                       # Phase 1: Browser Inspector & DOM Telemetry verification
-├── test_phase2.py                       # Phase 2: LangGraph Pipeline & IEEE 829 Planner verification
-├── test_phase3.py                       # Phase 3: Multi-Language POM Code Synthesizer verification
-├── test_phase4.py                       # Phase 4: CustomTkinter Desktop GUI verification
-├── test_interactive_mode.py             # Phase 4.1: Interactive Two-Step Session verification
-├── test_phase5.py                       # Phase 5: Standalone Executable smoke test
-├── test_phase6.py                       # Phase 6: Multi-Account .env & Multi-Day Workspace verification
-└── test_phase7.py                       # Phase 7: Self-Contained Enterprise Reporting & Real Media verification
+Install Edge or Chrome on the target machine. The Studio package includes the Playwright driver and available FFmpeg runtime. Missing video support is reported as unavailable; a fake recording is never substituted. Browser launch/policy errors are recorded as failures.
+
+## Try a complete local flow
+
+1. Click **Try demo**. This starts a disposable server on a free localhost port, loads the QA demo account, and fills the flow below.
+2. Click **Run test**. Use **Advanced settings** to change languages or the output folder. Python scripts and a test plan are included by default.
+3. Read the step outcomes in **Results**, or click **Open full report** for evidence. The primary flow should pass. The two additional advisory scenarios are **not run**, because generating a plan is not executing it.
+
+The main screen contains only the URL, login profile, flow, and run controls. **Edit** beside the profile opens account setup. Browser/session options, script languages and the results folder are under **Advanced settings**. Logs and technical counters are in **Details**; the test plan and source files have their own tabs.
+
+```text
+Login as QA;
+click "Tasks";
+click "New task";
+fill "Title" with "Office QA task";
+select "High" from "Priority";
+check "Notify team";
+click "Create task";
+verify API "/api/tasks" status code 201;
+verify "Task created"
 ```
 
----
+The demo account is `qa@example.test` / `local-demo-only`. It is only for this disposable local portal. The demo validates the title, priority, and checkbox values submitted to its API. It stores no real task data.
 
-## 🚀 Quickstart Guide
+For a standalone portal, run `.\.venv\Scripts\python -m core.demo_portal` and visit `http://127.0.0.1:8765`.
 
-### 1. Launching the Standalone Windows Desktop App
-Run the compiled executable directly (no Python installation required):
-```powershell
-& "E:\MySpace\Projects\playwright_agent\dist_release\PlaywrightEnterpriseQAStudio\PlaywrightEnterpriseQAStudio.exe"
-```
-Or launch from the Python virtual environment:
-```powershell
-.\.venv\Scripts\python.exe main.py
-```
+## Writing flows
 
-### 2. Running in Headless CLI Mode
-```powershell
-.\.venv\Scripts\python.exe main.py --cli --url "https://www.saucedemo.com" --flow "Search for 'backpack', click 'Cart' and verify 200 status code" --output "./Test"
-```
+Separate steps with semicolons, newlines, or `and` / `then` before another action. Quote labels and values containing punctuation or conjunctions. Numbered lines are supported.
 
-### 3. Rebuilding the Standalone `.exe`
-```powershell
-.\.venv\Scripts\python.exe build_exe.py
-```
-The compiled executable and bundled runtime are written to:
-`dist_release\PlaywrightEnterpriseQAStudio\PlaywrightEnterpriseQAStudio.exe`
+| Action | Example |
+| --- | --- |
+| Role login | `Login as ADMIN` |
+| Click | `click "Reports"` |
+| Fill | `fill "Email" with "qa@example.test"` |
+| Type | `enter "Sample title" into "Title"` |
+| Search and press Enter | `search for "Office QA task"` |
+| Native select | `select "High" from "Priority"` |
+| Checkbox | `check "Notify team"` / `uncheck "Notify team"` |
+| Keyboard | `press "Enter"` |
+| Navigate | `navigate to "/reports"` |
+| Visibility | `verify "Task created"` |
+| API status | `verify API "/api/tasks" status code 201` |
 
----
+Controls must match a unique visible label, ID, test ID, name, or placeholder. The DOM is read again after each action. The browser stays in the current journey instead of returning to the starting page between clicks. API assertions use responses associated with the preceding action; a successful login request cannot satisfy a later failing request.
 
-## 🧪 Verification Suites
+Unknown instructions, missing controls, ambiguous controls, failed login, and failed assertions fail the flow and skip dependent steps. They are not silently replaced with guessed actions. Arbitrary prose such as "test everything" is not supported. Custom dropdowns can be expressed as clicks; iframe traversal, popup switching, file uploads and arbitrary business assertions are not currently part of the automated grammar.
+
+Use **Advanced settings → Manual browser session** for manual SSO/MFA and exploration, then **Capture and generate**. This records inspection evidence; it does **not** certify that the requested flow passed or reconstruct the manual journey. Review generated tests before relying on them.
+
+## Deployed URLs and login loops
+
+HTTP and HTTPS targets use the same flow runner. Start with **Advanced settings → Browser session → Fresh (incognito-like)** when a site works only in incognito. Each run gets a clean context, while every step within that run shares the same context and cookies.
+
+Choose **Saved profile (normal)** when the application needs a remembered session. The Studio creates its own profile scoped to the target origin, role and browser; it does not use your personal browser profile. For saved sessions, set **Authenticated path** (for example `/dashboard`) or a CSS selector visible only after login. These markers verify the session before reusing it. Both markers must match if both are set. For SSO/MFA, use a saved profile in a manual browser session, sign in, capture and close the browser, then run the automated flow with the same project and role. Site-specific SSO behavior still needs validation against that site.
+
+Login waits for delayed SPA forms and a stable authenticated page (2.5 seconds by default). A return to the login form fails the flow and skips dependent steps; the runner does not repeatedly submit credentials. It also checks for session loss between flow actions. The report includes sanitized navigation paths and HTTP 401/403 responses to help diagnose the redirect. The stability window is finite; it cannot guarantee a session will remain valid indefinitely.
+
+Settings are saved in `browser-settings.json` and the workspace. Generated Python, JavaScript, TypeScript and Java suites apply the same session policy, each with a separate local profile directory. Do not run concurrent processes against one saved profile. `.browser_profiles/` contains authentication state and is excluded from version control.
+
+CLI settings: `--session-mode fresh|persistent`, `--auth-success-path /dashboard`, `--auth-success-selector "[data-testid=account-menu]"`, `--auth-timeout 15`, and `--auth-settle 2.5` (times in seconds).
+
+Session isolation cannot repair a deployed application's cookie domain/SameSite configuration, expired tokens, redirect configuration, or SSO policies. A failing target is reported instead of being marked passed. Local HTTP/HTTPS fixtures exercise these session controls; the office URL has not yet been supplied for direct verification.
+
+## Accounts and projects
+
+Save role accounts in the desktop profile panel. Selecting a role inserts login after initial navigation unless the flow already specifies login. Generated login actions preserve their recorded role; credentials come from the project's `.env`.
+
+Open an existing project to append numbered runs. Previous inspection cases and numbered flow scripts remain available. Framework configurations execute numbered flow files, excluding the old canned aggregate/sanity files.
+
+`.env` contains plaintext secrets and `.qa_studio_project.json` contains Base64-encoded passwords. Base64 is encoding, not encryption. Both files are gitignored in generated projects. Do not share them with reports. Screenshots, videos, and traces capture application content and should be handled as test evidence.
+
+## Reports and generated suites
+
+The Studio writes `Complete-Suite-Test-Report/index.html` and `report-summary.json` under each output project. Only the primary flow has execution results. Advisory UI/API plans are marked `not_run`. Durations, failures, final route, screenshots, recordings and traces come from the real run. Missing evidence is shown as unavailable.
+
+Each generated language writes its own timestamped `execution-reports/<run>/` folder. Executing a generated suite never overwrites the Studio's inspection report or another language's report. Copy a report folder with its evidence subfolder for offline viewing.
+
+Dependency installation is a separate initial provisioning step for generated projects. For an offline office machine, provision/cache the Python, Node or Maven dependencies first. The Studio executable does not include all four language toolchains.
 
 ```powershell
-# Phase 1: Browser Inspector & DOM Telemetry
-.\.venv\Scripts\python.exe test_phase1.py
+# From Python_Playwright
+python -m pip install -r requirements.txt
+python -m pytest
 
-# Phase 2: LangGraph State Machine & IEEE 829 Planner
-.\.venv\Scripts\python.exe test_phase2.py
+# From TypeScript_Playwright or JavaScript_Playwright
+npm install
+npm test
 
-# Phase 3: Multi-Language POM Code Synthesizer (Python, Java, TS, JS)
-.\.venv\Scripts\python.exe test_phase3.py
-
-# Phase 4: CustomTkinter Desktop GUI & Queue Polling
-.\.venv\Scripts\python.exe test_phase4.py
-
-# Phase 4.1: Interactive Two-Step Persistent Browser Mode
-.\.venv\Scripts\python.exe test_interactive_mode.py
-
-# Phase 5: Standalone PyInstaller Executable Smoke Test
-.\.venv\Scripts\python.exe test_phase5.py
-
-# Phase 6: Multi-Account .env, Dynamic Role Selection & Multi-Day Persistence
-.\.venv\Scripts\python.exe test_phase6.py
-
-# Phase 7: Self-Contained Enterprise Reporting, Zero-Leak Sweep & Real Media Capture
-.\.venv\Scripts\python.exe test_phase7.py
+# From Java_Playwright (JDK 17+ and Maven)
+mvn test
 ```
 
----
+Set `BROWSER_CHANNEL=chrome` to use Chrome. JavaScript, TypeScript and Java default to Edge. Python tries Edge, Chrome, then bundled Chromium. Configure `BASE_URL` in the generated project's `.env`.
 
-## 📁 Generated Deliverables Structure
+CLI use: `.\.venv\Scripts\python main.py --cli --url http://localhost:8765 --flow 'Login as QA; click "Tasks"' --profile QA --output PATH_TO_EXISTING_PROJECT`
 
-Each new run creates a self-contained timestamped workspace inside the chosen output folder:
+CLI exit code is zero only when the flow passed. A generated report does not imply a successful test.
 
+## Development and verification
+
+```powershell
+.\.venv\Scripts\python -m pip install -r requirements-dev.txt
+.\.venv\Scripts\python -u -m unittest tests.test_flow_regressions tests.test_generated_execution tests.test_desktop tests.test_report_ui -v
+npm install --prefix tmp/js_runtime @playwright/test dotenv typescript @types/node
+.\.venv\Scripts\python -u -m unittest tests.test_other_languages tests.test_java -v
+.\.venv\Scripts\python -u -m unittest tests.test_deployed_auth tests.test_generated_sessions -v
+# After rebuilding the executable:
+.\.venv\Scripts\python -u -m unittest tests.test_packaged tests.test_report_ui -v
 ```
-<Output_Folder>/<sanitized_domain>_<YYYY-MM-DD_HH-MM-SS>/
-│
-├── .env                                 # Local BASE_URL, TEST_ACCESS_PROFILE, and role credentials (gitignored)
-├── .env.example                         # Safe placeholder template for Git sharing
-├── .gitignore                           # Ignores .env, .qa_studio_project.json, caches, build artifacts
-├── .qa_studio_project.json              # Local multi-day workspace state, sequence counter & encoded vault
-├── access-profiles.json                 # Maps role names to environment variable keys
-├── README.md                            # Multi-framework execution manual
-│
-├── Complete-Suite-Test-Report/          # Phase 7: 100% Offline Enterprise Test Evidence Report
-│   ├── index.html                       # Self-contained HTML report (zero external CDNs)
-│   ├── README.txt                       # Offline viewing instructions
-│   ├── report-summary.json              # Machine-readable KPI & scenario summary
-│   └── Evidence/
-│       ├── Plans/<TEST_ID>/             # Per-test IEEE 829 markdown plans
-│       ├── Screenshots/<TEST_ID>/       # Real step PNGs & final-screenshot.png
-│       ├── Recording/<TEST_ID>/         # Playable Playwright video.webm
-│       └── Trace/<TEST_ID>/             # Playwright trace.zip archive
-│
-├── docs/
-│   ├── Test_Plan_IEEE829.md             # Master append-safe IEEE 829 Corporate Test Plan
-│   └── network_har_summary.json         # Captured API telemetry & status codes
-│
-├── Python_Playwright/                   # pytest-playwright POM Framework + Report Hooks
-│   ├── pages/ (base_page.py, login_page.py, app_page.py)
-│   ├── tests/ (001_<flow>.py, test_automation_suite.py, test_ui_sanity_check.py, test_api_contract_matrix.py)
-│   └── conftest.py, pytest.ini, requirements.txt
-│
-├── Java_Playwright/                     # TestNG + Maven Framework + EnterpriseReportListener
-│   ├── pom.xml, testng.xml
-│   └── src/
-│       ├── main/java/com/corp/qa/pages/ (BasePage.java, LoginPage.java, AppPage.java)
-│       └── test/java/com/corp/qa/
-│           ├── listeners/ (EnterpriseReportListener.java)
-│           └── tests/ (BaseTest.java, Test001<Flow>.java, AutomationSuiteTest.java, ...)
-│
-├── TypeScript_Playwright/               # @playwright/test TypeScript Framework + Custom Reporter
-│   ├── package.json, playwright.config.ts, enterprise-reporter.js
-│   ├── pages/ (LoginPage.ts, AppPage.ts)
-│   └── tests/ (001_<flow>.spec.ts, automation_suite.spec.ts, ui_sanity_check.spec.ts, api_contract_matrix.spec.ts)
-│
-└── JavaScript_Playwright/               # @playwright/test JavaScript Framework + Custom Reporter
-    ├── package.json, playwright.config.js, enterprise-reporter.js
-    ├── pages/ (LoginPage.js, AppPage.js)
-    └── tests/ (001_<flow>.spec.js, automation_suite.spec.js, ui_sanity_check.spec.js, api_contract_matrix.spec.js)
+
+`tests.test_generated_execution` creates passing/failing sample projects and records their location in `tmp/latest_verification.txt`. Cross-language checks use that project. The Java check uses the local Maven wrapper cache. Generated sample failures are intentional: the regression check passes only when these failures are correctly reported.
+
+Historical `test_phase*.py` scripts test the former probe-based behavior, including placeholder evidence assumptions; the current regression suite is under `tests/`.
+
+Build without replacing the older release:
+
+```powershell
+.\.venv\Scripts\python -m PyInstaller PlaywrightEnterpriseQAStudio.spec --noconfirm --distpath dist_verified --workpath build/verified
 ```
+
+## Implementation
+
+- `core/flow_parser.py`: explicit ordered grammar; preserves unsupported instructions.
+- `core/flow_executor.py`: live control resolution, actions, assertions and per-step outcomes.
+- `core/browser_inspector.py`: browser lifecycle, login, DOM, network and real media capture.
+- `core/browser_session.py`: fresh/saved profiles, stable login checks and sanitized authentication diagnostics.
+- `agents/`: parsing, inspection, advisory planning and scaffolding pipeline.
+- `scaffolder/flow_codegen.py`: emits the actual flow for all four languages.
+- `scaffolder/runtime_pytest.py` and `scaffolder/java_runtime/`: generated execution/report lifecycle.
+- `scaffolder/runtime_auth.py` and `scaffolder/runtime_session.js`: generated authentication/session checks.
+- `core/report_generator.py`: offline inspection report with evidence-backed statuses.
+- `core/demo_portal.py`: self-contained local test application.
+- `gui/app_window.py`: desktop interface and accurate execution outcome display.
+
+See `VALIDATION.md` for findings and verification details. The earlier PDF describes the original design; this README documents the corrected behavior.
