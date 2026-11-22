@@ -1,0 +1,2 @@
+# Preserve generated PDFs byte for byte and suppress binary whitespace diffs.
+*.pdf binary
